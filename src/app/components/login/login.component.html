@@ -1,0 +1,73 @@
+  <div class="container">
+    <div class="menu_wrapper">
+      <div class="main_logo">
+        <a href="/"><img src="../assets/images/logo.svg" class="img-fluid desk_logo" alt="" /></a>
+        <!-- <a class="navbar-brand" href="#"><img src="../../../assets/images/mobile-logo.png" class="mobile-logo"
+            alt="" /></a> -->
+      </div>
+      <!-- <img src="../assets/images/My-Realty.png" class="img-fluid" alt="" -->
+      <div class="header_btn gap-2">
+        <a href="/registration" class="post_btn">Register</a>
+      </div>
+    </div>
+  </div>
+
+  <section class="login_sing">
+    <div class="login_brg">
+      <div class="login_box">
+        <form #myForm="ngForm" (ngSubmit)="onFormSubmit(myForm)">
+          <h1 class="login_sign_head">Login</h1>
+          <div class="otp-process">
+            <div>
+              <input
+                type="tel"
+                maxlength="10"
+                class="gold-form-input"
+                [(ngModel)]="contact_no"
+                [disabled]="isMobileNumberDisabled"
+                name="contact_no"
+                pattern="^\d{10}$"
+                placeholder="Enter Mobile Number"
+                (keypress)="validateNumberInput($event)"
+                (input)="validContactNumber($event)"
+                required
+              />
+              <button
+                class="form-action-btn mt-3"
+                *ngIf="!isOtpGenerated || showContactError"
+                (click)="generateOtp(contact_no)"
+                [disabled]="myForm.form.invalid"
+              >
+                Generate OTP
+              </button>
+            </div>
+            <div *ngIf="isOtpGenerated && !showContactError" class="mt-3">
+              <input
+                type="number"
+                class="gold-form-input"
+                [(ngModel)]="enteredOtp"
+                name="otp"
+                #otpInput
+                (keypress)="validateNumberInput($event)"
+                placeholder="Enter OTP"
+                required
+              />
+              <button
+                class="form-action-btn mt-3"
+                *ngIf="isOtpGenerated && !showContactError"
+                (click)="validateOtp(contact_no, otpInput.value)"
+                [disabled]="myForm.form.invalid"
+              >
+                Submit OTP
+              </button>
+            </div>
+
+            <div *ngIf="isOtpValid" class="success-message">
+              OTP successfully validated!
+            </div>
+          </div>
+        </form>
+        <a target="_blank" routerlink="/registration" class="dropdown-item  pt-2"  href="/registration">New to RealtyMart ? <span> Sign Up </span></a>
+      </div>
+    </div>
+  </section>
