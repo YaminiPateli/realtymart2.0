@@ -53,6 +53,9 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   phoneContactTouched:boolean=false;
   termsError:boolean=false;
   termsContactError:boolean=false;
+  isSendingOtp: boolean = false;
+  isContactSendingOtp: boolean = false;
+  isBrochureSendingOtp: boolean = false;
   isMobileNumberDisabled: boolean = false;
   isSubmitting = false;
   enquirySubmitted = false;
@@ -62,7 +65,6 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   formData : any = {
     username: '', // Initialize with an empty string
     useremail: '', // Initialize with an empty string
-    countrycode: 'IN +91', // Initialize with an empty string
     contact_no: null, // Initialize with null or a default number
     property_for: '', // Initialize with an empty string,
     otp: '',
@@ -71,7 +73,6 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   formDataphone: any = {
     contactusername: '',
     contactuseremail: '',
-    contactcountrycode: 'IN +91',
     contactcontact_no: null,
     contactproperty_for: '', // Initialize with an empty string,
     contactotp: '',
@@ -269,6 +270,9 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   brochureOtpVisible: boolean = false;
   brochureOtp: string = '';
   brochureOtpError: boolean = false;
+  brochureNameTouched: boolean = false;
+  brochureEmailTouched: boolean = false;
+  brochureMobileTouched: boolean = false;
 
   // Download Brochure otp
   showOTP: boolean = false;
@@ -388,8 +392,9 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     this.nameTouched = true;
     this.emailTouched = true;
     this.phoneTouched = true;
-    this.nameError = !this.formData.username;
-    this.emailError = !this.formData.useremail;
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,5}$/;
+    this.nameError = !this.formData.username?.trim() || this.formData.username.trim().length < 3;
+    this.emailError = !this.formData.useremail || !emailPattern.test(this.formData.useremail);
     this.phoneError = !this.formData.contact_no || String(this.formData.contact_no).length < 10;
     this.termsError = !this.formData.termsAccepted;
 
@@ -452,15 +457,16 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     this.phoneError = false;
     this.emailError = false;
     this.termsError = false;
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,5}$/;
 
-    if(!this.formData.username) {
+    if(!this.formData.username?.trim() || this.formData.username.trim().length < 3) {
       this.nameError=true;
     }
-    if(!this.formData.useremail)
+    if(!this.formData.useremail || !emailPattern.test(this.formData.useremail))
     {
       this.emailError=true;
     }
-    if(!this.formData.contact_no)
+    if(!this.formData.contact_no || String(this.formData.contact_no).length < 10)
     {
       this.phoneError=true;
     }
@@ -483,15 +489,16 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     this.phoneContactError = false;
     this.emailContactError = false;
     this.termsContactError = false;
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,5}$/;
 
-    if(!this.formDataphone.contactusername) {
+    if(!this.formDataphone.contactusername?.trim() || this.formDataphone.contactusername.trim().length < 3) {
       this.nameContactError=true;
     }
-    if(!this.formDataphone.contactuseremail)
+    if(!this.formDataphone.contactuseremail || !emailPattern.test(this.formDataphone.contactuseremail))
     {
       this.emailContactError=true;
     }
-    if(!this.formDataphone.contactcontact_no)
+    if(!this.formDataphone.contactcontact_no || String(this.formDataphone.contactcontact_no).length < 10)
     {
       this.phoneContactError=true;
     }
@@ -638,6 +645,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   }
 
   sendOTPToMobile() {
+    this.isSendingOtp = true;
     this.spinner.show();
     this.http
       .post(`${this.apiUrl}genrateinquiryotp`, {
@@ -662,9 +670,11 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
         else {
           this.phoneError = true;
         }
+          this.isSendingOtp = false;
           this.spinner.hide();
         },
         (error) => {
+          this.isSendingOtp = false;
           this.toastr.error('Failed to send OTP.');
           console.error('Error sending OTP', error);
           this.spinner.hide();
@@ -672,6 +682,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
       );
   }
   sendOTPContactToMobile() {
+    this.isContactSendingOtp = true;
     this.spinner.show();
     this.http
       .post(`${this.apiUrl}genrateinquiryotp`, {
@@ -696,15 +707,18 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
         else {
           this.phoneContactError = true;
         }
+          this.isContactSendingOtp = false;
           this.spinner.hide();
         },
         (error) => {
+          this.isContactSendingOtp = false;
           this.toastr.error('Failed to send OTP.');
           console.error('Error sending OTP', error);
           this.spinner.hide();
         }
       );
   }
+
   resendOTP() {
     if (this.isResendEnabled) {
       this.sendOTPToMobile(); // Logic to send OTP
@@ -748,7 +762,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     this.nameTouched = true;
     const inputValue = event.target.value;
     const companyPattern = /^[a-zA-Z\s]+$/;
-    this.nameError = !companyPattern.test(inputValue);
+    this.nameError = !companyPattern.test(inputValue) || inputValue.trim().length < 3;
   }
 
   validateEmail(event: any) {
@@ -895,7 +909,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     this.nameContactTouched = true;
     const inputValue = event.target.value;
     const companyPattern = /^[a-zA-Z\s]+$/;
-    this.nameContactError = !companyPattern.test(inputValue);
+    this.nameContactError = !companyPattern.test(inputValue) || inputValue.trim().length < 3;
   }
 
   validateContactEmail(event: any) {
@@ -1011,29 +1025,18 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   }
 
   submitFormPhone() {
-    // this.nameContactError = false;
-    // this.phoneContactError = false;
-    // this.emailContactError = false;
-    // this.termsContactError = false;
+    this.nameContactTouched = true;
+    this.emailContactTouched = true;
+    this.phoneContactTouched = true;
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,5}$/;
+    this.nameContactError = !this.formDataphone.contactusername?.trim() || this.formDataphone.contactusername.trim().length < 3;
+    this.emailContactError = !this.formDataphone.contactuseremail || !emailPattern.test(this.formDataphone.contactuseremail);
+    this.phoneContactError = !this.formDataphone.contactcontact_no || String(this.formDataphone.contactcontact_no).length < 10;
+    this.termsContactError = !this.formDataphone.termsContactAccepted;
 
-    // if(!this.formDataphone.contactusername) {
-    //   this.nameContactError=true;
-    // }
-    // if(!this.formDataphone.contactuseremail)
-    // {
-    //   this.emailContactError=true;
-    // }
-    // if(!this.formDataphone.contactcontact_no)
-    // {
-    //   this.phoneContactError=true;
-    // }
-    // if (!this.formDataphone.termsContactAccepted) {
-    //   this.termsContactError = true;
-    // }
-    // if(this.nameContactError || this.phoneContactError || this.emailContactError || this.termsContactError)
-    // {
-    //   return;
-    // }
+    if (this.nameContactError || this.phoneContactError || this.emailContactError || this.termsContactError) {
+      return;
+    }
     this.spinner.show();
     const payload = {
       contact_no :this.formDataphone.contactcontact_no,
@@ -1121,7 +1124,10 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
 
   // ===== Brochure Form Methods =====
   sendBrochureOTP() {
-    this.brochureNameError = !this.brochureFormData.name?.trim();
+    this.brochureNameTouched = true;
+    this.brochureEmailTouched = true;
+    this.brochureMobileTouched = true;
+    this.brochureNameError = !this.brochureFormData.name?.trim() || this.brochureFormData.name.trim().length < 3;
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,5}$/;
     this.brochureEmailError = !emailPattern.test(this.brochureFormData.email);
     const mobilePattern = /^[0-9]{10}$/;
@@ -1130,9 +1136,11 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
 
     if (this.brochureNameError || this.brochureEmailError || this.brochureMobileError || this.brochureTermsError) return;
 
+    this.isBrochureSendingOtp = true;
     this.spinner.show();
     this.http.post(`${this.apiUrl}genrateinquiryotp`, { contact_no: this.brochureFormData.mobile })
       .subscribe((response: any) => {
+        this.isBrochureSendingOtp = false;
         this.spinner.hide();
         if (response.data === 'ok' && response.status === true) {
           this.brochureOtpVisible = true;
@@ -1140,7 +1148,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
         } else {
           this.toastr.error('Failed to send OTP.');
         }
-      }, () => { this.spinner.hide(); this.toastr.error('Failed to send OTP.'); });
+      }, () => { this.isBrochureSendingOtp = false; this.spinner.hide(); this.toastr.error('Failed to send OTP.'); });
   }
 
   submitBrochure() {
@@ -1174,7 +1182,33 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     this.brochureMobileError = false;
     this.brochureTermsError = false;
     this.brochureOtpError = false;
+    this.brochureNameTouched = false;
+    this.brochureEmailTouched = false;
+    this.brochureMobileTouched = false;
   }
+
+  validateBrochureName(event: any) {
+    this.brochureNameTouched = true;
+    const value = event.target.value;
+    const pattern = /^[a-zA-Z\s]+$/;
+    this.brochureNameError = !pattern.test(value) || value.trim().length < 3;
+  }
+
+  validateBrochureEmail(event: any) {
+    this.brochureEmailTouched = true;
+    const value = event.target.value;
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,5}$/;
+    this.brochureEmailError = !emailPattern.test(value);
+  }
+
+  validateBrochureMobile(event: any) {
+    this.brochureMobileTouched = true;
+    const value = event.target.value;
+    const mobilePattern = /^[0-9]{10}$/;
+    this.brochureMobileError = !mobilePattern.test(value);
+  }
+
+
 
   // ===== Gallery Inline Contact Form Methods =====
   openGalleryForm(type: string) {
@@ -1204,7 +1238,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   }
 
   sendGalleryContactOTP() {
-    this.galleryContactNameErr = !this.galleryContactData.name?.trim();
+    this.galleryContactNameErr = !this.galleryContactData.name?.trim() || this.galleryContactData.name.trim().length < 3;
     const emailPat = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,5}$/;
     this.galleryContactEmailErr = !emailPat.test(this.galleryContactData.email);
     const mobilePat = /^[0-9]{10}$/;

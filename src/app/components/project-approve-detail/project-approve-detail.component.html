@@ -30,7 +30,7 @@
     </div>
 
     <!-- RERA Badge - bottom left below logo box -->
-    <div class="banner-rera-badge">
+    <div class="banner-rera-badge" *ngIf="singleproject?.rera_id">
       <span class="banner-rera-icon">R</span>
       <span class="banner-rera-text">RERA APPROVED</span>
       <span class="banner-rera-info">&#9432;</span>
@@ -1281,8 +1281,8 @@
                     />
                     <span class="form-field__check" *ngIf="nameTouched && formData.username && !nameError">&#10003;</span>
                   </div>
-                  <div *ngIf="nameTouched && nameError" class="mgs_error">Please enter name.</div>
                 </div>
+                <div *ngIf="nameTouched && nameError" class="mgs_error">Please enter a valid name (min. 3 characters).</div>
 
                 <div class="form-field mt-3">
                   <label class="form-field__label" for="useremail">Email</label>
@@ -1298,8 +1298,8 @@
                     />
                     <span class="form-field__check" *ngIf="emailTouched && formData.useremail && !emailError">&#10003;</span>
                   </div>
-                  <div *ngIf="emailTouched && emailError" class="mgs_error">Please enter a valid email address.</div>
                 </div>
+                <div *ngIf="emailTouched && emailError" class="mgs_error">Please enter a valid email address.</div>
 
                 <div class="form-field mt-3">
                   <label class="form-field__label" for="goldNum">Mobile Number</label>
@@ -1317,8 +1317,8 @@
                     />
                     <span class="form-field__check" *ngIf="phoneTouched && formData.contact_no?.toString().length === 10 && !phoneError">&#10003;</span>
                   </div>
-                  <div *ngIf="phoneTouched && phoneError" class="mgs_error">Please enter a valid 10-digit number.</div>
                 </div>
+                <div *ngIf="phoneTouched && phoneError" class="mgs_error">Please enter a valid 10-digit number.</div>
 
                 <div class="check-compare mt-3">
                   <input
@@ -1350,7 +1350,8 @@
                 <input
                   class="sub_phone"
                   type="submit"
-                  value="Submit Enquiry"
+                  [disabled]="isSendingOtp"
+                  [value]="isSendingOtp ? 'Sending OTP...' : 'Submit Enquiry'"
                 />
               </form>
               </ng-container>
@@ -1629,7 +1630,7 @@
         <!-- Name -->
         <input type="text" placeholder="Name" [(ngModel)]="galleryContactData.name"
           (keypress)="validateCharInput($event)" class="gfc-input" name="gcName" />
-        <div *ngIf="galleryContactNameErr" class="mgs_error">Please enter your name.</div>
+        <div *ngIf="galleryContactNameErr" class="mgs_error">Please enter a valid name (min. 3 characters).</div>
 
         <!-- Mobile with prefix -->
         <div class="gfc-mobile-row">
@@ -1658,7 +1659,7 @@
           <div *ngIf="galleryContactOtpErr" class="mgs_error">Please enter a valid OTP.</div>
           <button class="gfc-submit" (click)="submitGalleryContact()">Submit Enquiry</button>
         </ng-container>
-        <button *ngIf="!galleryContactOtpVisible" class="gfc-submit" (click)="sendGalleryContactOTP()">Send OTP</button>
+        <button *ngIf="!galleryContactOtpVisible" class="gfc-submit" (click)="sendGalleryContactOTP()">Submit</button>
       </div>
     </div>
 
@@ -1805,77 +1806,97 @@
         ></button>
       </div>
       <div class="modal-body">
-        <div class="m-contact__covidmsg--heading">
-          {{ brochureMode === 'brochure' ? 'Download Brochure' : 'Download Payment Plan' }}
-        </div>
-        <div class="m-contact__covidmsg--text">
-          Fill your details &amp; get the document from {{ singleproject?.project_name }} directly
-        </div>
+        <h2 class="fill_one">{{ brochureMode === 'brochure' ? 'Download Brochure' : 'Download Payment Plan' }}</h2>
+        <p class="detail_share">Fill your details &amp; get the document from {{ singleproject?.project_name }} directly</p>
 
-        <input
-          type="text"
-          name="brochureName"
-          placeholder="Name"
-          [(ngModel)]="brochureFormData.name"
-          (keypress)="validateCharInput($event)"
-          class="gold-form-input"
-        />
-        <div *ngIf="brochureNameError" class="mgs_error">Please enter your name.</div>
-
-        <input
-          type="email"
-          name="brochureEmail"
-          placeholder="Email"
-          [(ngModel)]="brochureFormData.email"
-          class="gold-form-input"
-        />
-        <div *ngIf="brochureEmailError" class="mgs_error">Please enter a valid email address.</div>
-
-        <div class="row">
-          <div class="col-md-4">
-            <select name="brochureCode" class="gold-form-input"><option value="+91">Ind +91</option></select>
+        <form>
+          <!-- Name -->
+          <div class="form-field mt-3">
+            <label class="form-field__label" for="brochureName">Name</label>
+            <div class="form-field__wrap">
+              <input
+                type="text"
+                id="brochureName"
+                name="brochureName"
+                [(ngModel)]="brochureFormData.name"
+                (input)="validateBrochureName($event)"
+                (keypress)="validateCharInput($event)"
+                required
+                class="gold-form-input my-0"
+              />
+              <span class="form-field__check" *ngIf="brochureNameTouched && brochureFormData.name && !brochureNameError">&#10003;</span>
+            </div>
           </div>
-          <div class="col-md-8">
-            <input
-              type="tel"
-              name="brochureMobile"
-              placeholder="Mobile No."
-              maxlength="10"
-              [(ngModel)]="brochureFormData.mobile"
-              (keypress)="validateNumberInput($event)"
-              class="gold-form-input"
-            />
+          <div *ngIf="brochureNameTouched && brochureNameError" class="mgs_error">Please enter a valid name (min. 3 characters).</div>
+
+          <!-- Email -->
+          <div class="form-field mt-3">
+            <label class="form-field__label" for="brochureEmail">Email</label>
+            <div class="form-field__wrap">
+              <input
+                type="email"
+                id="brochureEmail"
+                name="brochureEmail"
+                [(ngModel)]="brochureFormData.email"
+                (blur)="validateBrochureEmail($event)"
+                required
+                class="gold-form-input my-0"
+              />
+              <span class="form-field__check" *ngIf="brochureEmailTouched && brochureFormData.email && !brochureEmailError">&#10003;</span>
+            </div>
           </div>
-        </div>
-        <div *ngIf="brochureMobileError" class="mgs_error">Please enter a valid 10-digit mobile number.</div>
+          <div *ngIf="brochureEmailTouched && brochureEmailError" class="mgs_error">Please enter a valid email address.</div>
 
-        <div class="check-compare m-0">
-          <input type="checkbox" id="BrochureTerms" name="BrochureTerms" [(ngModel)]="brochureFormData.termsAccepted" class="mycheck" />
-          <label for="BrochureTerms" class="compares">I Agree to RealtyMart <a routerLink="/terms-conditions">Terms of Use</a></label>
-        </div>
-        <div *ngIf="brochureTermsError" class="mgs_error">Please agree to the terms and conditions.</div>
+          <!-- Mobile -->
+          <div class="form-field mt-3">
+            <label class="form-field__label" for="brochureMobile">Mobile Number</label>
+            <div class="form-field__wrap">
+              <input
+                type="tel"
+                id="brochureMobile"
+                name="brochureMobile"
+                maxlength="10"
+                [(ngModel)]="brochureFormData.mobile"
+                (keypress)="validateNumberInput($event)"
+                (blur)="validateBrochureMobile($event)"
+                required
+                class="gold-form-input my-0"
+              />
+              <span class="form-field__check" *ngIf="brochureMobileTouched && brochureFormData.mobile?.toString().length === 10 && !brochureMobileError">&#10003;</span>
+            </div>
+          </div>
+          <div *ngIf="brochureMobileTouched && brochureMobileError" class="mgs_error">Please enter a valid 10-digit mobile number.</div>
 
-        <div *ngIf="brochureOtpVisible" class="mt-3">
-          <input
-            type="text"
-            name="brochureOtp"
-            placeholder="Enter OTP"
-            [(ngModel)]="brochureOtp"
-            (keypress)="validateNumberInput($event)"
-            maxlength="4"
-            class="gold-form-input"
-          />
-          <div *ngIf="brochureOtpError" class="mgs_error">Please enter a valid OTP.</div>
-          <input class="sub_phone" type="button" value="Verify &amp; Download" (click)="submitBrochure()" />
-        </div>
+          <!-- Terms -->
+          <div class="check-compare mt-3">
+            <input type="checkbox" id="BrochureTerms" name="BrochureTerms" [(ngModel)]="brochureFormData.termsAccepted" class="mycheck" />
+            <label for="BrochureTerms" class="compares">I Agree to RealtyMart <a routerLink="/terms-conditions" target="_blank">Terms of Use</a></label>
+          </div>
+          <div *ngIf="brochureTermsError" class="mgs_error">Please agree to the terms and conditions.</div>
 
-        <input
-          *ngIf="!brochureOtpVisible"
-          class="sub_phone"
-          type="button"
-          value="Send OTP"
-          (click)="sendBrochureOTP()"
-        />
+          <!-- OTP -->
+          <ng-container *ngIf="brochureOtpVisible">
+            <div class="form-field mt-3">
+              <label class="form-field__label" for="brochureOtp">Enter OTP</label>
+              <div class="form-field__wrap">
+                <input
+                  type="text"
+                  id="brochureOtp"
+                  name="brochureOtp"
+                  placeholder="Enter OTP"
+                  [(ngModel)]="brochureOtp"
+                  (keypress)="validateNumberInput($event)"
+                  maxlength="4"
+                  class="gold-form-input my-0"
+                />
+              </div>
+            </div>
+            <div *ngIf="brochureOtpError" class="mgs_error">Please enter a valid OTP.</div>
+            <button type="button" class="pp-form__cta mt-2" (click)="submitBrochure()">Verify &amp; Download</button>
+          </ng-container>
+
+          <button *ngIf="!brochureOtpVisible" type="button" class="pp-form__cta mt-3" [disabled]="isBrochureSendingOtp" (click)="sendBrochureOTP()">{{ isBrochureSendingOtp ? 'Sending OTP...' : 'Submit' }}</button>
+        </form>
       </div>
     </div>
   </div>
@@ -1939,8 +1960,8 @@
               />
               <span class="form-field__check" *ngIf="nameContactTouched && formDataphone.contactusername && !nameContactError">&#10003;</span>
             </div>
-            <div *ngIf="nameContactTouched && nameContactError" class="mgs_error">Please enter name.</div>
           </div>
+          <div *ngIf="nameContactTouched && nameContactError" class="mgs_error">Please enter a valid name (min. 3 characters).</div>
 
           <div class="form-field mt-3">
             <label class="form-field__label" for="usermail">Email</label>
@@ -1956,8 +1977,8 @@
               />
               <span class="form-field__check" *ngIf="emailContactTouched && formDataphone.contactuseremail && !emailContactError">&#10003;</span>
             </div>
-            <div *ngIf="emailContactTouched && emailContactError" class="mgs_error">Please enter a valid email address.</div>
           </div>
+          <div *ngIf="emailContactTouched && emailContactError" class="mgs_error">Please enter a valid email address.</div>
 
           <div class="form-field mt-3">
             <label class="form-field__label" for="usernumber">Mobile Number</label>
@@ -1998,8 +2019,8 @@
           <div *ngIf="termsContactError" class="mgs_error">
             Please agree to the terms and conditions.
           </div>
-          <button type="submit" class="pp-form__cta">
-            {{ is_token ? "Submit Enquiry" : "Continue" }}
+          <button type="submit" class="pp-form__cta" [disabled]="isContactSendingOtp">
+            {{ isContactSendingOtp ? 'Sending OTP...' : (is_token ? 'Submit Enquiry' : 'Continue') }}
           </button>
         </form>
         </ng-container>
