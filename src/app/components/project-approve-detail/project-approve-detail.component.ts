@@ -1066,10 +1066,13 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   }
 
   resetContactForm() {
+    const name = localStorage.getItem('name') || '';
+    const email = localStorage.getItem('email') || '';
+    const phone = localStorage.getItem('contact_no') || '';
     this.formDataphone = {
-      contactusername: '',
-      contactuseremail: '',
-      contactcontact_no: '',
+      contactusername: name,
+      contactuseremail: email,
+      contactcontact_no: phone,
       termsContactAccepted: true,
     };
     this.nameContactError = false;

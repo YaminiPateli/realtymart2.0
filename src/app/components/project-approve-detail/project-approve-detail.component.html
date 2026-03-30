@@ -267,7 +267,7 @@
               <div class="col-lg-12">
                 <div class="row align-items-center">
                 <p
-                  class="buy-price p-0 col-lg-3"
+                  class="buy-price p-0 col-lg-3 ps-2"
                   *ngIf="singleproject.project_price_show == '0'"
                 >
                   ₹ {{ this.singleproject.project_minimum_price }} - ₹
@@ -1920,7 +1920,7 @@
           id="getphoneno"
           data-bs-dismiss="modal"
           aria-label="Close"
-          (click)="resetContactForm()"
+          (click)="contactEnquirySubmitted = false"
         ></button>
       </div>
       <div class="modal-body">
