@@ -31,6 +31,7 @@ export class ServicesDetailComponent implements OnInit {
   urlSegments:any;
   fullPath:any;
   activeSection: string | undefined ='about';
+  private stickyOffset: number = 0;
   // google reviews
   lat = '23.0225';
   lng = '72.5714';
@@ -287,6 +288,10 @@ export class ServicesDetailComponent implements OnInit {
     this.selectedImages.splice(index, 1);
   }
   ngAfterViewInit() {
+    const navbar = document.getElementById('navbar');
+    if (navbar) {
+      this.stickyOffset = navbar.offsetTop;
+    }
     Fancybox.bind('[data-fancybox="gallery"]', {
       // Custom options if needed
     });
@@ -378,13 +383,13 @@ export class ServicesDetailComponent implements OnInit {
 
   @HostListener('window:scroll', ['$event'])
   checkScroll() {
-    const navbar = document.getElementById("navbar");
-    const sticky = navbar?.offsetTop;
+    const navbar = document.getElementById('navbar');
+    if (!navbar) return;
 
-    if (window.pageYOffset > sticky!) {
-      navbar?.classList.add("sticky");
+    if (window.scrollY > this.stickyOffset) {
+      navbar.classList.add('sticky');
     } else {
-      navbar?.classList.remove("sticky");
+      navbar.classList.remove('sticky');
     }
   }
 
