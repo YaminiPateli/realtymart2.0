@@ -1,3 +1,5 @@
+
+
 @media only screen and (max-width: 1530px){
   .policy-info {padding: 0 50px 0 50px;}
   .titles-heading{
@@ -13,7 +15,6 @@
 button.contact-buy-btn {padding: 10px 18px;}
 .proj-gallery-image-tow img {width: 225px;}
 }
-
 @media only screen and (max-width: 1365px) {
   /* header menu  */
   .login-custom-dropdown {left: auto}
