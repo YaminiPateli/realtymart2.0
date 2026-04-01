@@ -233,6 +233,7 @@
   .banner_img{height: 323px;}
 }
 @media only screen and (min-width: 1200px) and (max-width: 1281px) {
+    .provider_flow .slick-slide img{height: 58vh;}
     .top_flore{padding: 10px 0;}
   }
 @media only screen and (max-width: 1199px){
