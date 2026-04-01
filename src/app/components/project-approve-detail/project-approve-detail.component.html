@@ -1233,7 +1233,7 @@
                 Searching for a property in The
                 {{ this.singleproject.project_name }}
               </h3>
-              <form (submit)="is_token ? submitEnquiry() : openOTPModal()">
+              <form (submit)="submitEnquiry()">
                 <!-- <div class="pp-form__fieldset">
                                   <div class="pp-form__fieldset__heading">I
                                       am</div>
@@ -1350,8 +1350,7 @@
                 <input
                   class="sub_phone"
                   type="submit"
-                  [disabled]="isSendingOtp"
-                  [value]="isSendingOtp ? 'Sending OTP...' : 'Submit Enquiry'"
+                  value="Submit Enquiry"
                 />
               </form>
               </ng-container>

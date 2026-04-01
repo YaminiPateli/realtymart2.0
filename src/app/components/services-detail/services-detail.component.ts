@@ -79,6 +79,7 @@ export class ServicesDetailComponent implements OnInit {
   emailTouched = false;
   phoneTouched = false;
   enquirySubmitted = false;
+  is_token = false;
 
   validateCharInput(event: KeyboardEvent) {
     const charCode = event.which ? event.which : event.keyCode;
@@ -133,6 +134,10 @@ export class ServicesDetailComponent implements OnInit {
       return;
     }
 
+    this.storeEnquiry();
+  }
+
+  storeEnquiry(): void {
     this.spinner.show();
     const token = localStorage.getItem('myrealtylogintoken');
     const headers = new HttpHeaders()
@@ -140,19 +145,21 @@ export class ServicesDetailComponent implements OnInit {
       .set('Accept', 'application/json');
 
     const payload = {
+      contact_no: this.enquiryForm.contact_no,
       username: this.enquiryForm.username,
       useremail: this.enquiryForm.useremail,
-      contact_no: this.enquiryForm.contact_no,
       leads_type: 'company',
-      receiver_user_id: this.singlecompany?.user_id,
       company_id: this.singlecompany?.id,
-      location: localStorage.getItem('location')
+      receiver_user_id: this.singlecompany?.user_id,
+      leads_for: '',
+      countrycode: '',
+      request_price: 0,
     };
 
     this.http.post(`${this.apiUrl}storeinquiry`, payload, { headers }).subscribe({
       next: (response: any) => {
         this.spinner.hide();
-        if (response.status === true || response.status === 1 || response.status === 'true') {
+        if (response.status === true) {
           this.enquirySubmitted = true;
           this.resetEnquiryForm();
         } else {
@@ -161,7 +168,6 @@ export class ServicesDetailComponent implements OnInit {
       },
       error: (err) => {
         this.spinner.hide();
-        console.error('Error submitting enquiry', err);
         this.toastr.error('Something went wrong. Please try again.');
       }
     });
@@ -179,6 +185,7 @@ export class ServicesDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.is_token = !!localStorage.getItem('myrealtylogintoken');
     this.fetchCompanyServiceListing();
     // this.loadGoogleMapsScript();
     this.activatedRoute.url.subscribe((segments) => {
