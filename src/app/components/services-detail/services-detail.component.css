@@ -5,6 +5,102 @@
   padding: 0;
 }
 
+/* Enquiry Modal Form */
+.mgs_error {
+  color: red;
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.form-field {
+  position: relative;
+  border-bottom: 1px solid #bbbbbb;
+  padding-bottom: 4px;
+}
+
+.form-field__label {
+  display: block;
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 2px;
+}
+
+.form-field__wrap {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.form-field__wrap .gold-form-input {
+  border-bottom: none;
+  padding: 4px 28px 4px 0;
+  font-size: 16px;
+  flex: 1;
+}
+
+.form-field__check {
+  color: #34c759;
+  font-size: 18px;
+  font-weight: bold;
+  flex-shrink: 0;
+  margin-left: 4px;
+}
+
+input.sub_phone {
+  width: 100%;
+  margin-top: 20px;
+  padding: 12px 18px;
+  background-color: #e63525;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 5px;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+
+.enquiry-thankyou {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 20px 10px 10px;
+}
+
+.enquiry-thankyou h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 4px;
+}
+
+.enquiry-thankyou__location {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 18px;
+}
+
+.enquiry-thankyou__icon svg {
+  width: 56px;
+  height: 56px;
+  margin-bottom: 12px;
+}
+
+.enquiry-thankyou__title {
+  font-size: 28px;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin-bottom: 6px;
+}
+
+.enquiry-thankyou__msg {
+  font-size: 14px;
+  color: #444;
+  margin: 0;
+}
+
+
 .banner_img {
   width: 100%;
   height: 350px;

@@ -12,7 +12,7 @@ import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { GeolocationService } from '../service/geolocation.service';
 import { ToastrService } from 'ngx-toastr';
-import { NgxSpinnerService } from 'ngx-spinner';
+import { NgxSpinnerService, NgxSpinnerModule } from 'ngx-spinner';
 import { FormsModule } from '@angular/forms';
 declare var bootstrap: any;
 
@@ -23,7 +23,7 @@ declare const google: any;
   templateUrl: './services-detail.component.html',
   styleUrls: ['./services-detail.component.css'],
   standalone: true,
-  imports: [NgbRatingModule, CommonModule, SlickCarouselModule, FormsModule],
+  imports: [NgbRatingModule, CommonModule, SlickCarouselModule, FormsModule, NgxSpinnerModule],
 })
 export class ServicesDetailComponent implements OnInit {
   tooltipVisible = false;
@@ -71,18 +71,65 @@ export class ServicesDetailComponent implements OnInit {
     contact_no: '',
     termsAccepted: false
   };
-  enquiryNameError = false;
-  enquiryEmailError = false;
-  enquiryPhoneError = false;
-  enquiryTermsError = false;
+  nameError = false;
+  emailError = false;
+  phoneError = false;
+  termsError = false;
+  nameTouched = false;
+  emailTouched = false;
+  phoneTouched = false;
+  enquirySubmitted = false;
+
+  validateCharInput(event: KeyboardEvent) {
+    const charCode = event.which ? event.which : event.keyCode;
+    const inputElement = event.target as HTMLInputElement;
+    if (charCode === 32 && inputElement.value.length === 0) { event.preventDefault(); }
+    if ((charCode < 65 || (charCode > 90 && charCode < 97) || charCode > 122) && charCode !== 32) {
+      event.preventDefault();
+    }
+  }
+
+  validateNumberInput(event: KeyboardEvent) {
+    const charCode = event.which ? event.which : event.keyCode;
+    if (charCode < 48 || charCode > 57) { event.preventDefault(); }
+  }
+
+  validateName(event: any) {
+    this.nameTouched = true;
+    const val = event.target.value;
+    this.nameError = !/^[a-zA-Z\s]+$/.test(val) || val.trim().length < 3;
+  }
+
+  validateEmail(event: any) {
+    this.emailTouched = true;
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,5}$/;
+    this.emailError = !emailPattern.test(event.target.value);
+  }
+
+  validatePhoneNumber(event: any) {
+    this.phoneTouched = true;
+    const val = event.target.value;
+    const validFormat = /^[0-9]{10}$/;
+    const allSame = /^(.)\1{9}$/.test(val);
+    const sequential = /^(0123456789|9876543210|1234567890|0987654321)$/.test(val);
+    this.phoneError = !validFormat.test(val) || allSame || sequential;
+  }
+
+  onTermsChange(event: Event) {
+    this.termsError = !(event.target as HTMLInputElement).checked;
+  }
 
   submitEnquiry(): void {
-    this.enquiryNameError = !this.enquiryForm.username;
-    this.enquiryEmailError = !this.enquiryForm.useremail;
-    this.enquiryPhoneError = !this.enquiryForm.contact_no;
-    this.enquiryTermsError = !this.enquiryForm.termsAccepted;
+    this.nameTouched = true;
+    this.emailTouched = true;
+    this.phoneTouched = true;
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,5}$/;
+    this.nameError = !this.enquiryForm.username?.trim() || this.enquiryForm.username.trim().length < 3;
+    this.emailError = !this.enquiryForm.useremail || !emailPattern.test(this.enquiryForm.useremail);
+    this.phoneError = !this.enquiryForm.contact_no || String(this.enquiryForm.contact_no).length < 10;
+    this.termsError = !this.enquiryForm.termsAccepted;
 
-    if (this.enquiryNameError || this.enquiryEmailError || this.enquiryPhoneError || this.enquiryTermsError) {
+    if (this.nameError || this.emailError || this.phoneError || this.termsError) {
       return;
     }
 
@@ -105,13 +152,11 @@ export class ServicesDetailComponent implements OnInit {
     this.http.post(`${this.apiUrl}storeinquiry`, payload, { headers }).subscribe({
       next: (response: any) => {
         this.spinner.hide();
-        if (response.status === true) {
-          this.toastr.success('We have received your inquiry. Our team will get back to you within 24 working hours.');
-          const modalEl = document.getElementById('enquiryModal');
-          if (modalEl) {
-            bootstrap.Modal.getInstance(modalEl)?.hide();
-          }
+        if (response.status === true || response.status === 1 || response.status === 'true') {
+          this.enquirySubmitted = true;
           this.resetEnquiryForm();
+        } else {
+          this.toastr.warning(response.message || 'Could not submit enquiry. Please try again.');
         }
       },
       error: (err) => {
@@ -124,10 +169,13 @@ export class ServicesDetailComponent implements OnInit {
 
   resetEnquiryForm(): void {
     this.enquiryForm = { username: '', useremail: '', contact_no: '', termsAccepted: false };
-    this.enquiryNameError = false;
-    this.enquiryEmailError = false;
-    this.enquiryPhoneError = false;
-    this.enquiryTermsError = false;
+    this.nameError = false;
+    this.emailError = false;
+    this.phoneError = false;
+    this.termsError = false;
+    this.nameTouched = false;
+    this.emailTouched = false;
+    this.phoneTouched = false;
   }
 
   ngOnInit(): void {

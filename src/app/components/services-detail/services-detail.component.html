@@ -475,57 +475,99 @@
   <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header sign-in-box">
-        <h5 class="modal-title m-0" id="enquiryModalLabel">Send Enquiry</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Close" (click)="enquirySubmitted = false"></button>
       </div>
       <div class="modal-body">
-        <h2 class="fill_one">Fill out this one - time contact form</h2>
-        <p class="detail_share">We will share advertiser's details over email</p>
-        <form #enquiryFormRef="ngForm" (ngSubmit)="submitEnquiry()">
-          <div class="mt-3">
-            <input
-              type="text"
-              name="enquiryUsername"
-              placeholder="Name"
-              class="gold-form-input my-0"
-              [(ngModel)]="enquiryForm.username"
-              required />
-            <small class="text-danger" *ngIf="enquiryNameError">Name is required.</small>
+
+        <div *ngIf="enquirySubmitted" class="enquiry-thankyou">
+          <h3 *ngIf="singlecompany?.company_name">{{ singlecompany.company_name }}</h3>
+          <p class="enquiry-thankyou__location" *ngIf="singlecompany?.city">{{ singlecompany.city }}</p>
+          <div class="enquiry-thankyou__icon">
+            <svg viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="26" cy="26" r="26" fill="#34c759"/>
+              <path d="M14 27l8 8 16-16" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
           </div>
-          <div class="mt-3">
-            <input
-              type="email"
-              name="enquiryEmail"
-              placeholder="Email"
-              class="gold-form-input my-0"
-              [(ngModel)]="enquiryForm.useremail"
-              required />
-            <small class="text-danger" *ngIf="enquiryEmailError">Email is required.</small>
-          </div>
-          <div class="mt-3">
-            <input
-              type="tel"
-              maxlength="10"
-              name="enquiryPhone"
-              placeholder="Enter Mobile Number"
-              class="gold-form-input mb-0"
-              [(ngModel)]="enquiryForm.contact_no"
-              required />
-            <small class="text-danger" *ngIf="enquiryPhoneError">Mobile number is required.</small>
-          </div>
-          <div class="check-compare mt-3">
-            <input
-              type="checkbox"
-              id="enquiryTerms"
-              name="enquiryTerms"
-              class="mycheck"
-              [(ngModel)]="enquiryForm.termsAccepted"
-              required />
-            <label for="enquiryTerms" class="compares">I Agree to RealtyMart <a href="/terms-conditions" target="_blank">Terms of Use</a></label>
-            <small class="d-block text-danger" *ngIf="enquiryTermsError">Please accept terms to continue.</small>
-          </div>
-          <button type="submit" class="pp-form__cta">Submit Enquiry</button>
-        </form>
+          <h2 class="enquiry-thankyou__title">Thank You</h2>
+          <p class="enquiry-thankyou__msg">Your interest has been sent to the Advertiser</p>
+        </div>
+
+        <ng-container *ngIf="!enquirySubmitted">
+          <h2 class="fill_one">Fill out this one - time contact form</h2>
+          <p class="detail_share">We will share advertiser's details over email</p>
+          <form (submit)="submitEnquiry()">
+
+            <div class="form-field mt-3">
+              <label class="form-field__label" for="enqName">Name</label>
+              <div class="form-field__wrap">
+                <input
+                  type="text"
+                  id="enqName"
+                  name="enquiryUsername"
+                  class="gold-form-input my-0"
+                  [(ngModel)]="enquiryForm.username"
+                  (input)="validateName($event)"
+                  (keypress)="validateCharInput($event)"
+                  maxlength="60"
+                  required />
+                <span class="form-field__check" *ngIf="nameTouched && enquiryForm.username && !nameError">&#10003;</span>
+              </div>
+            </div>
+            <div *ngIf="nameTouched && nameError" class="mgs_error">Please enter a valid name (min. 3 characters).</div>
+
+            <div class="form-field mt-3">
+              <label class="form-field__label" for="enqEmail">Email</label>
+              <div class="form-field__wrap">
+                <input
+                  type="email"
+                  id="enqEmail"
+                  name="enquiryEmail"
+                  class="gold-form-input my-0"
+                  [(ngModel)]="enquiryForm.useremail"
+                  (input)="validateEmail($event)"
+                  maxlength="100"
+                  required />
+                <span class="form-field__check" *ngIf="emailTouched && enquiryForm.useremail && !emailError">&#10003;</span>
+              </div>
+            </div>
+            <div *ngIf="emailTouched && emailError" class="mgs_error">Please enter a valid email address.</div>
+
+            <div class="form-field mt-3">
+              <label class="form-field__label" for="enqPhone">Mobile No.</label>
+              <div class="form-field__wrap">
+                <input
+                  type="tel"
+                  id="enqPhone"
+                  name="enquiryPhone"
+                  class="gold-form-input my-0"
+                  [(ngModel)]="enquiryForm.contact_no"
+                  (input)="validatePhoneNumber($event)"
+                  (keypress)="validateNumberInput($event)"
+                  maxlength="10"
+                  required />
+                <span class="form-field__check" *ngIf="phoneTouched && enquiryForm.contact_no && !phoneError">&#10003;</span>
+              </div>
+            </div>
+            <div *ngIf="phoneTouched && phoneError" class="mgs_error">Please enter a valid 10-digit mobile number.</div>
+
+            <div class="check-compare mt-3">
+              <input
+                type="checkbox"
+                id="enqTerms"
+                name="enquiryTerms"
+                class="mycheck"
+                [(ngModel)]="enquiryForm.termsAccepted"
+                (change)="onTermsChange($event)" />
+              <label for="enqTerms">
+                I Agree to RealtyMart <a routerLink="/terms-conditions">Terms of Use</a>
+              </label>
+            </div>
+            <div *ngIf="termsError" class="mgs_error">Please agree to the terms and conditions.</div>
+
+            <input class="sub_phone" type="submit" value="Submit Enquiry" />
+          </form>
+        </ng-container>
+
       </div>
     </div>
   </div>
