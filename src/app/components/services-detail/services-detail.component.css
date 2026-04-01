@@ -104,8 +104,8 @@
   border-radius: 6px;
   border: 1px solid #ddd;
   background: #fff;
-  box-shadow: 8px -14px 30px 0px rgba(0, 0, 0, 0.09);
-  padding: 28px 30px;
+  /* box-shadow: 8px -14px 30px 0px rgba(0, 0, 0, 0.09); */
+  padding: 20px 30px;
 }
 .wp_box {
   color: #e53726;

@@ -391,7 +391,7 @@ export class ServicesDetailComponent implements OnInit {
   shareonWhatsapp(){
     // const whatsappMessage = `https://api.whatsapp.com/send?text=${encodeURIComponent('Check out my amazing concept: My Amazing Website! '+this.fullPath)}`;
     // window.open(whatsappMessage, '_blank');
-    const message = `Check out my amazing concept: My Amazing Website!`;
+    const message = `Thank you for your inquiry. Our team will get back to you shortly.`;
 
 const whatsappMessage =
   `https://api.whatsapp.com/send?phone=7378373783&text=${encodeURIComponent(message)}`;

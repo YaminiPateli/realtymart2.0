@@ -3520,6 +3520,14 @@ table {
   white-space: nowrap;
   color: #444;
 }
+.slider_mg img{height: 600px; object-fit: cover;}
+
+@media (max-width: 1537px) {
+  .slider_mg img {height: 370px;}
+}
+@media (max-width: 1441px) {
+  .slider_mg img {height: 330px;}
+}
 @media (max-width: 1024px) {
   .myprofile{
     gap: 20px;
@@ -7613,7 +7621,6 @@ button.contact-ow {
   /* height: 200px; */
   object-fit: contain;
 }
-.slider_mg img{height: 600px; object-fit: cover;}
 
 .call-label {
   color: #666666;

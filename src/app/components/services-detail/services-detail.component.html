@@ -376,7 +376,7 @@
                                 </defs>
                             </svg> WhatsApp us</a>
 
-                        <a href="javascript:void(0);" class="send_enquiry d-inline-flex gap-2 align-items-center">
+                        <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#enquiryModal" class="send_enquiry d-inline-flex gap-2 align-items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                                 <g clip-path="url(#clip0_1748_301)">
                                   <mask id="mask0_1748_301" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="-1" y="-1" width="25" height="25">
@@ -469,3 +469,35 @@
       </div>
     </div>
   </div>
+</div>
+
+<div class="modal fade" id="enquiryModal" tabindex="-1" aria-labelledby="enquiryModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header sign-in-box">
+        <h5 class="modal-title m-0" id="enquiryModalLabel">Send Enquiry</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <h2 class="fill_one">Fill out this one - time contact form</h2>
+        <p class="detail_share">We will share advertiser's details over email</p>
+        <form>
+          <div class="mt-3">
+            <input type="text" name="enquiryUsername" placeholder="Name" class="gold-form-input my-0" required />
+          </div>
+          <div class="mt-3">
+            <input type="email" name="enquiryEmail" placeholder="Email" class="gold-form-input my-0" required />
+          </div>
+          <div class="mt-3">
+            <input type="tel" maxlength="10" name="enquiryPhone" placeholder="Enter Mobile Number" class="gold-form-input mb-0" required />
+          </div>
+          <div class="check-compare mt-3">
+            <input type="checkbox" id="enquiryTerms" name="enquiryTerms" class="mycheck" required />
+            <label for="enquiryTerms" class="compares">I Agree to RealtyMart <a href="/terms-conditions" target="_blank">Terms of Use</a></label>
+          </div>
+          <button type="submit" class="pp-form__cta">Submit Enquiry</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
