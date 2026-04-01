@@ -65,37 +65,37 @@ input.sub_phone {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 20px 10px 10px;
+  padding: 10px 10px 6px;
 }
 
 .enquiry-thankyou h3 {
-  font-size: 20px;
+  font-size: 17px;
   font-weight: 700;
   color: #1a1a1a;
   margin-bottom: 4px;
 }
 
 .enquiry-thankyou__location {
-  font-size: 14px;
+  font-size: 13px;
   color: #555;
-  margin-bottom: 18px;
+  margin-bottom: 10px;
 }
 
 .enquiry-thankyou__icon svg {
-  width: 56px;
-  height: 56px;
-  margin-bottom: 12px;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 8px;
 }
 
 .enquiry-thankyou__title {
-  font-size: 28px;
+  font-size: 22px;
   font-weight: 800;
   color: #1a1a1a;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .enquiry-thankyou__msg {
-  font-size: 14px;
+  font-size: 13px;
   color: #444;
   margin: 0;
 }

@@ -479,7 +479,7 @@
       </div>
       <div class="modal-body">
 
-        <div *ngIf="enquirySubmitted" class="enquiry-thankyou">
+        <div *ngIf="enquirySubmitted" class="enquiry-thankyou p-0">
           <h3 *ngIf="singlecompany?.company_name">{{ singlecompany.company_name }}</h3>
           <p class="enquiry-thankyou__location" *ngIf="singlecompany?.city">{{ singlecompany.city }}</p>
           <div class="enquiry-thankyou__icon">
@@ -559,7 +559,7 @@
                 [(ngModel)]="enquiryForm.termsAccepted"
                 (change)="onTermsChange($event)" />
               <label for="enqTerms">
-                I Agree to RealtyMart <a routerLink="/terms-conditions">Terms of Use</a>
+                I Agree to RealtyMart <a href="/terms-conditions" target="_blank">Terms of Use</a>
               </label>
             </div>
             <div *ngIf="termsError" class="mgs_error">Please agree to the terms and conditions.</div>
