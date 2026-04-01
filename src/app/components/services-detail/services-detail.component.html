@@ -6,7 +6,7 @@
             *ngIf="singlecompany.prtsrc_banner_image?.length > 0"
             [config]="slideConfig1">
             <div ngxSlickItem class="slide slider_mg" *ngFor="let banner of singlecompany.prtsrc_banner_image">
-                <img src={{banner}} alt="banner-image" width="100%">
+                <img src={{banner}} alt="banner-image" class="banner_img" width="100%">
             </div>
         </ngx-slick-carousel>
     </section>
@@ -481,19 +481,48 @@
       <div class="modal-body">
         <h2 class="fill_one">Fill out this one - time contact form</h2>
         <p class="detail_share">We will share advertiser's details over email</p>
-        <form>
+        <form #enquiryFormRef="ngForm" (ngSubmit)="submitEnquiry()">
           <div class="mt-3">
-            <input type="text" name="enquiryUsername" placeholder="Name" class="gold-form-input my-0" required />
+            <input
+              type="text"
+              name="enquiryUsername"
+              placeholder="Name"
+              class="gold-form-input my-0"
+              [(ngModel)]="enquiryForm.username"
+              required />
+            <small class="text-danger" *ngIf="enquiryNameError">Name is required.</small>
           </div>
           <div class="mt-3">
-            <input type="email" name="enquiryEmail" placeholder="Email" class="gold-form-input my-0" required />
+            <input
+              type="email"
+              name="enquiryEmail"
+              placeholder="Email"
+              class="gold-form-input my-0"
+              [(ngModel)]="enquiryForm.useremail"
+              required />
+            <small class="text-danger" *ngIf="enquiryEmailError">Email is required.</small>
           </div>
           <div class="mt-3">
-            <input type="tel" maxlength="10" name="enquiryPhone" placeholder="Enter Mobile Number" class="gold-form-input mb-0" required />
+            <input
+              type="tel"
+              maxlength="10"
+              name="enquiryPhone"
+              placeholder="Enter Mobile Number"
+              class="gold-form-input mb-0"
+              [(ngModel)]="enquiryForm.contact_no"
+              required />
+            <small class="text-danger" *ngIf="enquiryPhoneError">Mobile number is required.</small>
           </div>
           <div class="check-compare mt-3">
-            <input type="checkbox" id="enquiryTerms" name="enquiryTerms" class="mycheck" required />
+            <input
+              type="checkbox"
+              id="enquiryTerms"
+              name="enquiryTerms"
+              class="mycheck"
+              [(ngModel)]="enquiryForm.termsAccepted"
+              required />
             <label for="enquiryTerms" class="compares">I Agree to RealtyMart <a href="/terms-conditions" target="_blank">Terms of Use</a></label>
+            <small class="d-block text-danger" *ngIf="enquiryTermsError">Please accept terms to continue.</small>
           </div>
           <button type="submit" class="pp-form__cta">Submit Enquiry</button>
         </form>

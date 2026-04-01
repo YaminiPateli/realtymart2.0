@@ -1385,7 +1385,7 @@
     .amenit_box{padding: 13px;}
   }
   @media only screen and (min-width: 1200px) and (max-width: 1281px) {
-    .project_banner, .banner_img{height:66vh;}
+    .project_banner, .banner_img{height:68vh;}
     .top_flore{padding: 10px 0;}
     .fill_info h3 {font-size: 20px;line-height: 28px;}
   }

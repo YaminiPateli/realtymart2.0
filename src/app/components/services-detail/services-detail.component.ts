@@ -9,8 +9,12 @@ import { SlickCarouselModule } from 'ngx-slick-carousel';
 import { Title, Meta } from '@angular/platform-browser';
 import { environment } from 'src/environments/environment';
 import { Observable } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { GeolocationService } from '../service/geolocation.service';
+import { ToastrService } from 'ngx-toastr';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { FormsModule } from '@angular/forms';
+declare var bootstrap: any;
 
 declare const google: any;
 
@@ -19,8 +23,7 @@ declare const google: any;
   templateUrl: './services-detail.component.html',
   styleUrls: ['./services-detail.component.css'],
   standalone: true,
-  imports: [NgbRatingModule,CommonModule,
-    SlickCarouselModule,],
+  imports: [NgbRatingModule, CommonModule, SlickCarouselModule, FormsModule],
 })
 export class ServicesDetailComponent implements OnInit {
   tooltipVisible = false;
@@ -56,9 +59,76 @@ export class ServicesDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private sanitizer: DomSanitizer,
     private activatedRoute: ActivatedRoute,
-    private http:HttpClient,
-    private geolocationService: GeolocationService
+    private http: HttpClient,
+    private geolocationService: GeolocationService,
+    private toastr: ToastrService,
+    private spinner: NgxSpinnerService
   ) {}
+
+  enquiryForm = {
+    username: '',
+    useremail: '',
+    contact_no: '',
+    termsAccepted: false
+  };
+  enquiryNameError = false;
+  enquiryEmailError = false;
+  enquiryPhoneError = false;
+  enquiryTermsError = false;
+
+  submitEnquiry(): void {
+    this.enquiryNameError = !this.enquiryForm.username;
+    this.enquiryEmailError = !this.enquiryForm.useremail;
+    this.enquiryPhoneError = !this.enquiryForm.contact_no;
+    this.enquiryTermsError = !this.enquiryForm.termsAccepted;
+
+    if (this.enquiryNameError || this.enquiryEmailError || this.enquiryPhoneError || this.enquiryTermsError) {
+      return;
+    }
+
+    this.spinner.show();
+    const token = localStorage.getItem('myrealtylogintoken');
+    const headers = new HttpHeaders()
+      .set('Authorization', `Bearer ${token}`)
+      .set('Accept', 'application/json');
+
+    const payload = {
+      username: this.enquiryForm.username,
+      useremail: this.enquiryForm.useremail,
+      contact_no: this.enquiryForm.contact_no,
+      leads_type: 'company',
+      receiver_user_id: this.singlecompany?.user_id,
+      company_id: this.singlecompany?.id,
+      location: localStorage.getItem('location')
+    };
+
+    this.http.post(`${this.apiUrl}storeinquiry`, payload, { headers }).subscribe({
+      next: (response: any) => {
+        this.spinner.hide();
+        if (response.status === true) {
+          this.toastr.success('We have received your inquiry. Our team will get back to you within 24 working hours.');
+          const modalEl = document.getElementById('enquiryModal');
+          if (modalEl) {
+            bootstrap.Modal.getInstance(modalEl)?.hide();
+          }
+          this.resetEnquiryForm();
+        }
+      },
+      error: (err) => {
+        this.spinner.hide();
+        console.error('Error submitting enquiry', err);
+        this.toastr.error('Something went wrong. Please try again.');
+      }
+    });
+  }
+
+  resetEnquiryForm(): void {
+    this.enquiryForm = { username: '', useremail: '', contact_no: '', termsAccepted: false };
+    this.enquiryNameError = false;
+    this.enquiryEmailError = false;
+    this.enquiryPhoneError = false;
+    this.enquiryTermsError = false;
+  }
 
   ngOnInit(): void {
     this.fetchCompanyServiceListing();
@@ -381,7 +451,7 @@ export class ServicesDetailComponent implements OnInit {
     }
   }
 
-  @HostListener('window:scroll', ['$event'])
+  @HostListener('window:scroll')
   checkScroll() {
     const navbar = document.getElementById('navbar');
     if (!navbar) return;
