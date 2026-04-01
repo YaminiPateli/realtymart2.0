@@ -83,7 +83,9 @@ button.contact-buy-btn {padding: 10px 18px;}
 
 
 }
-
+@media only screen and (min-width: 1200px) and (max-width: 1281px) {
+    .top_flore{padding: 10px 0;}
+  }
 @media only screen and (max-width: 1199px) {
     .feature-img img {max-width: 300px;}
     .feature-btn{right: 0%;}

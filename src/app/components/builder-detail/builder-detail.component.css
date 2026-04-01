@@ -99,5 +99,5 @@ line-height: normal;
 }
 
 @media only screen and (min-width: 1200px) and (max-width: 1281px) {
-  .provider_flow .slick-slide img{height:66vh;}
+  .provider_flow .slick-slide img{height:68vh;}
 }

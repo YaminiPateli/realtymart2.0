@@ -227,8 +227,11 @@
 }
 @media only screen and (max-width: 1365px){
   /* .ft_area{padding: 13px 15px;} */
-  .banner_img{height: 300px;}
+  .banner_img{height: 323px;}
 }
+@media only screen and (min-width: 1200px) and (max-width: 1281px) {
+    .top_flore{padding: 10px 0;}
+  }
 @media only screen and (max-width: 1199px){
   .ft_box .col-lg-5{display: none;}
   .ft_box .col-lg-7{width: 100%;}
