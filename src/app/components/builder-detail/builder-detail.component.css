@@ -98,6 +98,12 @@ line-height: normal;
   padding-left: 0;
 }
 
+@media only screen and (max-width: 1537px) {
+  .provider_flow .slick-slide img{height: 72vh;}
+}
+@media only screen and (max-width: 1441px) {
+  .provider_flow .slick-slide img{height: 68vh;}
+}
 @media only screen and (min-width: 1200px) and (max-width: 1281px) {
   .provider_flow .slick-slide img{height:68vh;}
 }
