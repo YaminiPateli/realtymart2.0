@@ -256,7 +256,7 @@
                       data-bs-toggle="modal"
                       data-bs-target="#Brochure"
                       (click)="brochureMode='payment'; resetBrochureForm()"
-                      *ngIf="singleproject?.project_brochure"
+                      *ngIf="singleproject?.project_payment_brochure"
                     >
                       <span class="payment-icon">&#8377;</span>
                       Download Payment Plan
@@ -304,6 +304,7 @@
                       data-bs-toggle="modal"
                       data-bs-target="#Brochure"
                       (click)="brochureMode='payment'; resetBrochureForm()"
+                      *ngIf="singleproject?.project_payment_brochure"
                     >
                       <span class="payment-icon">&#8377;</span>
                       Download Payment Plan
@@ -1621,6 +1622,22 @@
         <!-- × close -->
         <button class="gallery-form-card-close" (click)="closeGalleryForm()">&times;</button>
 
+        <!-- Thank You state -->
+        <ng-container *ngIf="galleryContactSubmitted">
+          <div class="enquiry-thankyou">
+            <div class="enquiry-thankyou__icon">
+              <svg viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="26" cy="26" r="26" fill="#34c759"/>
+                <path d="M14 27l8 8 16-16" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h2 class="enquiry-thankyou__title">Thank You</h2>
+            <p class="enquiry-thankyou__msg">Your interest has been sent to the Advertiser</p>
+          </div>
+        </ng-container>
+
+        <!-- Form state -->
+        <ng-container *ngIf="!galleryContactSubmitted">
         <!-- Title block -->
         <div class="gfc-title">{{ singleproject?.project_name }}</div>
         <div class="gfc-location">{{ singleproject?.project_localities }}</div>
@@ -1659,6 +1676,7 @@
           <button class="gfc-submit" (click)="submitGalleryContact()">Submit Enquiry</button>
         </ng-container>
         <button *ngIf="!galleryContactOtpVisible" class="gfc-submit" (click)="sendGalleryContactOTP()">Submit</button>
+        </ng-container>
       </div>
     </div>
 

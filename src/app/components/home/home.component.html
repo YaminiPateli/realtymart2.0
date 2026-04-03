@@ -1854,7 +1854,7 @@
     </div>
   </section>
 
-  <section class="hot-deals" *ngIf="hotdeals">
+  <section class="hot-deals d-none" *ngIf="hotdeals">
     <div class="container">
       <div class="all-deals">
         <h2 class="titles-heading">Hot Deals</h2>
@@ -1916,6 +1916,60 @@
                 </div>
               </div>
             </div>
+          </ngx-slick-carousel>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="hot-deals" *ngIf="ahmedabadProjects && ahmedabadProjects.length > 0">
+    <div class="container">
+      <div class="all-deals">
+        <h2 class="titles-heading">Hot Deals</h2>
+        <div class="all-main-hots">
+          <ngx-slick-carousel class="carousel" #slickModal="slick-carousel" [config]="slideConfig2">
+            <ng-container *ngFor="let proj of ahmedabadProjects">
+            <div ngxSlickItem class="slide" *ngIf="proj?.project_minimum_price != null && proj?.project_maximum_price != null">
+              <div class="deal-slider-bar">
+                <div class="main-deals">
+                  <div class="deal-imgs">
+                    <img src="{{ proj?.project_images }}" class="img-fluid" alt="" />
+                    <div class="hot-details">
+                      <a target="_blank" routerLink="/project-details/{{ proj?.firstUrlPart }}/{{ proj?.secondUrlPart }}" class="detail-head">
+                        <h2 class="proj-Mhead">{{ proj?.project_name }}</h2>
+
+                        <p class="detail-pera">
+                          {{ proj?.builderName }}
+                        </p>
+                        <p class="ongoing-location">
+                          <span class="locator-icon">
+                            <i class="fa-sharp fa-solid fa-location-dot" style="color: #000000"></i> </span>{{
+                          proj?.prjlocalities }}
+                        </p>
+                        <div class="area-detail">
+                          <div class="availabilty">
+                            <p class="area-title">Possession:</p>
+                          </div>
+                          <div class="area">
+                            <p class="main-area">
+                              {{ getFormattedDate(proj?.project_possession_date) }}
+                            </p>
+                          </div>
+                        </div>
+                      </a>
+                    </div>
+                    <div class="deal-price">
+                      <p class="main-price-one">
+                        <span class="me-3">Price:</span>₹ {{ proj?.project_minimum_price }} - ₹ {{ proj?.project_maximum_price }}
+                      </p>
+                    </div>
+                  </div>
+
+                  <a target="_blank" routerLink="/project-details/{{ proj?.firstUrlPart }}/{{ proj?.secondUrlPart }}" class="show-deals"><i class="fa fa-thin fa-chevron-right" style="color: #ffffff"></i></a>
+                </div>
+              </div>
+            </div>
+            </ng-container>
           </ngx-slick-carousel>
         </div>
       </div>

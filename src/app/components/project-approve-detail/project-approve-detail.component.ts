@@ -297,6 +297,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   galleryContactOtpVisible: boolean = false;
   galleryContactOtp: string = '';
   galleryContactOtpErr: boolean = false;
+  galleryContactSubmitted: boolean = false;
 
   get currentAlbum(): any[] {
     if (this.galleryActiveTab === 'layout') return this.layoutAlbum;
@@ -1163,11 +1164,14 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
           const modalEl = document.getElementById('Brochure');
           if (modalEl) bootstrap.Modal.getInstance(modalEl)?.hide();
           this.galleryFormType = ''; // close gallery panel if open
-          const pdfUrl = this.singleproject?.project_brochure;
+          const baseUrl = 'https://realtymart.com/backend/public/images/';
+          const pdfUrl = this.brochureMode === 'payment'
+            ? (this.singleproject?.project_payment_brochure ? baseUrl + 'project_payment_brochure/' + this.singleproject.project_payment_brochure : null)
+            : this.singleproject?.project_brochure;
           if (pdfUrl) {
             window.open(pdfUrl, '_blank');
           } else {
-            this.toastr.info('Brochure is not available.');
+            this.toastr.info(this.brochureMode === 'payment' ? 'Payment plan is not available.' : 'Brochure is not available.');
           }
           this.resetBrochureForm();
         } else {
@@ -1238,6 +1242,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     this.galleryContactOtpVisible = false;
     this.galleryContactOtp = '';
     this.galleryContactOtpErr = false;
+    this.galleryContactSubmitted = false;
   }
 
   sendGalleryContactOTP() {
@@ -1291,9 +1296,11 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
             .subscribe((r: any) => {
               this.spinner.hide();
               if (r?.status === true) {
+                this.galleryContactSubmitted = true;
+              } else {
+                this.galleryFormType = '';
+                this.resetGalleryContactForm();
               }
-              this.galleryFormType = '';
-              this.resetGalleryContactForm();
             }, () => { this.spinner.hide(); this.galleryFormType = ''; this.resetGalleryContactForm(); });
         } else {
           this.spinner.hide();
@@ -1321,6 +1328,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   closeGallery() {
     this.galleryVisible = false;
     this.galleryFormType = '';
+    this.galleryContactSubmitted = false;
     document.body.style.overflow = '';
     document.body.style.paddingRight = '';
     document.body.classList.remove('modal-open');

@@ -81,6 +81,7 @@ export class HomeComponent implements AfterViewInit, OnInit {
   topbuilders: any;
   hotdealData: any;
   hotdeals: any;
+  ahmedabadProjects: any[] = [];
   featureCommercialData: any;
   featuredcommercials: any;
   featureResidentalData: any;
@@ -247,6 +248,7 @@ export class HomeComponent implements AfterViewInit, OnInit {
     this.checkLoggedIn();
     this.propertyServicesHomePage()
     this.loadpropertyresidential();
+    this.loadAhmedabadProjects();
     this.titleService.setTitle('Real Estate Property Portal | Real Estate Services | Buy, Sell, Rent Properties | realtymart.com');
     this.metaService.addTag({
       name: 'description',
@@ -400,6 +402,13 @@ export class HomeComponent implements AfterViewInit, OnInit {
         this.hotdealData = hotdealData;
         this.hotdeals = this.hotdealData?.data;
     });
+  }
+
+  loadAhmedabadProjects() {
+    this.http.get<any>(`${environment.apiUrl}projectincity/Ahmedabad?page=1`)
+      .subscribe((response) => {
+        this.ahmedabadProjects = response?.data?.data || [];
+      });
   }
 
   getFormattedDate(dateString: string) {
