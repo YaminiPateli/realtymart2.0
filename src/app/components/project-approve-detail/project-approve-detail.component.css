@@ -271,7 +271,7 @@ a {
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
   padding: 20px 0;
   position: sticky;
-  top: 132px;
+  top: 125px;
   /* z-index: 100; */
   z-index: 1;
   background-color: #fff;
@@ -1390,7 +1390,7 @@ input::-webkit-inner-spin-button {
 
 @media only screen and (max-width: 1537px) {
   .project_banner img {
-    height: 500px;
+    height: 535px;
   }
   .amenit_box {
     padding: 13px;
