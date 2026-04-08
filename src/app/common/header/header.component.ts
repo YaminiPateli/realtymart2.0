@@ -1,4 +1,4 @@
-import { Component, OnInit , AfterViewInit, ElementRef } from '@angular/core';
+import { Component, OnInit , AfterViewInit, ElementRef, Renderer2 } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { PropertyservicesService } from '../../components/service/propertyservices.service';
@@ -53,7 +53,8 @@ export class HeaderComponent implements AfterViewInit{
     private elementRef: ElementRef,
     private toastr: ToastrService,
     private geolocationService: GeolocationService,
-    private headerService: HeaderService
+    private headerService: HeaderService,
+    private renderer: Renderer2
   ) {
     if(this.checkToken == null || this.checkToken == undefined){
       this.checkToken = localStorage.getItem('myrealtylogintoken');
@@ -139,11 +140,112 @@ export class HeaderComponent implements AfterViewInit{
     }
   }
 
-  ngAfterViewInit(){
+
+  ngAfterViewInit() {
     setTimeout(() => {
       this.spinner.hide();
       this.loading = true;
+      this.initDropdownBehavior();
     }, 3000);
+  }
+
+  private initDropdownBehavior() {
+    const minWidth = 1200;
+    const isDesktop = () => window.innerWidth >= minWidth;
+    const self = this;
+
+    // Block Bootstrap BEFORE it opens the dropdown
+    this.renderer.listen('document', 'show.bs.dropdown', function (e: any) {
+      if (isDesktop()) {
+        e.preventDefault();
+      }
+    });
+
+    // Hover handlers
+    function showDropdown(this: HTMLElement) {
+      if (!isDesktop()) return;
+      this.classList.add('show');
+      const menu = this.querySelector('.dropdown-menu');
+      if (menu) {
+        menu.classList.add('show');
+        menu.setAttribute('data-bs-popper', 'none');
+      }
+    }
+
+    function hideDropdown(this: HTMLElement) {
+      if (!isDesktop()) return;
+      this.classList.remove('show');
+      const menu = this.querySelector('.dropdown-menu');
+      if (menu) {
+        menu.classList.remove('show');
+        menu.removeAttribute('data-bs-popper');
+      }
+    }
+
+    function handleDropdownBehavior() {
+      const toggles = document.querySelectorAll('.navbar .dropdown-toggle');
+      toggles.forEach(function (toggle, i) {
+        const toggleEl = toggle as HTMLElement;
+        const parent = toggleEl.closest('.dropdown');
+        if (!parent) return;
+        if (isDesktop()) {
+          // Step 1: Destroy Bootstrap Dropdown instance to remove its listeners
+          if ((window as any).bootstrap && (window as any).bootstrap.Dropdown) {
+            const bsInstance = (window as any).bootstrap.Dropdown.getInstance(toggleEl);
+            if (bsInstance) bsInstance.dispose();
+          }
+          // Step 2: Strip Bootstrap's data attributes
+          toggleEl.removeAttribute('data-bs-toggle');
+          toggleEl.removeAttribute('data-bs-auto-close');
+          // Step 3: Hard block click with capture listener (only once)
+          if (!(parent as any)._clickGuardAttached) {
+            (parent as any)._clickGuardAttached = true;
+            toggleEl.addEventListener('click', function (e) {
+              if (isDesktop()) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+              }
+            }, true);
+          }
+          // Step 4: Attach hover listeners (only once)
+          if (!(parent as any)._hoverAttached) {
+            (parent as any)._hoverAttached = true;
+            parent.addEventListener('mouseenter', showDropdown);
+            parent.addEventListener('mouseleave', hideDropdown);
+          }
+        } else {
+          // Mobile mode
+          if ((window as any).bootstrap && (window as any).bootstrap.Dropdown) {
+            const existingInstance = (window as any).bootstrap.Dropdown.getInstance(toggleEl);
+            if (!existingInstance) {
+              toggleEl.setAttribute('data-bs-toggle', 'dropdown');
+              new (window as any).bootstrap.Dropdown(toggleEl);
+            }
+          }
+          toggleEl.setAttribute('data-bs-toggle', 'dropdown');
+          // Remove hover listeners
+          if ((parent as any)._hoverAttached) {
+            (parent as any)._hoverAttached = false;
+            parent.removeEventListener('mouseenter', showDropdown);
+            parent.removeEventListener('mouseleave', hideDropdown);
+          }
+        }
+      });
+      // Force-close any open dropdowns when switching to desktop
+      if (isDesktop()) {
+        document.querySelectorAll('.navbar .dropdown.show').forEach(function (d) {
+          const dropdown = d as HTMLElement;
+          dropdown.classList.remove('show');
+          const menu = dropdown.querySelector('.dropdown-menu');
+          if (menu) (menu as HTMLElement).classList.remove('show');
+        });
+      }
+    }
+
+    // Listen for resize
+    window.addEventListener('resize', handleDropdownBehavior);
+    // Run on init
+    handleDropdownBehavior();
   }
 
   togglePasswordVisibility() {
