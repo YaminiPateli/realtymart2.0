@@ -932,6 +932,8 @@
             (keypress)="validateNumberInput($event)"
             maxlength="4"
             style="border-color: #00000029"
+            autocomplete="one-time-code"
+            inputmode="numeric"
           />
 
           <div *ngIf="otpError" class="mgs_error">Please enter a valid OTP.</div>

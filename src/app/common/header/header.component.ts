@@ -23,6 +23,11 @@ interface ApiResponse {
   styleUrls: ['./header.component.css'],
 })
 export class HeaderComponent implements AfterViewInit{
+  // ...existing code...
+  getDisplayUserName(): string {
+    if (!this.userName) return 'Account';
+    return this.userName.length > 10 ? this.userName.slice(0, 10) + '...' : this.userName;
+  }
   private apiUrl: string = environment.apiUrl;
   [x: string]: any;
   propertyget: any;
@@ -43,6 +48,7 @@ export class HeaderComponent implements AfterViewInit{
   city: any;
   locationFooter: any;
   validCities: string[] = ['Ahmedabad', 'Rajkot', 'Surat', 'Vadodara', 'Mumbai', 'Navi Mumbai', 'Pune', 'Bangalore', 'NCR', 'Delhi', 'Gurgaon', 'Hyderabad'];
+  userName: string | null = null;
 
   constructor(
     public http: HttpClient,
@@ -59,6 +65,9 @@ export class HeaderComponent implements AfterViewInit{
     if(this.checkToken == null || this.checkToken == undefined){
       this.checkToken = localStorage.getItem('myrealtylogintoken');
     }
+    if (this.checkToken) {
+      this.userName = localStorage.getItem('name');
+    }
 
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: 'instant' });
@@ -74,11 +83,16 @@ export class HeaderComponent implements AfterViewInit{
   ngOnInit(): void {
     this.headerService.refresh$.subscribe((refresh) => {
       if (refresh) {
-      this.getLocation();
-      this.getLocations();
-      if(this.checkToken == null || this.checkToken == undefined){
-        this.checkToken = localStorage.getItem('myrealtylogintoken');
-      }
+        this.getLocation();
+        this.getLocations();
+        if(this.checkToken == null || this.checkToken == undefined){
+          this.checkToken = localStorage.getItem('myrealtylogintoken');
+        }
+        if (this.checkToken) {
+          this.userName = localStorage.getItem('name');
+        } else {
+          this.userName = null;
+        }
         this.headerService.resetRefresh();
       }
     });
@@ -86,6 +100,11 @@ export class HeaderComponent implements AfterViewInit{
     this.getLocations();
     if(this.checkToken == null || this.checkToken == undefined){
       this.checkToken = localStorage.getItem('myrealtylogintoken');
+    }
+    if (this.checkToken) {
+      this.userName = localStorage.getItem('name');
+    } else {
+      this.userName = null;
     }
   }
 
@@ -271,8 +290,10 @@ export class HeaderComponent implements AfterViewInit{
         localStorage.removeItem('role');
         localStorage.removeItem('name');
         localStorage.removeItem('sessionId');
+        this.userName = null;
+        this.checkToken = null;
         const currentUrl = this.location.path();
-          this.headerService.triggerRefresh();
+        this.headerService.triggerRefresh();
         if(currentUrl == ''){
           window.location.reload();
         }else{

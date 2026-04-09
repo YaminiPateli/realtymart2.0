@@ -496,7 +496,7 @@ export class PropertyincityrentComponent {
     }
     let payload = {
       contact_no: this.formData.contact_no,
-      otp: this.formData.otp,
+      otp: this.formData.otp ? this.formData.otp.toString().padStart(4, '0') : '',
     };
 
     this.http.post(`${this.apiUrl}verifyinquiryotp`, payload).subscribe(

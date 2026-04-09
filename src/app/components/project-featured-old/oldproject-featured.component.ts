@@ -129,7 +129,7 @@ export class ProjectFeaturedComponent implements OnInit {
     commercialhub: 'Commercial Hub',
   };
 
-  hasKeysOrValues(obj: any): boolean {
+  hasKeysOrValues(obj: any): boolean {  
     return Object.keys(obj).some((key) => obj[key] && obj[key].length > 0);
   }
 
