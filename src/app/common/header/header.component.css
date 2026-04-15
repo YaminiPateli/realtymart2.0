@@ -1,4 +1,218 @@
-(at end of file)
+/* Custom User Dropdown Styles */
+.custom-user-dropdown {
+    min-width: 200px;
+    padding: 0;
+    border-radius: 18px;
+    border: 1px solid #e53935;
+    background: #fff;
+    margin-top: 12px !important;
+    overflow: hidden;
+}
+.user-card {
+    background: #fff5f5;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+.user-avatar {
+    width: 30px;
+    height: 30px;
+    background: #e53935;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: 700;
+}
+.user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.user-name {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #b71c1c;
+}
+.user-email {
+    font-size: 0.98rem;
+    color: #b71c1c;
+    opacity: 0.8;
+}
+.dropdown-divider {
+    height: 1px;
+    background: #f2dede;
+    margin: 0;
+}
+.user-menu-item {
+    padding: 10px;
+    cursor: pointer;
+    background: #fff;
+}
+.user-menu-item.logout {
+    color: #e53935;
+}
+.user-menu-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.user-menu-badge.active {
+    background: #e6f9ed;
+    color: #1b5e20;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 2px 10px;
+    margin-left: 8px;
+}
+.user-menu-desc {
+    font-size: 0.97rem;
+    color: #b71c1c;
+    opacity: 0.6;
+    margin-top: 2px;
+}
+.user-menu-item.logout .user-menu-desc {
+    color: #e53935;
+    opacity: 0.5;
+}
+.user-initials {
+    width: 28px;
+    height: 28px;
+    background: #b3d8e6;
+    color: #1976d2;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 15px;
+    margin-right: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.user-hi {
+    font-size: 15px;
+    color: #fff;
+    font-weight: 500;
+    max-width: 110px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-right: 4px;
+}
+
+
+/* Header Wrapper */
+.header_wrapper {
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    padding: 0;
+}
+.help_custom_dropdown, .property_service_custom_dropdown{
+left: -50%!important;
+}
+.property_service_custom_dropdown{
+left: -50vh!important;
+}
+/* Header Button Area */
+.header_btn {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    background: #e53935;
+    border-radius: 14px;
+    padding: 4px 8px 4px 10px;
+    margin-left: auto;    
+    position: relative;
+}
+.header_btn > li {
+    padding: 0;
+    background: none;
+    color: #fff;
+    font-size: 16px;
+    line-height: 1;
+    font-weight: 500;
+    border-radius: 0;
+    text-decoration: none;
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+}
+
+/* User Icon */
+.header_btn .nav-link > span:first-child {
+    width: 28px !important;
+    height: 28px !important;
+    background: #b3d8e6 !important;
+    color: #1976d2 !important;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 15px;
+    margin-right: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+}
+
+/* User Name */
+.header_btn .nav-link > span:last-child {
+    font-size: 15px;
+    color: #fff;
+    font-weight: 500;
+    max-width: 110px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-right: 4px;
+}
+
+/* POST PROPERTY FREE Button */
+.post_btn {
+    background: #fff;
+    color: #232a31;
+    border: 2px solid #fff;
+    border-radius: 12px;
+    padding: 6px 18px;
+    font-size: 15px;
+    font-weight: 500;
+    margin-left: 0;
+    transition: background 0.2s, color 0.2s;
+    display: inline-block;
+    line-height: 1.2;
+    box-shadow: none;
+}
+.post_btn span {
+    color: #e53726;
+    font-weight: 700;
+    margin-left: 2px;
+}
+.post_btn:hover {
+    background: #f5f5f5;
+    color: #232a31;
+}
+.post_btn:hover span {
+    color: #e53726;
+}
+
+/* Responsive adjustments */
+@media (max-width: 991px) {
+    .main_logo {
+        padding: 10px 0 10px 0;
+    }
+    .header_btn {
+        gap: 8px;
+    }
+    .post_btn {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+}
+/* (at end of file) */
 @media (min-width: 1200px) {
     .navbar .dropdown:hover > .dropdown-menu {
         display: block;
@@ -55,4 +269,5 @@
 .desk_logo{
     width: 150px;
 }
+
 }

@@ -1,3 +1,4 @@
+import { SubscriptionComponent } from './components/subscription/subscription.component';
 import { CUSTOM_ELEMENTS_SCHEMA, Component, NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
@@ -143,6 +144,7 @@ const routes: Routes = [
   { path: 'login', component:  LoginComponent },
   { path: 'project-approval-details/:name/:id', component: ProjectApproveDetailComponent},
   { path: 'thank-you-register', component:  ThankYouRegisterComponent },
+  { path: 'subscription', component: SubscriptionComponent },
 ];
 
 // register Swiper custom elements
@@ -206,6 +208,7 @@ register();
     PropertyincityrentComponent,
     CookieConsentComponent,
     LocationPermissionComponent,
+    SubscriptionComponent,
   ],
   imports: [
     LoginComponent,

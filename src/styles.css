@@ -516,7 +516,7 @@ select[id="ownerISD"]:focus-visible {
   /* transform: scale(0); */
   transition: all 0.5s ease-in-out;
   min-width: 50em;
-  top: 73%;
+  top: 99%;
   /* left: inherit; */
 }
 
@@ -2332,11 +2332,11 @@ ul.enq-bullet {
 }
 
 .explor-builders a {
-  padding: 14px 20px;
+  padding: 10px 20px;
   background-color: transparent;
   color: var(--grey-333333);
   border: 2px solid var(--border);
-  font-size: 16px;
+  font-size: 14px;
   line-height: 28px;
   font-weight: 600;
   border-radius: 5px;
@@ -2359,7 +2359,6 @@ ul.enq-bullet {
   border-radius: 10px 0 0 10px;
   object-fit: cover;
 }
-
 
 /* Ahmedabad builders Listing Page CSS End */
 

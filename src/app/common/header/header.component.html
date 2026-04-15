@@ -9,10 +9,79 @@
       </div>
       <!-- <img src="../assets/images/My-Realty.png" class="img-fluid" alt="" -->
       <div class="header_btn gap-2">
+        <!-- Login/Logout Button moved here -->
+        <li 
+          class="nav-item top_log dropdown" 
+          *ngIf="checkToken; else loginBlock"
+          style="display: inline-block;"
+        >
+          <a
+            class="nav-link dropdown-toggle"
+            href="#"
+            id="userDropdown"
+            data-bs-toggle="dropdown"
+            role="button"
+            aria-expanded="false"
+            style="display: flex; align-items: center;"
+          >
+            <span class="user-initials">{{ userName ? userName.charAt(0).toUpperCase() : '?' }}</span>
+            <span class="user-hi">Hi, {{ getDisplayUserName() }}</span>
+          </a>
+          <div class="custom-user-dropdown dropdown-menu" aria-labelledby="userDropdown">
+            <div class="user-card">
+              <div class="user-avatar">{{ userName ? userName.charAt(0).toUpperCase() : '?' }}</div>
+              <div class="user-info">
+                <div class="user-name">{{ getDisplayUserName() }}</div>
+              </div>
+            </div>
+            <div class="dropdown-divider"></div>
+            <div class="user-menu-item">
+              <div class="user-menu-title">
+                Subscription
+                <span class="user-menu-badge active">Active</span>
+              </div>
+              <div class="user-menu-desc">Manage your plan</div>
+            </div>
+            <div class="dropdown-divider"></div>
+            <div class="user-menu-item logout" (click)="logout()">
+              <div class="user-menu-title">Logout</div>
+              <div class="user-menu-desc">Sign out safely</div>
+            </div>
+          </div>
+        </li>
+        <ng-template #loginBlock>
+          <li 
+            class="nav-item top_log dropdown"
+            style="list-style: none; display: inline-block; margin-left: 10px;"
+          >
+            <a
+              class="nav-link dropdown-toggle"
+              href="#"
+              id="loginDropdown"
+              data-bs-toggle="dropdown"
+              role="button"
+              aria-expanded="false"
+              style="display: flex; align-items: center; color: black; padding: 0 10px;"
+            >
+              Login
+            </a>
+            <ul class="dropdown-menu login-custom-dropdown" aria-labelledby="loginDropdown">
+              <li>
+                <a class="dropdown-item" routerLink="/login">Login</a>
+              </li>
+              <li>
+                <a class="dropdown-item" routerLink="/registration">
+                  New to RealtyMart? <span>Sign Up</span>
+                </a>
+              </li>
+            </ul>
+          </li>
+        </ng-template>
         <!-- <a routerLink="/register" class="register ms-3"
           > SIGN UP</a
         > -->
         <a target="_blank" routerLink="/selling-guide" class="post_btn">POST PROPERTY <span>FREE</span></a>
+        
       </div>
     </div>
   </div>
@@ -316,42 +385,7 @@
               </div>
             </ul> -->
           <!-- </li>  -->
-           <li 
-              class="nav-item" 
-              [class.dropdown]="!checkToken"  
-            >
 
-              <!-- TOGGLE BUTTON -->
-              <a
-                class="nav-link"
-                [class.dropdown-toggle]="!checkToken"   
-                href="javascript:void(0)"
-                id="navbarDropdownMenu"
-                [attr.data-bs-toggle]="!checkToken ? 'dropdown' : null"
-                role="button"
-                aria-expanded="false"
-                (click)="checkToken && logout()"   
-              >
-                {{ checkToken ? 'Logout' : 'Login' }}
-              </a>
-
-              <!-- DROPDOWN (only visible when logged OUT) -->
-              <ul 
-                class="dropdown-menu login-custom-dropdown" 
-                *ngIf="!checkToken"
-                aria-labelledby="navbarDropdownMenu"
-              >
-                <li>
-                  <a class="dropdown-item" routerLink="/login">Login</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" routerLink="/registration">
-                    New to RealtyMart? <span>Sign Up</span>
-                  </a>
-                </li>
-              </ul>
-
-            </li>
 
         </ul>
       </div>
