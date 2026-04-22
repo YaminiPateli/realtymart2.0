@@ -121,9 +121,10 @@ export class HomeComponent implements AfterViewInit, OnInit {
   activeTab: string = 'buy';
   city: any;
   citySearch: any;
-  city1:City[]=[];
-  contact:any;
-  contactData:any;
+  city1: City[] = [];
+  filteredCity1: City[] = []; // Add this new property
+  contact: any;
+  contactData: any;
   formData: any = {
     username: '',
     useremail: '',
@@ -137,7 +138,7 @@ export class HomeComponent implements AfterViewInit, OnInit {
     selectedItemsOrder: any[] = [];
     selectedItemsPg: Array<{ id: number, name: string }> = [];
     selectedItemsHostel: Array<{ id: number, name: string }> = [];
-    propertyServices:any;
+    propertyServices: any;
     genderOptions = [
       { id: 1, name: 'Boys' },
       { id: 2, name: 'Girls' }
@@ -163,21 +164,21 @@ export class HomeComponent implements AfterViewInit, OnInit {
       'Hyderabad',
     ];
 
-    nameError:boolean=false;
-    emailError:boolean=false;
-    phoneError:boolean=false;
+    nameError: boolean = false;
+    emailError: boolean = false;
+    phoneError: boolean = false;
     otpError: boolean = false;
     isResendEnabled = false;
-    termsError:boolean=false;
+    termsError: boolean = false;
     isMobileNumberDisabled: boolean = false;
     openModel = 0;
     remainingTime: number = 60;
     private timer: any;
     isSubmitting = false;
-    proj_id:string='';
-    singleProp:any;
-    checkToken:any;
-    is_token:boolean=false;
+    proj_id: string = '';
+    singleProp: any;
+    checkToken: any;
+    is_token: boolean = false;
 
   constructor(
     public http: HttpClient,
@@ -615,11 +616,11 @@ export class HomeComponent implements AfterViewInit, OnInit {
   }
 
   
-  cars = [
-    { id: 0, name: 'Ahmedabad' },
-    { id: 1, name: 'Rajkot' },
-    { id: 2, name: 'Surat' },
-    { id: 3, name: 'Vadodara' },
+  // cars = [
+  //   { id: 0, name: 'Ahmedabad' },
+  //   { id: 1, name: 'Rajkot' },
+  //   { id: 2, name: 'Surat' },
+  //   { id: 3, name: 'Vadodara' },
     // { id: 4, name: 'Pune' },
     // { id: 5, name: 'Mumbai' },
     // { id: 6, name: 'Navi Mumbai' },
@@ -628,7 +629,7 @@ export class HomeComponent implements AfterViewInit, OnInit {
     // { id: 9, name: 'Delhi' },
     // { id: 10, name: 'Gurgaon' },
     // { id: 11, name: 'Hydrabad' },
-  ];
+  // ];
 
 
   //-------------------------------//
@@ -874,9 +875,16 @@ export class HomeComponent implements AfterViewInit, OnInit {
           cid: city.id,
           cname: city.name
         }));
+
+        // Filter to only 5 cities
+        const allowedCities = ['Ahmedabad', 'Gandhinagar', 'Rajkot', 'Surat', 'Vadodara'];
+        this.filteredCity1 = this.city1.filter(city => 
+          allowedCities.includes(city.cname)
+        );
+
         this.citySearch = response.responseData;
 
-        const defaultCity = this.city1.find(city => city.cname === this.city);
+        const defaultCity = this.filteredCity1.find(city => city.cname === this.city);
         if (defaultCity) {
           this.myForm.get('selectcitysearch')?.setValue(defaultCity.cid);
         }
@@ -886,7 +894,25 @@ export class HomeComponent implements AfterViewInit, OnInit {
       }
     );
   }
+//  fetchCities() {
+//     this.http.get<{ data: { id: number; name: string }[] }>(`${environment.apiUrl}cities`).subscribe(
+//       (response: any) => {
+//         this.city1 = response.responseData.map((city: any) => ({
+//           cid: city.id,
+//           cname: city.name
+//         }));
+//         this.citySearch = response.responseData;
 
+//         const defaultCity = this.city1.find(city => city.cname === this.city);
+//         if (defaultCity) {
+//           this.myForm.get('selectcitysearch')?.setValue(defaultCity.cid);
+//         }
+//       },
+//       (error: any) => {
+//         console.error('API Error:', error);
+//       }
+//     );
+//   }
   onSubmit() {
     if (this.myForm.invalid) {
       this.searchError = true;
