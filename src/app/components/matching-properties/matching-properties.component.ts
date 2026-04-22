@@ -4,7 +4,9 @@ import {
   HostListener,
   Input,
   OnInit,
+  OnDestroy,
   ViewChild,
+  AfterViewInit,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -14,6 +16,9 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Fancybox } from '@fancyapps/ui';
 import { ActivityTrackerService } from '../service/activitytracker.service';
 import { GeolocationService } from '../service/geolocation.service';
+import { fromEvent, Subject } from 'rxjs';
+import { debounceTime, takeUntil } from 'rxjs/operators';
+import { ChangeDetectorRef } from '@angular/core';
 declare var bootstrap: any;
 
 interface City {
@@ -26,14 +31,14 @@ interface City {
   templateUrl: './matching-properties.component.html',
   styleUrls: ['./matching-properties.component.css'],
 })
-export class MatchingPropertiesComponent {
+export class MatchingPropertiesComponent implements OnInit, AfterViewInit, OnDestroy {
   tooltipVisible = false;
   tooltipPosition = { top: '0px', left: '0px' };
   @ViewChild('otpModel') otpModel!: ElementRef;
   @ViewChild('otpContactModel') otpContactModel!: ElementRef;
   private apiUrl: string = environment.apiUrl;
   homepagesearch: any;
-  searchdata: any;
+  searchdata: any[] = [];
   original: any[] = [];
   filteredData: any[] = [];
   selectedSortOption: string = 'Relevance';
@@ -67,9 +72,12 @@ export class MatchingPropertiesComponent {
   contactData: any;
   visiblePageStart: number = 1;
   visiblePageCount: number = 5;
-  initialListCount = 5;
-  propertyToLoad = 5;
+  initialListCount: number = 4;
+  itemsPerLoad: number = 4;
   loading: boolean = false;
+  private destroy$ = new Subject<void>();
+  private intersectionObserver!: IntersectionObserver;
+  @ViewChild('propertySection') propertySection!: ElementRef;
 
   sortOptions: string[] = [
     'Relevance',
@@ -106,7 +114,8 @@ export class MatchingPropertiesComponent {
     private elementRef: ElementRef,
     private activityTrackerService: ActivityTrackerService,
     private geolocationService: GeolocationService,
-    private spinner: NgxSpinnerService
+    private spinner: NgxSpinnerService,
+    private cdr: ChangeDetectorRef
   ) {
     const navigation = this.router.getCurrentNavigation();
 
@@ -114,35 +123,6 @@ export class MatchingPropertiesComponent {
       const data = navigation.extras.state as any;
       this.searchdata = data.responseData || [];
       this.original = [...this.searchdata];
-    }
-  }
-
-  @HostListener('window:scroll', ['$event'])
-  onScroll() {
-    let offsetHeight: number;
-    if (window.innerWidth > 1144) {
-      // Desktop
-      offsetHeight = 5000;
-    } else if (window.innerWidth > 768) {
-      // Tablet
-      offsetHeight = 4000;
-    } else {
-      // Mobile
-      offsetHeight = 2000;
-    }
-
-    const scrollPosition = window.innerHeight + window.scrollY;
-    const totalHeight = document.body.offsetHeight;
-    if (
-      scrollPosition >= totalHeight - offsetHeight &&
-      !this.loading &&
-      this.initialListCount < this.searchdata.length
-    ) {
-      this.loading = true;
-      setTimeout(() => {
-        this.initialListCount += this.propertyToLoad;
-        this.loading = false;
-      }, 700);
     }
   }
 
@@ -161,6 +141,111 @@ export class MatchingPropertiesComponent {
       this.formDataphone.termsContactAccepted = true;
     }
   }
+
+  ngAfterViewInit() {
+    this.setupIntersectionObserver();
+    Fancybox.bind('[data-fancybox="gallery"]', {
+      // Custom options if needed
+    });
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+    if (this.intersectionObserver) {
+      this.intersectionObserver.disconnect();
+    }
+  }
+
+  setupIntersectionObserver() {
+    const options = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.5, // Trigger when 50% visible
+    };
+
+    this.intersectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && !this.loading) {
+          this.loadMoreItems();
+        }
+      });
+    }, options);
+
+    // Observe every 4th card
+    this.observeFourthCard();
+  }
+
+  private observeFourthCard() {
+    const propertyDivs = this.elementRef.nativeElement.querySelectorAll(
+      '.maching-myproperties'
+    );
+
+    if (propertyDivs.length > 0) {
+      // Observe the 4th card (index 3)
+      const fourthCard = propertyDivs[3];
+      if (fourthCard) {
+        this.intersectionObserver.observe(fourthCard);
+      }
+    }
+  }
+
+  loadMoreItems() {
+    this.loading = true;
+    console.log(`Loading more items. Current count: ${this.initialListCount}`);
+
+    setTimeout(() => {
+      this.initialListCount += this.itemsPerLoad;
+      this.cdr.detectChanges();
+      console.log(`Items loaded. New count: ${this.initialListCount}`);
+
+      // Keep loader visible for 1 second after items are loaded
+      setTimeout(() => {
+        this.loading = false;
+        this.cdr.detectChanges();
+
+        // Re-observe the next 4th card after loading
+        setTimeout(() => {
+          this.updateObserverToNextFourthCard();
+        }, 100);
+      }, 2000); // Loader stays for 1 second
+    }, 300);
+  }
+
+  private updateObserverToNextFourthCard() {
+    if (this.intersectionObserver) {
+      this.intersectionObserver.disconnect();
+    }
+
+    const options = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.5,
+    };
+
+    this.intersectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && !this.loading) {
+          this.loadMoreItems();
+        }
+      });
+    }, options);
+
+    const propertyDivs = this.elementRef.nativeElement.querySelectorAll(
+      '.maching-myproperties'
+    );
+
+    if (propertyDivs.length > 0) {
+      // Observe the 4th card from currently displayed items
+      const nextFourthIndex = this.initialListCount - 1; // Last visible card (or adjust as needed)
+      const targetCard = propertyDivs[nextFourthIndex];
+
+      if (targetCard) {
+        this.intersectionObserver.observe(targetCard);
+      }
+    }
+  }
+
   checkLoggedIn() {
     this.checkToken = localStorage.getItem('myrealtylogintoken');
     if (this.checkToken) {
@@ -892,14 +977,7 @@ export class MatchingPropertiesComponent {
     );
   }
 
-  ngAfterViewInit(): void {
-    Fancybox.bind('[data-fancybox="gallery"]', {
-      // Custom options if needed
-    });
-  }
-
   // Share and copy link
-
   @Input() propertyLink: string = '';
   copyLink(event: MouseEvent) {
     navigator.clipboard.writeText(this.dynamicUrl).then(
