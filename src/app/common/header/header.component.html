@@ -36,16 +36,14 @@
             </div>
             <div class="dropdown-divider"></div>
             <div class="user-menu-item">
-              <div class="user-menu-title">
+              <a class="user-menu-title" routerLink="/subscription">
                 Subscription
                 <span class="user-menu-badge active">Active</span>
-              </div>
-              <div class="user-menu-desc">Manage your plan</div>
+              </a>
             </div>
             <div class="dropdown-divider"></div>
             <div class="user-menu-item logout" (click)="logout()">
               <div class="user-menu-title">Logout</div>
-              <div class="user-menu-desc">Sign out safely</div>
             </div>
           </div>
         </li>
@@ -72,6 +70,11 @@
               <li>
                 <a class="dropdown-item" routerLink="/registration">
                   New to RealtyMart? <span>Sign Up</span>
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" routerLink="/subscription">
+                  Subscription
                 </a>
               </li>
             </ul>

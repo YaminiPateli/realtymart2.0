@@ -1,70 +1,63 @@
 <div class="subscription-wrapper">
-	<div class="subscription-table">
-		<div class="subscription-header">
-			<div class="subscription-title">Choose Your Plan</div>
-		</div>
-		<div class="subscription-body">
-			<div class="subscription-row subscription-row--head">
-				<div class="subscription-col">Features</div>
-				<div class="subscription-col subscription-col--free">FREE</div>
-				<div class="subscription-col subscription-col--basic">BASIC</div>
-				<div class="subscription-col subscription-col--pro">PRO</div>
+	<div class="container">
+		<div class="subscription-table">
+			<div class="subscription-header">
+				<div class="subscription-title">Choose Your Plan</div>
 			</div>
-			<div class="subscription-row">
-				<div class="subscription-col text-start">No. of Owners you can contact <span class="info">i</span></div>
-				<div class="subscription-col">Max 2</div>
-				<div class="subscription-col">Max 10</div>
-				<div class="subscription-col">Max 30</div>
+			<div class="subscription-body">
+				<div class="subscription-row subscription-row--head">
+					<div class="subscription-col">Features</div>
+					<div class="subscription-col subscription-col--free">FREE</div>
+					<div class="subscription-col subscription-col--basic">BASIC</div>
+					<div class="subscription-col subscription-col--pro">PRO</div>
+				</div>
+				<div class="subscription-row">
+					<div class="subscription-col text-start">No. of Owners you can contact
+					</div>
+					<div class="subscription-col">Max 2</div>
+					<div class="subscription-col">Max 10</div>
+					<div class="subscription-col">Max 30</div>
+				</div>
+				<div class="subscription-row">
+					<div class="subscription-col text-start">Unlock Owner Properties reserved for Prime Members </div>
+					<div class="subscription-col"><span class="cross">&#10005;</span></div>
+					<div class="subscription-col"><span class="tick">&#10003;</span></div>
+					<div class="subscription-col"><span class="tick">&#10003;</span></div>
+				</div>
+				<div class="subscription-row">
+					<div class="subscription-col text-start">Validity (Months)</div>
+					<div class="subscription-col">NA</div>
+					<div class="subscription-col">6</div>
+					<div class="subscription-col">6</div>
+				</div>
 			</div>
-			<div class="subscription-row">
-				<div class="subscription-col text-start">Unlock Owner Properties reserved for Prime Members <span class="info">i</span></div>
-				<div class="subscription-col"><span class="cross">&#10005;</span></div>
-				<div class="subscription-col"><span class="tick">&#10003;</span></div>
-				<div class="subscription-col"><span class="tick">&#10003;</span></div>
+			<div class="subscription-footer">
+				<div class="subscription-plan" [class.selected]="selectedPlan === 'FREE'" (click)="selectPlan('FREE')"
+					style="cursor:pointer">
+					<div class="plan-label">FREE</div>
+					<div class="plan-price">₹ 0</div>
+				</div>
+				<div class="subscription-plan" [class.selected]="selectedPlan === 'BASIC'" (click)="selectPlan('BASIC')"
+					style="cursor:pointer">
+					<div class="plan-label">BASIC</div>
+					<div class="plan-price">₹ 1599 <span class="plan-old">₹ 3198</span> <span class="plan-off">50%
+							Off</span></div>
+				</div>
+				<div class="subscription-plan" [class.selected]="selectedPlan === 'PRO'" (click)="selectPlan('PRO')"
+					style="cursor:pointer">
+					<div class="recommended">RECOMMENDED</div>
+					<div class="plan-label">PRO</div>
+					<div class="plan-price">₹ 2199 <span class="plan-old">₹ 4398</span> <span class="plan-off">50%
+							Off</span></div>
+				</div>
 			</div>
-			<div class="subscription-row">
-				<div class="subscription-col text-start">Validity (Months)</div>
-				<div class="subscription-col">NA</div>
-				<div class="subscription-col">6</div>
-				<div class="subscription-col">6</div>
+			<div class="subscription-agree">
+				<input type="checkbox" id="agree" (change)="onAgreeChange($event)" />
+				<label for="agree">I agree with <a target="_blank" routerLink="/terms-conditions">Transparency Promise</a> T&amp;C</label>
 			</div>
-		</div>
-		<div class="subscription-footer">
-			<div
-				class="subscription-plan"
-				[class.selected]="selectedPlan === 'FREE'"
-				(click)="selectPlan('FREE')"
-				style="cursor:pointer"
-			>
-				<div class="plan-label">FREE</div>
-				<div class="plan-price">₹ 0</div>
+			<div class="subscription-action">
+				<button class="btn-continue" [disabled]="!canContinue">{{ continueButtonText }}</button>
 			</div>
-			<div
-				class="subscription-plan"
-				[class.selected]="selectedPlan === 'BASIC'"
-				(click)="selectPlan('BASIC')"
-				style="cursor:pointer"
-			>
-				<div class="plan-label">BASIC</div>
-				<div class="plan-price">₹ 1599 <span class="plan-old">₹ 3198</span> <span class="plan-off">50% Off</span></div>
-			</div>
-			<div
-				class="subscription-plan"
-				[class.selected]="selectedPlan === 'PRO'"
-				(click)="selectPlan('PRO')"
-				style="cursor:pointer"
-			>
-				<div class="recommended">RECOMMENDED</div>
-				<div class="plan-label">PRO</div>
-				<div class="plan-price">₹ 2199 <span class="plan-old">₹ 4398</span> <span class="plan-off">50% Off</span></div>
-			</div>
-		</div>
-		<div class="subscription-agree">
-			<input type="checkbox" id="agree" (change)="onAgreeChange($event)" />
-			<label for="agree">I agree with <a href="#">Transparency Promise</a> T&amp;C</label>
-		</div>
-		<div class="subscription-action">
-			<button class="btn-continue" [disabled]="!canContinue">{{ continueButtonText }}</button>
 		</div>
 	</div>
 </div>
