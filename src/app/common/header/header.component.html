@@ -10,7 +10,7 @@
       <!-- <img src="../assets/images/My-Realty.png" class="img-fluid" alt="" -->
       <div class="header_btn gap-2">
         <!-- Login/Logout Button moved here -->
-        <li 
+        <!-- <li 
           class="nav-item top_log dropdown" 
           *ngIf="checkToken; else loginBlock"
           style="display: inline-block;"
@@ -79,7 +79,7 @@
               </li>
             </ul>
           </li>
-        </ng-template>
+        </ng-template> -->
         <!-- <a routerLink="/register" class="register ms-3"
           > SIGN UP</a
         > -->
@@ -350,7 +350,7 @@
               </div>
             </ul>
           </li>
-          <!-- <li class="nav-item dropdown"> -->
+          <li class="nav-item dropdown"> 
             <!-- <a class="nav-link dropdown-toggle" routerLink="javascript:void(0)" id="navbarDropdown"
               data-bs-toggle="dropdown" role="button" aria-expanded="false" *ngIf="checkToken == null">
               Login
@@ -359,7 +359,7 @@
               role="button" aria-expanded="false" *ngIf="checkToken != null">
               Logout
             </a> -->
-             <!-- <a 
+             <a 
                 class="nav-link dropdown-toggle" 
                 href="javascript:void(0)" 
                 id="navbarDropdownMenu" 
@@ -368,8 +368,8 @@
                 aria-expanded="false"
               >
                 {{ checkToken ? 'Logout' : 'Login' }}
-              </a> -->
-           <!-- <ul class="dropdown-menu login-custom-dropdown" aria-labelledby="navbarDropdown">
+              </a>
+           <ul class="dropdown-menu login-custom-dropdown" aria-labelledby="navbarDropdown">
               <div class="row">
                 <div class="">
                   
@@ -386,8 +386,8 @@
                   </li>
                 </div>
               </div>
-            </ul> -->
-          <!-- </li>  -->
+            </ul>
+          </li> 
 
 
         </ul>
