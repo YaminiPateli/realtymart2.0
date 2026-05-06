@@ -131,7 +131,14 @@ export class LoginComponent {
       .post(`${this.apiUrl}generateotp`, { contact_no: this.contact_no })
       .subscribe(
         (response: any) => {
-          if (response?.code == 1) {
+          // Handle new response format { status: false, message: "Number not registered!" }
+        if (response?.status === false) {
+          this.toastr.error(
+            response.message || 'Number not registered!',
+            'Mobile Number Not Registered'   // Title
+          );
+        }
+          else if (response?.code == 1) {
             this.toastr.error('The mobile number you entered is not registered!');
           } else if (response?.code == 2) {
             this.toastr.error("Your Profile is under review. You can log in once it's approved.!");
