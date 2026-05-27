@@ -30,7 +30,7 @@
     </div>
 
     <!-- RERA Badge - bottom left below logo box -->
-    <div class="banner-rera-badge" *ngIf="singleproject?.rera_id">
+    <div class="banner-rera-badge" *ngIf="singleproject?.project_rera_id">
       <span class="banner-rera-icon">R</span>
       <span class="banner-rera-text">RERA APPROVED</span>
       <span class="banner-rera-info">&#9432;</span>
@@ -715,36 +715,6 @@
             </div>
           </div>
 
-          <div
-            class="gallery"
-            *ngIf="singleproject.project_images?.length > 0 || singleproject.project_images_3d?.length > 0"
-          >
-            <h3 class="companies-names">Gallery</h3>
-            <ngx-slick-carousel
-              class="carousel project_slider"
-              #slickModal="slick-carousel"
-              [config]="slideConfig3"
-            >
-              <div
-                ngxSlickItem
-                class="slide"
-                *ngFor="let gallery of singleproject.project_images"
-              >
-                <div class="gallery_box">
-                  <div class="gallery">
-                    <!-- Adding data-fancybox for Fancybox functionality -->
-                    <a routerLink="{{ gallery }}" data-fancybox="gallery">
-                      <img
-                        src="{{ gallery }}"
-                        alt="Gallery Image"
-                        class="img-fluid"
-                      />
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </ngx-slick-carousel>
-          </div>
 
           <div
             class="specifications"
