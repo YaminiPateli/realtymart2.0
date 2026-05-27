@@ -45,6 +45,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { ActivityTrackerService } from '../service/activitytracker.service';
 import { PropertyplotService } from '../service/propertyplot.service';
 import { HeaderService } from '../service/header.service';
+import { FilteredCities } from 'src/app/filteredcities';
 declare var bootstrap: any;
 interface City {
   cid: number;
@@ -870,6 +871,7 @@ export class HomeComponent implements AfterViewInit, OnInit {
   fetchCities() {
     this.http.get<{ data: { id: number; name: string }[] }>(`${environment.apiUrl}cities`).subscribe(
       (response: any) => {
+        response.responseData = response.responseData.filter((city:{ id: number; name: string }) => FilteredCities.includes(city.name));
         this.city1 = response.responseData.map((city: any) => ({
           cid: city.id,
           cname: city.name

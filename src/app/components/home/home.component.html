@@ -24,6 +24,13 @@
                 Rent
               </button>
             </li>
+             <li class="nav-item" role="presentation">
+              <button class="nav-link" id="pills-Hostel-tab" data-bs-toggle="pill" data-bs-target="#pills-Hostel"
+                type="button" role="tab" aria-controls="pills-Hostel" aria-selected="false"
+                (click)="handleTabClick('commercial')">
+                Commercial
+              </button>
+            </li>
             <li class="nav-item" role="presentation">
               <button class="nav-link" id="pills-Farmhouse-tab" data-bs-toggle="pill" data-bs-target="#pills-Farmhouse"
                 type="button" role="tab" aria-controls="pills-Farmhouse" (click)="handleTabClick('farm house')"
@@ -42,13 +49,6 @@
               <button class="nav-link" id="pills-pg-tab" data-bs-toggle="pill" data-bs-target="#pills-pg" type="button"
                 role="tab" aria-controls="pills-pg" aria-selected="false" (click)="handleTabClick('pg')">
                 PG
-              </button>
-            </li>
-            <li class="nav-item" role="presentation">
-              <button class="nav-link" id="pills-Hostel-tab" data-bs-toggle="pill" data-bs-target="#pills-Hostel"
-                type="button" role="tab" aria-controls="pills-Hostel" aria-selected="false"
-                (click)="handleTabClick('commercial')">
-                Commercial
               </button>
             </li>
           </ul>
@@ -2045,7 +2045,7 @@
       <div class="row">
        
         <div class="col-lg-12 col-md-12 col-sm-12 ps-0 ps-lg-0 ps-md-3">
-          <a target="_blank"
+          <a target="_blank" *ngIf = "bannerbuilder[0]"
             routerLink="project-details/{{ bannerbuilder[0].projectfirstUrlPart }}/{{ bannerbuilder[0].projectsecondUrlPart }}">
             <img src="{{ bannerbuilder[0].project_banner_img }}" alt="" class="img-fluid group-main-img" />
           </a>
@@ -2125,7 +2125,7 @@
           </div>
         </div> -->
         <div class="col-lg-12 col-md-12 col-sm-12 ps-0 ps-lg-0 ps-md-3">
-          <a target="_blank"
+          <a target="_blank" *ngIf="bannerbuilder[1]"
             routerLink="project-details/{{ bannerbuilder[1].projectfirstUrlPart }}/{{ bannerbuilder[1].projectsecondUrlPart }}">
             <img src="{{ bannerbuilder[1].project_banner_img }}" alt="" class="img-fluid group-main-img" />
           </a>
@@ -2257,7 +2257,7 @@
           </div>
         </div> -->
         <div class="col-lg-12 col-md-12 col-sm-12 ps-0 ps-lg-0 ps-md-3">
-          <a target="_blank"
+          <a target="_blank" *ngIf="bannerbuilder[2]"
             routerLink="project-details/{{ bannerbuilder[2].projectfirstUrlPart }}/{{ bannerbuilder[2].projectsecondUrlPart }}">
             <img src="{{ bannerbuilder[2].project_banner_img }}" alt="" class="img-fluid group-main-img" />
           </a>
