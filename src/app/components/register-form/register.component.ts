@@ -108,6 +108,7 @@ export class RegisterComponent implements OnDestroy {
   openModel = 0;
   selectedService: string = '';
   remainingTime: number = 60;
+  isLoading = true;
   private timer: any;
   constructor(
     private http: HttpClient,
@@ -437,6 +438,7 @@ export class RegisterComponent implements OnDestroy {
     return this.formData.register_as === 'service-provider';
   }
   sendOTPToMobile() {
+    this.isLoading = true;
     this.spinner.show();
     this.http
       .post(`${this.apiUrl}sendotp`, {
@@ -445,8 +447,7 @@ export class RegisterComponent implements OnDestroy {
       .subscribe(
         (response: any) => {
           if(response.data =='ok') {
-          this.startTimer();
-          if (response.status === true) {
+            if (response.status === true) {
             // this.sendOTPToMobile();
             const modalElement = this.otpModel.nativeElement;
             const modal = new bootstrap.Modal(modalElement);
@@ -463,12 +464,15 @@ export class RegisterComponent implements OnDestroy {
         else {
           this.phoneError = true;
         }
-          this.spinner.hide();
+        this.spinner.hide();
+        this.isLoading = false;
+        this.startTimer();
         },
         (error) => {
           this.toastr.error('Failed to send OTP.');
           console.error('Error sending OTP', error);
           this.spinner.hide();
+          this.isLoading = false;
         }
       );
   }

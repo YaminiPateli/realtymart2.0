@@ -276,7 +276,8 @@ export class HeaderComponent implements AfterViewInit{
         if(currentUrl == ''){
           window.location.reload();
         }else{
-          this.route.navigate(['/']);
+          // this.route.navigate(['/']);
+          window.location.href = '/'
         }
       }
     });

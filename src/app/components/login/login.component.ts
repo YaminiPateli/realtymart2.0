@@ -131,6 +131,9 @@ export class LoginComponent {
       .post(`${this.apiUrl}generateotp`, { contact_no: this.contact_no })
       .subscribe(
         (response: any) => {
+          if(response.status === false){
+            this.toastr.error(response.message);
+          }
           if (response?.code == 1) {
             this.toastr.error('The mobile number you entered is not registered!');
           } else if (response?.code == 2) {
@@ -187,7 +190,7 @@ export class LoginComponent {
         }
       },
       (error) => {
-        console.error('Error sending data', error);
+        this.toastr.error(error.error.message);
       }
     );
   }

@@ -185,10 +185,15 @@
                 </div>
                 <div class="modal-footer border-0 flex-column text-center">
                   <button type="button" class="btn reg_sub" (click)="verifyOTP()">
-                    Verify
+                    
+                      <span *ngIf="!isLoading" class="text-light">Verify</span>
+                      
+                      <span *ngIf="isLoading" class="text-light">
+                        <span class="btn-spinner"></span> Processing...
+                      </span>
                   </button>
                   <div>
-                    <label *ngIf="!isResendEnabled" class="resend-label mb-3" style="cursor: pointer">
+                    <label *ngIf="!isResendEnabled && !isLoading" class="resend-label mb-3" style="cursor: pointer">
                       You will receive OTP within
                       <b style="color: #ff5444"> 00:{{ remainingTime }}</b>
                       seconds
