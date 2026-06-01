@@ -26,6 +26,8 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   @ViewChild('otpContactModel') otpContactModel!: ElementRef;
   private apiUrl: string = environment.apiUrl;
   @ViewChild('descriptionElem') descriptionElem!: ElementRef;
+  @ViewChild('slider') slider!: ElementRef;
+
   @Input() item: any;
   @Input() latitude!: any;
   @Input() longitude!: any;
@@ -82,6 +84,208 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   isResendEnabled = false;
   openModel = 0;
   remainingTime: number = 60;
+  reels = [
+    {
+      title: 'Reel 1',
+      videoUrl: ''
+    },
+    {
+      title: 'Reel 2',
+      videoUrl: ''
+    },
+    {
+      title: 'Reel 3',
+      videoUrl: ''
+    }
+  ];
+  selectedType = '2bhk';
+  floorPlans = {
+  '2bhk': {
+    area: '700 SqFt',
+    image: './assets/images/floor_plan.png'
+  },
+  '3bhk': {
+    area: '950 SqFt',
+    image: './assets/images/floor_plan.png'
+  }
+  };
+
+  markerPosition: google.maps.LatLngLiteral = {
+    lat: 22.2865,
+    lng: 73.1812
+  };
+
+  amenities = [
+    {
+      name: 'Parking',
+      icon: '../../assets/images/parking_icon.png'
+    },
+    {
+      name: 'Lift',
+      icon: '../../assets/images/lift.png'
+    },
+    {
+      name: 'Power Backup',
+      icon: '../../assets/images/power_backup.png'
+    },
+    {
+      name: 'Gas Pipeline',
+      icon: '../../assets/images/gas_pipeline.png'
+    },
+    {
+      name: 'Park',
+      icon: '../../assets/images/park.png'
+    },
+    {
+      name: 'Gymnasium',
+      icon: '../../assets/images/gym.png'
+    },
+    {
+      name: 'Swimming Pool',
+      icon: '../../assets/images/pool.png'
+    },
+    {
+      name: 'Club House',
+      icon: '../../assets/images/club_house.png'
+    }
+  ];
+
+    developerProjects = [
+    {
+      name: 'Sarang Lakeview',
+      image: '../../../assets/images/slider-img-1.png'
+    },
+    {
+      name: 'Sarang Lakeview',
+      image: '../../../assets/images/slider-img-1.png'
+    },
+    {
+      name: 'Sarang Lakeview',
+      image: '../../../assets/images/slider-img-1.png'
+    },
+    {
+      name: 'Sarang Lakeview',
+      image: '../../../assets/images/slider-img-1.png'
+    }
+  ];
+
+
+  specifications = [
+    {
+      title: 'Flooring',
+      points: [
+        'Italian marble kitchen / dinning / livingroom and full body vitrified tiles in bedrooms'
+      ]
+    },
+    {
+      title: 'RCC',
+      points: [
+        'Quality controlled earth quake resistant, r.c.c. frame structure'
+      ]
+    },
+    {
+      title: 'Kitchen',
+      points: [
+        'Granite platform with ss sink.',
+        'Decorative tiles dado up to lintel level.'
+      ]
+    },
+    {
+      title: 'Kitchen Wash Area',
+      points: [
+        'Dado of glazed tiles.',
+        'Electric point for washing machine.'
+      ]
+    },
+    {
+      title: 'Bathroom Plumbing',
+      points: [
+        'Sanitary ware & c.p. fitting jaquar / kohler / toto or equivalent.',
+        'Floor-antiskid floor tiles with designers wall tiles up to lintel level.'
+      ]
+    },
+    {
+      title: 'Doors',
+      points: [
+        'Main door: flush doors with laminate finish.',
+        'Other doors: flush doors.'
+      ]
+    },
+    {
+      title: 'Windows',
+      points: [
+        'Sliders dgu glass.',
+        'Full body vitrified'
+      ]
+    },
+    {
+      title: 'Electrification',
+      points: [
+        'Adequate points as per architecture drawings.',
+        'Concealed 3 phase electrification with good quality isi copper wire / cable.',
+        'Branded modular switches, accessories and distribution board with mcb & elcb.'
+      ]
+    },
+    {
+      title: 'Paint',
+      points: [
+        'Internal walls finished with wall putty.',
+        'External walls with textured apex paint.'
+      ]
+    },
+    {
+      title: 'Lift',
+      points: [
+        'Fully automatic elevators.'
+      ]
+    },
+    {
+      title: 'Terrace',
+      points: [
+        'China mosaic with required water proofing on terrace.'
+      ]
+    }
+  ];
+
+  faqs = [
+    {
+      question: 'How to calculate the value of the property?',
+      answer: 'Precision in property valuation demands a skilled touch. When it comes to determining the true worth of your property, enlist the assistance of property valuation professionals. These experts possess a wealth of knowledge regarding the dynamic property market, enabling them to provide you with a precise and well-informed assessment.'
+    },
+    {
+      question: 'What is the fair market value of the property?',
+      answer: 'Fair market value is the estimated price at which a property would sell in the open market under normal conditions.'
+    },
+    {
+      question: 'Services included in the home valuation process',
+      answer: 'Property inspection, market analysis, area evaluation, legal verification and final valuation report.'
+    },
+    {
+      question: 'Types of property valuation methods',
+      answer: 'Sales comparison approach, income approach, cost approach and residual valuation methods.'
+    },
+    {
+      question: 'Documents required for property valuation',
+      answer: 'Sale deed, property tax receipts, approved plan, ownership documents and utility bills.'
+    }
+  ];
+
+galleryImages = [
+  '../../../assets/images/gallary_img.png',
+  '../../../assets/images/gallery-2.jpg',
+  '../../../assets/images/gallery-3.jpg',
+  '../../../assets/images/gallery-4.jpg',
+  '../../../assets/images/gallery-5.jpg',
+  '../../../assets/images/gallery-6.jpg'
+];
+
+ showViewer = true;
+
+  currentIndex = 4;
+
+  zoomLevel = 1;
+  googleMapUrl =
+    'https://www.google.com/maps?q=22.2865,73.1812';
   private timer: any;
   constructor(
     private titleService: Title,
@@ -129,6 +333,10 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     });
 }
 
+
+  playReel(reel: any) {
+    console.log(reel);
+  }
 
   getFormattedDate(dateString: string) {
     // return this.datePipe.transform(dateString, 'MMMM, yyyy');
@@ -720,6 +928,20 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
       );
   }
 
+  slideLeft() {
+    this.slider.nativeElement.scrollBy({
+      left: -320,
+      behavior: 'smooth'
+    });
+  }
+
+  slideRight() {
+    this.slider.nativeElement.scrollBy({
+      left: 320,
+      behavior: 'smooth'
+    });
+  }
+
   resendOTP() {
     if (this.isResendEnabled) {
       this.sendOTPToMobile(); // Logic to send OTP
@@ -1309,33 +1531,6 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
       }, () => { this.spinner.hide(); this.toastr.error('Something went wrong.'); });
   }
 
-  // ===== Gallery Methods =====
-  openGallery(tab: string = 'photos', index: number = 0) {
-    // default to first available tab
-    if (tab === 'photos' && this.photoAlbum.length === 0) {
-      if (this.layoutAlbum.length > 0) tab = 'layout';
-      else if (this.videoAlbum.length > 0) tab = 'video';
-    }
-    this.galleryActiveTab = tab;
-    this.galleryActiveIndex = index;
-    this.galleryZoom = 1;
-    this.galleryFormType = '';
-    this.galleryVisible = true;
-    document.body.style.overflow = 'hidden';
-    document.body.classList.add('gallery-open');
-  }
-
-  closeGallery() {
-    this.galleryVisible = false;
-    this.galleryFormType = '';
-    this.galleryContactSubmitted = false;
-    document.body.style.overflow = '';
-    document.body.style.paddingRight = '';
-    document.body.classList.remove('modal-open');
-    document.body.classList.remove('gallery-open');
-    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
-  }
-
   ngOnDestroy(): void {
     document.body.style.overflow = '';
     document.body.style.paddingRight = '';
@@ -1402,14 +1597,6 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     return tabs;
   }
 
-  zoomIn() {
-    if (this.galleryZoom < 3) this.galleryZoom = parseFloat((this.galleryZoom + 0.5).toFixed(1));
-  }
-
-  zoomOut() {
-    if (this.galleryZoom > 1) this.galleryZoom = parseFloat((this.galleryZoom - 0.5).toFixed(1));
-  }
-
   // ===== Review Methods =====
   openReviewModal() {
     if (!this.is_token) {
@@ -1469,6 +1656,52 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     this.reviewRatingError = false;
     this.hoveredReviewRating = 0;
   }
+
+   previousImage() {
+    if (this.currentIndex > 0) {
+      this.currentIndex--;
+    } else {
+      this.currentIndex = this.galleryImages.length - 1;
+    }
+  }
+
+  nextImage() {
+    if (this.currentIndex < this.galleryImages.length - 1) {
+      this.currentIndex++;
+    } else {
+      this.currentIndex = 0;
+    }
+  }
+
+  selectImage(index: number) {
+    this.currentIndex = index;
+  }
+
+  zoomIn() {
+    this.zoomLevel += 0.2;
+  }
+
+  zoomOut() {
+    if (this.zoomLevel > 1) {
+      this.zoomLevel -= 0.2;
+    }
+  }
+
+  closeViewer() {
+    this.showViewer = false;
+  }
+
+  toggleFullscreen() {
+
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+    } else {
+      document.exitFullscreen();
+    }
+
+  }
+
+
   // toggleShowMore(category: string): void {
   //   this.showMore[category] = !this.showMore[category];
   // }
