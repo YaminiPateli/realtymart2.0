@@ -21,12 +21,6 @@
         alt="Project Logo"
         class="banner-logo-img"
       />
-      <img
-        *ngIf="singleproject?.aboutdeveloper?.builderLogo"
-        src="{{ singleproject.aboutdeveloper.builderLogo }}"
-        alt="Builder Logo"
-        class="banner-logo-img"
-      />
     </div>
 
     <!-- RERA Badge - bottom left below logo box -->
@@ -1039,7 +1033,7 @@
                               {{ item.name }}
                             </div>
                             <span class="pdp__landmarks__card__item--bold">
-                              ({{ item.distance_km }} Km)
+                              ({{ item.distance_km }})
                             </span>
                           </div>
                         </ng-container>
@@ -1644,11 +1638,14 @@
     <div class="gallery-thumbnails-row" *ngIf="currentAlbum.length > 0">
       <button class="gallery-thumb-nav" (click)="prevGalleryImage()">&#8249;</button>
       <div class="gallery-thumbnails" id="galleryThumbs">
-        <div class="gallery-thumb" *ngFor="let img of currentAlbum; let i = index"
+        <div class="gallery-thumb" *ngFor="let item of currentAlbum; let i = index"
           [class.active]="i === galleryActiveIndex"
           (click)="setGalleryImage(i)">
-          <img *ngIf="galleryActiveTab !== 'video'" [src]="img" alt="thumb" />
-          <div *ngIf="galleryActiveTab === 'video'" class="gallery-thumb-video">&#9654;</div>
+          <img *ngIf="galleryActiveTab !== 'video'" [src]="item" alt="thumb" />
+          <div *ngIf="galleryActiveTab === 'video'" class="gallery-thumb-video">
+            <img *ngIf="item.thumbnail" [src]="item.thumbnail" alt="Video thumb" />
+            <span class="gallery-thumb-video-icon">&#9654;</span>
+          </div>
         </div>
       </div>
       <button class="gallery-thumb-nav" (click)="nextGalleryImage()">&#8250;</button>
@@ -1680,13 +1677,22 @@
             [style.cursor]="galleryZoom > 1 ? 'grab' : 'default'"
           />
         </a>
-        <video
-          *ngIf="galleryActiveTab === 'video' && currentAlbum.length > 0"
-          [src]="currentAlbum[galleryActiveIndex]"
-          controls
-          autoplay
-          class="gallery-main-img"
-        ></video>
+        <div *ngIf="galleryActiveTab === 'video' && currentAlbum.length > 0" class="gallery-video-card">
+          <div *ngIf="!videoPlaying && currentAlbum[galleryActiveIndex]?.thumbnail" class="gallery-video-preview" (click)="playVideo()">
+            <img [src]="currentAlbum[galleryActiveIndex]?.thumbnail" alt="Video Thumbnail" class="gallery-main-img" />
+            <div class="gallery-video-preview-overlay">
+              <span class="gallery-video-play">&#9658;</span>
+            </div>
+          </div>
+          <iframe
+            *ngIf="videoPlaying || !currentAlbum[galleryActiveIndex]?.thumbnail"
+            [src]="getSafeVideoUrl(currentAlbum[galleryActiveIndex]?.link)"
+            class="gallery-video-iframe"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen>
+          </iframe>
+        </div>
       </div>
 
       <button class="gallery-nav gallery-nav-next" (click)="nextGalleryImage()">&#8250;</button>

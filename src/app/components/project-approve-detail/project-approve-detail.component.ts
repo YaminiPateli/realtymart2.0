@@ -5,6 +5,7 @@ import { ProjectdetailsService } from '../service/projectdetails.service';
 import { ActivatedRoute } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Location } from '@angular/common';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 // import { DatePipe } from '@angular/common';
 import { ToastrModule,ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
@@ -97,7 +98,8 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     // private datePipe: DatePipe,
     private spinner: NgxSpinnerService,
     private toastr: ToastrService,
-    private activityTrackerService: ActivityTrackerService
+    private activityTrackerService: ActivityTrackerService,
+    private sanitizer: DomSanitizer
   ) {
     this._album.push({
       src: 'assets/images/advertisement.png',
@@ -287,6 +289,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   galleryActiveIndex: number = 0;
   galleryZoom: number = 1;
   galleryFormType: string = ''; // 'contact' | 'brochure' | 'payment' | ''
+  videoPlaying: boolean = false;
 
   // ===== Gallery Inline Contact Form =====
   galleryContactData: any = { name: '', email: '', mobile: '', termsAccepted: true };
@@ -905,6 +908,26 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     }
   }
 
+  getSafeVideoUrl(videoUrl: string | undefined): SafeResourceUrl {
+    const embedUrl = this.getEmbeddedVideoUrl(videoUrl);
+    return this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
+  }
+
+  private getEmbeddedVideoUrl(url: string | undefined): string {
+    if (!url) {
+      return '';
+    }
+
+    // Handle YouTube short links and regular watch URLs
+    const ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([\w-]+)/);
+    if (ytMatch && ytMatch[1]) {
+      return `https://www.youtube.com/embed/${ytMatch[1]}`;
+    }
+
+    // Default to given URL if no known video provider matched
+    return url;
+  }
+
   validateContactName(event:any)
   {
     this.nameContactTouched = true;
@@ -957,7 +980,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
             const imageBaseUrl = 'https://realtymart.com/backend/public/images/';
 
             // Project Photos tab: from 3d_project_images (comma-separated filenames)
-            const raw3dImages = this.singleproject?.['3d_project_images'];
+            const raw3dImages = this.singleproject?.['project_images'];
             if (typeof raw3dImages === 'string' && raw3dImages.trim()) {
               this.photoAlbum = raw3dImages.split(',').map((f: string) => imageBaseUrl + '3d_project_images/' + f.trim()).filter((u: string) => u !== imageBaseUrl + '3d_project_images/');
             } else if (Array.isArray(raw3dImages)) {
@@ -972,8 +995,14 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
 
             // Videos tab
             this.videoAlbum = Array.isArray(this.singleproject?.project_video)
-              ? this.singleproject.project_video
-              : (this.singleproject?.project_video ? [this.singleproject.project_video] : []);
+              ? this.singleproject.project_video.map((video: any) => ({
+                  link: video.proj_video_link,
+                  thumbnail: video.project_banner_image ? imageBaseUrl + video.project_banner_image : null
+                }))
+              : (this.singleproject?.project_video ? [{
+                  link: this.singleproject.project_video.proj_video_link,
+                  thumbnail: this.singleproject.project_video.project_banner_image ? imageBaseUrl + this.singleproject.project_video.project_banner_image : null
+                }] : []);
 
             // Auto-select first tab that has content
             if (this.photoAlbum.length > 0) this.galleryActiveTab = 'photos';
@@ -1319,6 +1348,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     this.galleryActiveTab = tab;
     this.galleryActiveIndex = index;
     this.galleryZoom = 1;
+    this.videoPlaying = false;
     this.galleryFormType = '';
     this.galleryVisible = true;
     document.body.style.overflow = 'hidden';
@@ -1347,11 +1377,13 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     this.galleryActiveTab = tab;
     this.galleryActiveIndex = 0;
     this.galleryZoom = 1;
+    this.videoPlaying = false;
   }
 
   setGalleryImage(index: number) {
     this.galleryActiveIndex = index;
     this.galleryZoom = 1;
+    this.videoPlaying = false;
   }
 
   nextGalleryImage() {
@@ -1372,6 +1404,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
       }
     }
     this.galleryZoom = 1;
+    this.videoPlaying = false;
   }
 
   prevGalleryImage() {
@@ -1392,6 +1425,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
       }
     }
     this.galleryZoom = 1;
+    this.videoPlaying = false;
   }
 
   get availableTabs(): string[] {
@@ -1400,6 +1434,10 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     if (this.layoutAlbum.length > 0) tabs.push('layout');
     if (this.videoAlbum.length > 0) tabs.push('video');
     return tabs;
+  }
+
+  playVideo() {
+    this.videoPlaying = true;
   }
 
   zoomIn() {
