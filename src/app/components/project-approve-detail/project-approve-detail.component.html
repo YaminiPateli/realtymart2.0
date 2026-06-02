@@ -10,8 +10,8 @@
   </div>
 
   <!-- Photos Count -->
-  <div class="photo-count shadow-sm cursor-pointer" 
-  *ngIf="photoAlbum.length > 0 || layoutAlbum.length > 0 || videoAlbum.length > 0">
+  <div class="photo-count shadow-sm cursor-pointer"
+    *ngIf="photoAlbum.length > 0 || layoutAlbum.length > 0 || videoAlbum.length > 0">
     <img src="../../../assets/images/photo.png" alt="" srcset="">
     <span> {{ photoAlbum.length + layoutAlbum.length + videoAlbum.length }} Photos</span>
   </div>
@@ -29,12 +29,12 @@
 
           <div>
             <div class="d-flex flex-wrap align-items-center">
-              <h2 class="project-title mb-0">Binori Aristella</h2>
+              <h2 class="project-title mb-0">{{ singleproject?.project_name }}</h2>
               <div class="mb-search__property__data">
                 <span class="ms-2 text-muted small">
                   by
                   <a href="#" class="builder-link text-decoration-underline">
-                    Binori Group
+                    {{ singleproject?.builderName }}
                   </a>
                 </span>
 
@@ -42,13 +42,14 @@
             </div>
 
             <p class="location mb-2 m-0 d-flex justify-content-start align-items-center gap-1">
-              <span><img src="../../../assets/images/location-icon-2.svg" alt="" srcset=""></span> S.P. Ring Road,
-              Ahmedabad
+              <span><img src="../../../assets/images/location-icon-2.svg" alt="" srcset=""></span> {{
+              singleproject?.project_localities }}
             </p>
 
             <div class="price-info d-flex align-items-center justify-content-start gap-2">
               <span class="price-icon"><img src="../../../assets//images/Tag.svg" alt="" srcset=""></span>
-              ₹ 32 L - ₹46 L <span class="d-flex"><img src="../../../assets/images/tooltip.svg" alt="" srcset=""></span>
+              ₹ {{singleproject?.project_minimum_price}} - ₹{{ singleproject?.project_maximum_price }} <span
+                class="d-flex"><img src="../../../assets/images/tooltip.svg" alt="" srcset=""></span>
             </div>
           </div>
 
@@ -56,10 +57,10 @@
       </div>
 
       <!-- Right Section -->
-      <div class="col-lg-6 d-flex justify-content-end align-self-end">
+      <div class="col-lg-6 mt-5 d-flex justify-content-end align-self-end">
         <div class="d-flex flex-wrap justify-content-lg-end gap-2">
-
-          <button class="btn btn-danger d-flex align-items-center gap-2 action-btn view-contact-btn text-light">
+          <button data-bs-toggle="modal" data-bs-target="#get-builder"
+            class="btn btn-danger d-flex align-items-center gap-2 action-btn view-contact-btn text-light">
             <span><img src="../../../assets/images/phone.svg" alt="" srcset=""></span>
             View Contact
           </button>
@@ -69,7 +70,9 @@
             WhatsApp
           </button>
 
-          <button class="btn btn-dark d-flex align-items-center gap-2 action-btn download-btn">
+          <button data-bs-toggle="modal" data-bs-target="#Brochure"
+            (click)="brochureMode='brochure'; resetBrochureForm()" *ngIf="singleproject?.project_brochure"
+            class="btn btn-dark d-flex align-items-center gap-2 action-btn download-btn">
             <span><img src="../../../assets/images/download.svg" alt="" srcset=""></span>
             Download Brochure
           </button>
@@ -85,28 +88,28 @@
       <div class="col-6 col-md-6 col-lg-3">
         <div class="info-card">
           <div class="label">Project Type</div>
-          <div class="value">2, 3 BHK Flat</div>
+          <div class="value">{{ singleproject?.project_type.join(', ') }}</div>
         </div>
       </div>
 
       <div class="col-6 col-md-6 col-lg-3">
         <div class="info-card">
           <div class="label">Project Size</div>
-          <div class="value">700 SqFt - 963 SqFt</div>
+          <div class="value">{{ singleproject?.project_size_in_sqft }} SqFt</div>
         </div>
       </div>
 
       <div class="col-6 col-md-6 col-lg-3">
         <div class="info-card">
           <div class="label">Launch Date</div>
-          <div class="value">Mar, 2022</div>
+          <div class="value">{{ singleproject?.project_launch_date | date:'MMM, yyyy' }}</div>
         </div>
       </div>
 
       <div class="col-6 col-md-6 col-lg-3">
         <div class="info-card">
           <div class="label">Total Units</div>
-          <div class="value">82</div>
+          <div class="value">{{ singleproject?.project_total_units }}</div>
         </div>
       </div>
 
@@ -167,7 +170,7 @@
 
       <!-- Left Content -->
       <div class="col-lg-8">
-        <section class="overview-section">
+        <section id="overview" class="overview-section">
 
           <h4 class="section-title">Overview</h4>
 
@@ -175,12 +178,13 @@
 
             <div class="col-md-4">
               <p class="label">Price</p>
-              <h6 class="value">₹32 L - ₹46 L</h6>
+              <h6 class="value">₹ {{ singleproject?.project_minimum_price }} - ₹ {{ singleproject?.project_maximum_price
+                }}</h6>
             </div>
 
             <div class="col-md-4">
               <p class="label">Type</p>
-              <h6 class="value">2, 3 BHK Flat</h6>
+              <h6 class="value">{{ singleproject?.project_type.join(', ') }}</h6>
             </div>
 
             <div class="col-md-4">
@@ -190,79 +194,54 @@
 
             <div class="col-md-4">
               <p class="label">Size</p>
-              <h6 class="value">700 SqFt - 963 SqFt</h6>
+              <h6 class="value">{{ singleproject?.project_size_in_sqft }} SqFt</h6>
             </div>
 
             <div class="col-md-4">
               <p class="label">Status</p>
-              <h6 class="value">Ready to Move</h6>
+              <h6 class="value">{{ singleproject?.project_status }}</h6>
             </div>
 
             <div class="col-md-4">
               <p class="label">Towers</p>
-              <h6 class="value">7</h6>
+              <h6 class="value">{{ singleproject?.project_total_tower }}</h6>
             </div>
 
             <div class="col-md-4">
               <p class="label">No. of Floors</p>
-              <h6 class="value">8</h6>
+              <h6 class="value">{{ singleproject?.project_total_floor }}</h6>
             </div>
 
             <div class="col-md-4">
               <p class="label">Total Units</p>
-              <h6 class="value">Ready to Move</h6>
+              <h6 class="value">{{ singleproject?.project_total_units }}</h6>
             </div>
 
             <div class="col-md-4">
               <p class="label">Launch Date</p>
-              <h6 class="value">Mar, 2022</h6>
+              <h6 class="value">{{ singleproject?.project_launch_date | date:'MMM, yyyy' }}</h6>
             </div>
 
           </div>
 
           <hr class="my-5">
         </section>
-        <section class="about-project-section">
+        <section id="aboutProject" class="about-project-section">
 
           <h3 class="section-title">About Project</h3>
 
-          <div class="about-content">
-            <p>
-              Aristella, a greek origin name, literally meaning the Best. Our project,
-              Aristella represents the meaning of the name holistically.
-            </p>
+          <div *ngIf="this.singleproject.project_about !== null" class="about-content"
+            [innerHTML]="this.singleproject.project_about"></div>
 
-            <p>
-              Welcome to an unparalleled oasis of elegance, where modern sophistication
-              meets timeless luxury. Nestled in a serene enclave, our residential
-              project redefines opulent living with meticulously crafted and ...
-              <a href="javascript:void(0)" class="read-more-link">
-                Read More
-              </a>
-            </p>
-          </div>
+          <div class="investing-card" *ngIf="this.singleproject.project_why_buy_sell !== null">
 
-          <div class="investing-card">
-
-            <h4 class="investing-title">
-              What makes investing in The Binori Aristella a compelling choice?
+            <h4 class="investing-title" *ngIf="this.singleproject.project_why_buy_sell !== null">
+              What makes investing in The
+              {{ this.singleproject.project_name }} a compelling choice?
             </h4>
 
-            <p class="investing-desc">
-              Located over the Gandhinagar Sarkhej Highway, the Science City of
-              Ahmedabad is a progressive initiative of the Gujarat government. It will
-              help the citizens to get the knowledge of science with the help of
-              entertainment and experimental knowledge. It has a nice and beautiful
-              location, with an area of more than 107 hectares. The idea of this city
-              is to create virtual reality activity places, imaginative exhibits, and
-              live demonstrations of science in an easy manner. This is a very big
-              initiative by the Gujarat government. The government is creating a
-              recliner center whose aim is to provide the perfect blend of education
-              and entertainment. All the basic amenities like hospitals, ...
-              <a href="javascript:void(0)" class="read-more-link">
-                Read More
-              </a>
-            </p>
+            <div *ngIf="this.singleproject.project_why_buy_sell !== null"
+              [innerHTML]="this.singleproject.project_why_buy_sell" class="investing-desc"></div>
 
           </div>
 
@@ -270,16 +249,20 @@
           <hr class="my-5">
 
         </section>
-        <section class="reels-section">
-          <h3 class="section-title">Watch Our Reals</h3>
+        <section id="reels" class="reels-section">
+          <h3 class="section-title">Watch Our Reels</h3>
 
           <div class="row g-4">
 
-            <div class="col-12 col-sm-6 col-lg-4" *ngFor="let reel of reels">
-              <div class="reel-card" (click)="playReel(reel)">
+            <div class="col-12 col-sm-6 col-lg-4" *ngFor="let reel of reels; let i = index">
+              <div class="reel-card" (click)="openReelsView(i)">
+
+                <img [src]="reel.thumbnail" [alt]="reel.title" class="reel-thumbnail" />
 
                 <div class="play-btn">
-                  <span><img src="../../../assets/images/play.svg" alt="" srcset=""></span>
+                  <span>
+                    <img src="../../../assets/images/play.svg" alt="Play">
+                  </span>
                 </div>
 
               </div>
@@ -287,10 +270,9 @@
 
           </div>
 
-
           <hr class="my-5">
         </section>
-        <section class="floor-plan-section">
+        <section id="floorPlan" class="floor-plan-section">
 
           <h2 class="section-title">Floor Plan</h2>
 
@@ -326,227 +308,229 @@
           </div>
 
         </section>
-        <section class="address-card">
-        
+        <section id="address" class="address-card">
+
           <div class="address-header">
             <h2 class="section-title">Address</h2>
-          
+
             <a [href]="googleMapUrl" target="_blank" class="map-btn">
               <i class="bi bi-geo-alt"></i>
               View on Google Map
             </a>
           </div>
-        
+
           <google-map height="500px" width="100%" [zoom]="15">
-        
+
             <map-marker [position]="markerPosition">
             </map-marker>
-        
+
           </google-map>
-        
+
         </section>
-        <section class="amenities-section">
-        
+        <section id="amenities" class="amenities-section" *ngIf="this.singleproject.amenitiess.length > 0">
+
           <h2 class="section-title">Amenities</h2>
-        
+
           <div class="row g-4">
-        
-            <div class="col-6 col-md-4 col-lg-3 col-xl-2" *ngFor="let amenity of amenities">
-        
+
+            <div class="col-6 col-md-4 col-lg-3 col-xl-2" *ngFor="let amenity of this.singleproject.amenitiess">
+
               <div class="amenity-card">
-        
+
                 <div class="amenity-icon">
-                  <img [src]="amenity.icon" [alt]="amenity.name" class="img-fluid">
+                  <img [src]="amenity.image" [alt]="amenity.name" class="img-fluid">
                 </div>
-        
+
                 <h6 class="amenity-name">
                   {{ amenity.name }}
                 </h6>
-        
+
               </div>
-        
+
             </div>
-        
+
           </div>
-        
+
           <hr class="my-5">
-        
+
         </section>
-        <section class="brochure-section">
-        
+        <section id="brochure" class="brochure-section">
+
           <h2 class="section-title">Brochure</h2>
-        
+
           <div class="brochure-card">
-        
+
             <div class="row g-3">
-        
+
               <div class="col-12 col-md-6">
                 <div class="brochure-image">
                   <img src="../../../assets/images/brochure-1.png" alt="Brochure Image" class="img-fluid">
                 </div>
               </div>
-        
+
               <div class="col-12 col-md-6">
                 <div class="brochure-image">
                   <img src="../../../assets/images/brochure-2.png" alt="Brochure Image" class="img-fluid">
                 </div>
               </div>
-        
+
             </div>
-        
+
             <div class="text-center mt-4">
-        
-              <button class="download-btn">
-        
+
+              <button class="download-btn" data-bs-toggle="modal" data-bs-target="#Brochure"
+                (click)="brochureMode='brochure'; resetBrochureForm()" *ngIf="singleproject?.project_brochure">
+
                 <img src="../../../assets/images/download.svg" alt="" srcset="">
-        
+
                 Download Brochure
-        
+
               </button>
-        
+
             </div>
-        
+
           </div>
-        
+
         </section>
-        <section class="project-details-section">
-        
+        <section id="project-detail" class="project-details-section">
+
           <h2 class="section-title">Project Details</h2>
-        
+
           <div class="specification-card">
-        
+
             <h3 class="specification-title">
               Specifications
             </h3>
-        
+
             <div class="specification-item" *ngFor="let item of specifications">
-        
+
               <h5 class="specification-heading">
                 {{ item.title }}
               </h5>
-        
+
               <ul class="specification-list">
                 <li *ngFor="let point of item.points">
                   {{ point }}
                 </li>
               </ul>
-        
+
             </div>
-        
+
           </div>
-        
+
         </section>
-        <section class="developer-section py-4">
-        
+        <section id="developer" class="developer-section py-4">
+
           <div class="d-flex justify-content-between align-items-center mb-3">
-        
-            <h5 class="developer-title mb-0">
+
+            <h5 class="section-title mb-0">
               About Developer
             </h5>
-        
+
             <div class="slider-nav">
               <button class="nav-btn" (click)="slideLeft()">
                 <img src="../../../assets/images/arrow-left.png" alt="" srcset="">
               </button>
-        
+
               <button class="nav-btn" (click)="slideRight()">
                 <img src="../../../assets/images/arrow-right.png" alt="" srcset="">
               </button>
             </div>
-        
+
           </div>
-        
+
           <div class="developer-slider" #slider>
-        
+
             <div class="developer-card" *ngFor="let item of developerProjects">
-        
+
               <div class="card h-100">
-        
+
                 <div class="card-img-wrapper">
                   <img [src]="item.image" alt="" class="img-fluid w-100">
                 </div>
-        
+
                 <div class="card-body">
-        
+
                   <h6 class="project-name">
                     {{ item.name }}
                   </h6>
-        
+
                   <p class="builder-name mb-1">
                     Wishlist Builder
                   </p>
-        
+
                   <p class="location mb-3">
                     <i class="bi bi-geo-alt"></i>
                     DPL, Gandhinagar
                   </p>
-        
+
                   <hr>
-        
+
                   <div class="project-info">
-        
+
                     <div class="d-flex justify-content-between mb-2">
                       <span>Availability:</span>
                       <span>2023-08-22</span>
                     </div>
-        
+
                     <div class="d-flex justify-content-between">
                       <span>Area:</span>
                       <span>1450 Sq-ft</span>
                     </div>
-        
+
                   </div>
-        
+
                 </div>
-        
+
                 <div class="price-bar">
                   Price : ₹ 70 Lac - 2 Cr
                 </div>
-        
+
               </div>
-        
+
             </div>
-        
+
           </div>
-        
+
         </section>
         <section class="faq-section py-5">
-        
+
           <div class="container">
-        
+
             <h2 class="faq-title text-center mb-4">
               FAQ
             </h2>
-        
+
             <div class="accordion custom-faq" id="faqAccordion">
-        
+
               <div class="accordion-item" *ngFor="let faq of faqs; let i = index">
-        
+
                 <h2 class="accordion-header">
-        
+
                   <button class="accordion-button" [class.collapsed]="i !== 0" type="button" data-bs-toggle="collapse"
                     [attr.data-bs-target]="'#faq'+i">
-        
+
                     {{ faq.question }}
-        
+
                   </button>
-        
+
                 </h2>
-        
-                <div [id]="'faq'+i" class="accordion-collapse collapse" [class.show]="i === 0" data-bs-parent="#faqAccordion">
-        
+
+                <div [id]="'faq'+i" class="accordion-collapse collapse" [class.show]="i === 0"
+                  data-bs-parent="#faqAccordion">
+
                   <div class="accordion-body">
                     {{ faq.answer }}
                   </div>
-        
+
                 </div>
-        
+
               </div>
-        
+
             </div>
-        
+
           </div>
-        
+
         </section>
       </div>
 
@@ -572,7 +556,7 @@
             Nisi aliquam nullam amet hac eget.
           </p>
 
-          <button class="btn contact-btn w-100 mb-2">
+          <button class="btn contact-btn w-100 mb-2" data-bs-toggle="modal" data-bs-target="#get-builder">
             <span><img src="../../../assets/images/phone.svg" alt="" srcset=""></span>
             View Contact
           </button>
@@ -596,75 +580,349 @@
 </section>
 
 <div class="gallery-overlay" *ngIf="showViewer">
-  <div class="gallery-header">
-    <div class="counter">
-      {{ currentIndex + 1 }} / {{ galleryImages.length }}
-    </div>
-
-    <div class="actions">
-      <button class="icon-btn" (click)="zoomOut()">
-        <i class="bi bi-zoom-out"></i>
-      </button>
-
-      <button class="icon-btn" (click)="zoomIn()">
-        <i class="bi bi-zoom-in"></i>
-      </button>
-
-      <button class="icon-btn" (click)="toggleFullscreen()">
-        <i class="bi bi-arrows-fullscreen"></i>
-      </button>
-
-      <button class="icon-btn" (click)="closeViewer()">
-        <i class="bi bi-x-lg"></i>
-      </button>
-    </div>
+  <!-- Header Icons -->
+  <div class="viewer-actions">
+    <button><i class="bi bi-zoom-in"></i></button>
+    <button><i class="bi bi-zoom-out"></i></button>
+    <button><i class="bi bi-grid-3x3-gap"></i></button>
+    <button><i class="bi bi-arrows-fullscreen"></i></button>
+    <button><i class="bi bi-download"></i></button>
+    <button (click)="closeViewer()">
+      <i class="bi bi-x-lg"></i>
+    </button>
   </div>
 
-  <!-- Previous -->
-  <button
-    class="nav-btn prev-btn"
-    (click)="previousImage()"
-    *ngIf="galleryImages.length > 1"
-  >
+  <!-- Prev -->
+  <button class="nav-btn prev-btn" (click)="prevImage()">
     <i class="bi bi-chevron-left"></i>
   </button>
 
   <!-- Main Image -->
-  <div class="image-container">
-
-    <img
-      [src]="galleryImages[currentIndex]"
-      alt=""
-      [style.transform]="'scale(' + zoomLevel + ')'"
-      class="main-image"
-    />
-
+  <div class="viewer-content">
+    <img [src]="galleryImages[currentIndex]" class="main-image" alt="gallery image" />
   </div>
 
   <!-- Next -->
-  <button
-    class="nav-btn next-btn"
-    (click)="nextImage()"
-    *ngIf="galleryImages.length > 1"
-  >
+  <button class="nav-btn next-btn" (click)="nextImage()">
     <i class="bi bi-chevron-right"></i>
   </button>
 
+  <!-- Counter -->
+  <div class="image-count">
+    {{ currentIndex + 1 }} / {{ galleryImages.length }}
+  </div>
+
   <!-- Thumbnails -->
   <div class="thumbnail-wrapper">
+    <div class="thumbnail-item" *ngFor="let image of galleryImages; let i = index" [class.active]="i === currentIndex"
+      (click)="selectImage(i)">
+      <img [src]="image" />
+    </div>
+  </div>
+</div>
 
-    <div class="thumbnail-slider">
+<div class="modal fade" id="get-builder" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header sign-in-box">
+        <button type="button" class="btn-close" id="getphoneno" data-bs-dismiss="modal" aria-label="Close"
+          (click)="contactEnquirySubmitted = false"></button>
+      </div>
+      <div class="modal-body">
 
-      <div
-        class="thumb-box"
-        *ngFor="let image of galleryImages; let i = index"
-        [class.active]="currentIndex === i"
-        (click)="selectImage(i)"
-      >
-        <img [src]="image" alt="" />
+        <!-- Thank You state -->
+        <div *ngIf="contactEnquirySubmitted" class="enquiry-thankyou">
+          <h3 *ngIf="singleproject.project_name">{{ singleproject.project_name }}</h3>
+          <p class="enquiry-thankyou__location"
+            *ngIf="singleproject.allProperties?.[0]?.property_locality || singleproject.project_localities">{{
+            singleproject.allProperties?.[0]?.property_locality || singleproject.project_localities }}</p>
+          <div class="enquiry-thankyou__icon">
+            <svg viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="26" cy="26" r="26" fill="#34c759" />
+              <path d="M14 27l8 8 16-16" stroke="#fff" stroke-width="3.5" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </div>
+          <h2 class="enquiry-thankyou__title">Thank You</h2>
+          <p class="enquiry-thankyou__msg">Your interest has been sent to the Advertiser</p>
+        </div>
+
+        <ng-container *ngIf="!contactEnquirySubmitted">
+          <h2 class="fill_one">Fill out this one - time contact form</h2>
+          <p class="detail_share">
+            We will share advertiser's details over email
+          </p>
+          <form (submit)="is_token ? submitFormPhone() : openContactOTPModal()">
+            <div class="form-field mt-3">
+              <label class="form-field__label" for="Aname">Name</label>
+              <div class="form-field__wrap">
+                <input type="text" id="Aname" name="contactusername" [(ngModel)]="formDataphone.contactusername"
+                  (input)="validateContactName($event)" (keypress)="validateContactCharInput($event)" required
+                  class="gold-form-input my-0" />
+                <span class="form-field__check"
+                  *ngIf="nameContactTouched && formDataphone.contactusername && !nameContactError">&#10003;</span>
+              </div>
+            </div>
+            <div *ngIf="nameContactTouched && nameContactError" class="mgs_error">Please enter a valid name (min. 3
+              characters).</div>
+
+            <div class="form-field mt-3">
+              <label class="form-field__label" for="usermail">Email</label>
+              <div class="form-field__wrap">
+                <input type="email" id="usermail" [(ngModel)]="formDataphone.contactuseremail"
+                  (blur)="validateContactEmail($event)" required name="contactusermail" class="gold-form-input my-0" />
+                <span class="form-field__check"
+                  *ngIf="emailContactTouched && formDataphone.contactuseremail && !emailContactError">&#10003;</span>
+              </div>
+            </div>
+            <div *ngIf="emailContactTouched && emailContactError" class="mgs_error">Please enter a valid email address.
+            </div>
+
+            <div class="form-field mt-3">
+              <label class="form-field__label" for="usernumber">Mobile Number</label>
+              <div class="form-field__wrap">
+                <input type="tel" id="usernumber" name="contactcontact_no" maxlength="10"
+                  [(ngModel)]="formDataphone.contactcontact_no" (keypress)="validateContactNumberInput($event)"
+                  (blur)="validateContactPhoneNumber($event)" required class="gold-form-input mb-0 my-0" />
+                <span class="form-field__check"
+                  *ngIf="phoneContactTouched && formDataphone.contactcontact_no?.toString().length === 10 && !phoneContactError">&#10003;</span>
+              </div>
+            </div>
+            <div *ngIf="phoneContactTouched && phoneContactError" class="mgs_error">
+              Please enter a valid 10-digit number.
+            </div>
+
+            <div class="check-compare">
+              <input type="checkbox" id="compare" (change)="onTermsContactChange($event)"
+                [(ngModel)]="formDataphone.termsContactAccepted" name="termsContactAccepted" required class="mycheck" />
+              <label for="compare" class="compares">I Agree to RealtyMart <a routerLink="/terms-conditions"
+                  target="_blank">Terms of Use</a></label>
+              <!-- <span><a routerLink="../terms-conditions">Terms of Use</a></span> <br /> -->
+            </div>
+            <div *ngIf="termsContactError" class="mgs_error">
+              Please agree to the terms and conditions.
+            </div>
+            <button type="submit" class="pp-form__cta" [disabled]="isContactSendingOtp">
+              {{ isContactSendingOtp ? 'Sending OTP...' : (is_token ? 'Submit Enquiry' : 'Continue') }}
+            </button>
+          </form>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="Brochure" tabindex="-1" aria-labelledby="brochureModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header sign-in-box">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+          (click)="resetBrochureForm()"></button>
+      </div>
+      <div class="modal-body">
+        <h2 class="fill_one">{{ brochureMode === 'brochure' ? 'Download Brochure' : 'Download Payment Plan' }}</h2>
+        <p class="detail_share">Fill your details &amp; get the document from {{ singleproject?.project_name }} directly
+        </p>
+
+        <form>
+          <!-- Name -->
+          <div class="form-field mt-3">
+            <label class="form-field__label" for="brochureName">Name</label>
+            <div class="form-field__wrap">
+              <input type="text" id="brochureName" name="brochureName" [(ngModel)]="brochureFormData.name"
+                (input)="validateBrochureName($event)" (keypress)="validateCharInput($event)" required
+                class="gold-form-input my-0" />
+              <span class="form-field__check"
+                *ngIf="brochureNameTouched && brochureFormData.name && !brochureNameError">&#10003;</span>
+            </div>
+          </div>
+          <div *ngIf="brochureNameTouched && brochureNameError" class="mgs_error">Please enter a valid name (min. 3
+            characters).</div>
+
+          <!-- Email -->
+          <div class="form-field mt-3">
+            <label class="form-field__label" for="brochureEmail">Email</label>
+            <div class="form-field__wrap">
+              <input type="email" id="brochureEmail" name="brochureEmail" [(ngModel)]="brochureFormData.email"
+                (blur)="validateBrochureEmail($event)" required class="gold-form-input my-0" />
+              <span class="form-field__check"
+                *ngIf="brochureEmailTouched && brochureFormData.email && !brochureEmailError">&#10003;</span>
+            </div>
+          </div>
+          <div *ngIf="brochureEmailTouched && brochureEmailError" class="mgs_error">Please enter a valid email address.
+          </div>
+
+          <!-- Mobile -->
+          <div class="form-field mt-3">
+            <label class="form-field__label" for="brochureMobile">Mobile Number</label>
+            <div class="form-field__wrap">
+              <input type="tel" id="brochureMobile" name="brochureMobile" maxlength="10"
+                [(ngModel)]="brochureFormData.mobile" (keypress)="validateNumberInput($event)"
+                (blur)="validateBrochureMobile($event)" required class="gold-form-input my-0" />
+              <span class="form-field__check"
+                *ngIf="brochureMobileTouched && brochureFormData.mobile?.toString().length === 10 && !brochureMobileError">&#10003;</span>
+            </div>
+          </div>
+          <div *ngIf="brochureMobileTouched && brochureMobileError" class="mgs_error">Please enter a valid 10-digit
+            mobile number.</div>
+
+          <!-- Terms -->
+          <div class="check-compare mt-3">
+            <input type="checkbox" id="BrochureTerms" name="BrochureTerms" [(ngModel)]="brochureFormData.termsAccepted"
+              class="mycheck" />
+            <label for="BrochureTerms" class="compares">I Agree to RealtyMart <a routerLink="/terms-conditions"
+                target="_blank">Terms of Use</a></label>
+          </div>
+          <div *ngIf="brochureTermsError" class="mgs_error">Please agree to the terms and conditions.</div>
+
+          <!-- OTP -->
+          <ng-container *ngIf="brochureOtpVisible">
+            <div class="form-field mt-3">
+              <label class="form-field__label" for="brochureOtp">Enter OTP</label>
+              <div class="form-field__wrap">
+                <input type="text" id="brochureOtp" name="brochureOtp" placeholder="Enter OTP" [(ngModel)]="brochureOtp"
+                  (keypress)="validateNumberInput($event)" maxlength="4" class="gold-form-input my-0" />
+              </div>
+            </div>
+            <div *ngIf="brochureOtpError" class="mgs_error">Please enter a valid OTP.</div>
+            <button type="button" class="pp-form__cta mt-2" (click)="submitBrochure()">Verify &amp; Download</button>
+          </ng-container>
+
+          <button *ngIf="!brochureOtpVisible" type="button" class="pp-form__cta mt-3" [disabled]="isBrochureSendingOtp"
+            (click)="sendBrochureOTP()">{{ isBrochureSendingOtp ? 'Sending OTP...' : 'Submit' }}</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =============================================
+     REELS IMMERSIVE OVERLAY
+     Layout: [back btn] [card + sidebar] [nav arrows far-right]
+     ============================================= -->
+<div class="reels-immersive-overlay" *ngIf="showReelsView">
+
+  <!-- Dark backdrop -->
+  <div class="reels-backdrop"></div>
+
+  <!-- ← Back to Property -->
+  <button class="reels-back-btn" (click)="closeReelsView()">
+    <i class="fa-solid fa-arrow-left me-2"></i>Back to Property
+  </button>
+
+  <!-- Centre: card + interaction sidebar -->
+  <div class="reels-container-wrapper">
+
+    <!-- ── Phone card ── -->
+    <div class="reels-player-card"
+         (touchstart)="onTouchStart($event)"
+         (touchend)="onTouchEnd($event)">
+
+      <!-- Media (YouTube or image fallback) -->
+      <div class="reels-media-container">
+        <iframe
+          *ngIf="reels[activeReelIndex].videoUrl.includes('youtube.com') || reels[activeReelIndex].videoUrl.includes('youtu.be')"
+          [src]="getSanitizedVideoUrl(reels[activeReelIndex].videoUrl)"
+          class="reels-video-frame" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen>
+        </iframe>
+        <div
+          *ngIf="!reels[activeReelIndex].videoUrl.includes('youtube.com') && !reels[activeReelIndex].videoUrl.includes('youtu.be')"
+          class="reels-image-wrapper">
+          <img [src]="reels[activeReelIndex].thumbnail" class="reels-image-fallback" alt="Reel image">
+        </div>
+      </div>
+
+      <!-- Top-right: mute + settings (stacked vertically) -->
+      <div class="reels-card-top-controls">
+        <button class="reels-icon-btn" (click)="toggleReelsMute()" title="Mute / Unmute">
+          <i class="fa-solid" [ngClass]="isReelsMuted ? 'fa-volume-xmark' : 'fa-volume-high'"></i>
+        </button>
+        <button class="reels-icon-btn" title="Settings">
+          <i class="fa-solid fa-sliders"></i>
+        </button>
+      </div>
+
+      <!-- Bottom overlay: builder info + CTA buttons -->
+      <div class="reels-card-bottom-details">
+        <div class="reels-developer-info">
+          <div class="reels-dev-logo-wrap">
+            <img *ngIf="singleproject?.project_logo"
+                 [src]="singleproject?.project_logo"
+                 class="reels-dev-logo" alt="Builder logo">
+            <span *ngIf="!singleproject?.project_logo" class="reels-dev-letter">B</span>
+          </div>
+          <div>
+            <h6 class="reels-dev-name">{{ singleproject?.builderName || 'Binori Group' }}</h6>
+            <small class="reels-dev-location">
+              <i class="fa-solid fa-location-dot me-1"></i>{{ singleproject?.project_localities || 'Ahmedabad' }}
+            </small>
+          </div>
+        </div>
+        <div class="reels-action-row">
+          <button class="reels-action-btn-red" (click)="closeReelsView()">View Details</button>
+          <button class="reels-action-btn-outline" data-bs-toggle="modal" data-bs-target="#get-builder">
+            <i class="fa-solid fa-phone me-1"></i>View Contact
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- end .reels-player-card -->
+
+    <!-- ── Interaction sidebar (right of card) ── -->
+    <div class="reels-interaction-bar">
+
+      <!-- Like -->
+      <div class="reels-interact-item">
+        <button class="reels-interact-btn"
+                [class.liked]="reelsLikedStates[activeReelIndex]"
+                (click)="toggleReelsLike(activeReelIndex)">
+          <i class="fa-heart"
+             [ngClass]="reelsLikedStates[activeReelIndex] ? 'fa-solid reel-liked' : 'fa-regular'"></i>
+        </button>
+        <span class="reels-interact-count">{{ reelsLikesCount[activeReelIndex] }}</span>
+      </div>
+
+      <!-- Comment -->
+      <div class="reels-interact-item">
+        <button class="reels-interact-btn" (click)="showReelComments = !showReelComments">
+          <i class="fa-regular fa-comment"></i>
+        </button>
+        <span class="reels-interact-count">{{ projectReviews.length }}</span>
+      </div>
+
+      <!-- Views -->
+      <div class="reels-interact-item">
+        <button class="reels-interact-btn">
+          <i class="fa-regular fa-eye"></i>
+        </button>
+        <span class="reels-interact-count">0</span>
+      </div>
+
+      <!-- Share -->
+      <div class="reels-interact-item">
+        <button class="reels-interact-btn" (click)="shareReel(activeReelIndex)">
+          <i class="fa-solid fa-share-nodes"></i>
+        </button>
+        <span class="reels-interact-count">Share</span>
       </div>
 
     </div>
+    <!-- end .reels-interaction-bar -->
 
   </div>
+  <!-- end .reels-container-wrapper -->
+
+  <!-- ── Nav arrows — absolute FAR RIGHT of screen ── -->
+  <div class="reels-nav-fixed">
+    <button class="reels-nav-btn" (click)="previousReel()" [disabled]="activeReelIndex === 0">
+      <i class="fa-solid fa-chevron-up"></i>
+    </button>
+    <button class="reels-nav-btn" (click)="nextReel()" [disabled]="activeReelIndex === reels.length - 1">
+      <i class="fa-solid fa-chevron-down"></i>
+    </button>
+  </div>
+
 </div>
+<!-- end .reels-immersive-overlay -->

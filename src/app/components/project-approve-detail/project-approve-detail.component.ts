@@ -9,7 +9,7 @@ import { Location } from '@angular/common';
 import { ToastrModule,ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
 import { Fancybox } from "@fancyapps/ui";
-import { Title, Meta } from '@angular/platform-browser';
+import { Title, Meta, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { error } from 'jquery';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { IssponsoredService } from '../service/issponsored.service';
@@ -55,6 +55,12 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   phoneContactTouched:boolean=false;
   termsError:boolean=false;
   termsContactError:boolean=false;
+  showReelsView: boolean = false;
+  activeReelIndex: number = 0;
+  isReelsMuted: boolean = false;
+  reelsLikedStates: boolean[] = [false, false, false, false, false, false];
+  reelsLikesCount: number[] = [124, 87, 245, 56, 189, 93];
+  showReelComments: boolean = false;
   isSendingOtp: boolean = false;
   isContactSendingOtp: boolean = false;
   isBrochureSendingOtp: boolean = false;
@@ -86,16 +92,34 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   remainingTime: number = 60;
   reels = [
     {
-      title: 'Reel 1',
-      videoUrl: ''
+      title: 'Luxury Apartments',
+      thumbnail: 'https://images.unsplash.com/photo-1460317442991-0ec209397118?w=800',
+      videoUrl: 'https://youtu.be/example1'
     },
     {
-      title: 'Reel 2',
-      videoUrl: ''
+      title: 'Modern Township',
+      thumbnail: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800',
+      videoUrl: 'https://youtu.be/example2'
     },
     {
-      title: 'Reel 3',
-      videoUrl: ''
+      title: 'Premium Villas',
+      thumbnail: 'https://images.unsplash.com/photo-1511818966892-d7d671e672a2?w=800',
+      videoUrl: 'https://youtu.be/example3'
+    },
+    {
+      title: 'Commercial Project',
+      thumbnail: 'https://images.unsplash.com/photo-1494526585095-c41746248156?w=800',
+      videoUrl: 'https://youtu.be/example4'
+    },
+    {
+      title: 'Smart Homes',
+      thumbnail: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800',
+      videoUrl: 'https://youtu.be/example5'
+    },
+    {
+      title: 'High Rise Tower',
+      thumbnail: 'https://images.unsplash.com/photo-1462396240927-52058a6a84ec?w=800',
+      videoUrl: 'https://youtu.be/example6'
     }
   ];
   selectedType = '2bhk';
@@ -279,11 +303,13 @@ galleryImages = [
   '../../../assets/images/gallery-6.jpg'
 ];
 
- showViewer = true;
+ showViewer = false;
 
   currentIndex = 4;
 
   zoomLevel = 1;
+  touchStartY = 0;
+touchEndY = 0;
   googleMapUrl =
     'https://www.google.com/maps?q=22.2865,73.1812';
   private timer: any;
@@ -301,7 +327,8 @@ galleryImages = [
     // private datePipe: DatePipe,
     private spinner: NgxSpinnerService,
     private toastr: ToastrService,
-    private activityTrackerService: ActivityTrackerService
+    private activityTrackerService: ActivityTrackerService,
+    private sanitizer: DomSanitizer
   ) {
     this._album.push({
       src: 'assets/images/advertisement.png',
@@ -554,8 +581,7 @@ galleryImages = [
       lat: this.singleproject?.latitude,
       lng: this.singleproject?.longitude,
     };
-    window.onscroll = () => this.checkScroll();
-      this.route.fragment.subscribe(fragment => {
+    this.route.fragment.subscribe(fragment => {
         this.currentSection = fragment;
       });
       const modalElement = document.getElementById('get-builder');
@@ -564,6 +590,12 @@ galleryImages = [
           this.resetContactForm();
         });
       }
+      this.route.queryParams.subscribe(params => {
+        if (params['reels'] === 'true') {
+          const index = params['reel'] ? parseInt(params['reel'], 10) : 0;
+          this.openReelsView(index);
+        }
+      });
   }
 
   checkLoggedIn() {
@@ -1017,11 +1049,11 @@ galleryImages = [
     }
   }
   observeSections() {
-    const sections = document.querySelectorAll('#overview,#properties,#aboutProject, #amenities,#project-detail,#locality,#developer');
+    const sections = document.querySelectorAll('#overview,#aboutProject,#reels,#floorPlan,#address,#amenities,#brochure,#project-detail,#developer');
     const observerOptions = {
       root: null,
-      rootMargin: '0px',
-      threshold: 0.5, // Section is considered active if 50% is visible
+      rootMargin: '-120px 0px -60% 0px',
+      threshold: 0.2, // Section is considered active when it crosses into view
     };
 
     const observer = new IntersectionObserver((entries) => {
@@ -1037,22 +1069,19 @@ galleryImages = [
 
 
   scrollToSection(sectionId: string): void {
-    // Clear any Bootstrap modal overflow-hidden left on body
     document.body.classList.remove('modal-open');
     document.body.style.overflow = '';
     document.body.style.paddingRight = '';
-    // Remove any lingering Bootstrap modal backdrop
     document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
 
     const section = document.getElementById(sectionId);
     const navbar = document.getElementById('navbar');
 
-    if (section && navbar) {
-      const navbarHeight = navbar.offsetHeight;
+    if (section) {
+      const navbarHeight = navbar ? navbar.offsetHeight : 0;
       const sectionPosition = section.getBoundingClientRect().top + window.scrollY;
-      const scrollMargin = 130;
-      // const scrollToPosition = sectionPosition - navbarHeight ;
-      const scrollToPosition = sectionPosition - navbarHeight - scrollMargin;
+      // Account for navbar's sticky top position (125px) + navbar height + extra padding
+      const scrollToPosition = sectionPosition - 125 - navbarHeight - 20;
 
       window.scrollTo({
         top: scrollToPosition,
@@ -1065,44 +1094,38 @@ galleryImages = [
 
   @HostListener('window:scroll', ['$event'])
   onWindowScroll(): void {
-    this.checkScroll()
     this.detectActiveSectionOnScroll();
-  }
-  checkScroll() {
-    const navbar = document.getElementById("navbar");
-    const sticky = navbar?.offsetTop;
-
-    if (window.pageYOffset > sticky!) {
-      navbar?.classList.add("sticky");
-    } else {
-      navbar?.classList.remove("sticky");
-    }
   }
   detectActiveSectionOnScroll(): void {
     const sections = [
       { id: 'overview', element: document.getElementById('overview') },
-      { id: 'properties', element: document.getElementById('properties') },
       { id: 'aboutProject', element: document.getElementById('aboutProject') },
+      { id: 'reels', element: document.getElementById('reels') },
+      { id: 'floorPlan', element: document.getElementById('floorPlan') },
+      { id: 'address', element: document.getElementById('address') },
       { id: 'amenities', element: document.getElementById('amenities') },
+      { id: 'brochure', element: document.getElementById('brochure') },
       { id: 'project-detail', element: document.getElementById('project-detail') },
-      { id: 'locality', element: document.getElementById('locality') },
       { id: 'developer', element: document.getElementById('developer') },
     ];
 
     const navbar = document.getElementById('navbar');
     const navbarHeight = navbar ? navbar.offsetHeight : 0;
+    const scrollPosition = window.scrollY + navbarHeight + 150;
 
+    // Find the section that is currently in view
+    let activeSection = 'overview';
     for (const section of sections) {
       if (section.element) {
-        const rect = section.element.getBoundingClientRect();
-        const offset = rect.top - navbarHeight - 150; // Adjust this margin as needed
-
-        if (offset <= 0 && rect.bottom > navbarHeight) {
-          this.activeSection = section.id;
+        const sectionTop = section.element.offsetTop;
+        if (scrollPosition >= sectionTop) {
+          activeSection = section.id;
+        } else {
           break;
         }
       }
     }
+    this.activeSection = activeSection;
   }
 
 
@@ -1665,44 +1688,149 @@ galleryImages = [
     }
   }
 
-  nextImage() {
-    if (this.currentIndex < this.galleryImages.length - 1) {
-      this.currentIndex++;
-    } else {
-      this.currentIndex = 0;
-    }
-  }
-
   selectImage(index: number) {
     this.currentIndex = index;
   }
 
-  zoomIn() {
-    this.zoomLevel += 0.2;
+    nextImage() {
+    this.currentIndex =
+      (this.currentIndex + 1) % this.galleryImages.length;
   }
 
-  zoomOut() {
-    if (this.zoomLevel > 1) {
-      this.zoomLevel -= 0.2;
-    }
+  prevImage() {
+    this.currentIndex =
+      (this.currentIndex - 1 + this.galleryImages.length) %
+      this.galleryImages.length;
   }
-
   closeViewer() {
     this.showViewer = false;
   }
 
-  toggleFullscreen() {
-
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen();
-    } else {
-      document.exitFullscreen();
-    }
-
+  openGallery() {
+    this.showViewer = true;
   }
-
 
   // toggleShowMore(category: string): void {
   //   this.showMore[category] = !this.showMore[category];
   // }
+
+  openReelsView(index: number = 0) {
+    this.activeReelIndex = index;
+    this.showReelsView = true;
+    this.showReelComments = false;
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeReelsView() {
+    this.showReelsView = false;
+    document.body.style.overflow = '';
+    const urlWithoutParams = window.location.pathname;
+    window.history.replaceState({}, '', urlWithoutParams);
+  }
+
+ nextReel(): void {
+  if (this.activeReelIndex < this.reels.length - 1) {
+    this.activeReelIndex++;
+  }
+}
+
+previousReel(): void {
+  if (this.activeReelIndex > 0) {
+    this.activeReelIndex--;
+  }
+}
+
+  toggleReelsLike(index: number) {
+    this.reelsLikedStates[index] = !this.reelsLikedStates[index];
+    if (this.reelsLikedStates[index]) {
+      this.reelsLikesCount[index]++;
+      this.toastr.success('Added to favorites');
+    } else {
+      this.reelsLikesCount[index]--;
+    }
+  }
+
+  toggleReelsMute() {
+    this.isReelsMuted = !this.isReelsMuted;
+  }
+
+  shareReel(index: number) {
+    const shareUrl = `${window.location.origin}${window.location.pathname}?reels=true&reel=${index}`;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        this.toastr.success('Reel link copied to clipboard!');
+      }, () => {
+        this.toastr.error('Failed to copy link.');
+      });
+    } else {
+      const textArea = document.createElement('textarea');
+      textArea.value = shareUrl;
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        this.toastr.success('Reel link copied to clipboard!');
+      } catch (err) {
+        this.toastr.error('Failed to copy link.');
+      }
+      document.body.removeChild(textArea);
+    }
+  }
+
+  getSanitizedVideoUrl(url: string): SafeResourceUrl {
+    let embedUrl = url;
+    if (url.includes('youtube.com') || url.includes('youtu.be')) {
+      let videoId = '';
+      if (url.includes('youtu.be/')) {
+        videoId = url.split('youtu.be/')[1].split('?')[0].split('&')[0];
+      } else if (url.includes('v=')) {
+        videoId = url.split('v=')[1].split('&')[0];
+      } else if (url.includes('embed/')) {
+        videoId = url.split('embed/')[1].split('?')[0];
+      }
+      if (videoId === 'example1' || videoId === 'example2' || videoId === 'example3' || videoId === 'example4' || videoId === 'example5' || videoId === 'example6') {
+        const dummyVideoIds = ['g9_VwacuNU8', '9DR3CqVgvgk', 'Oo_KUGQ7QjI', 'aqz-KE-bpKQ', '3PQm-JcpnaA', 'kYJ40_7i1sQ'];
+        const idx = parseInt(videoId.replace('example', ''), 10) - 1;
+        videoId = dummyVideoIds[idx >= 0 && idx < dummyVideoIds.length ? idx : 0];
+      }
+      embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${this.isReelsMuted ? 1 : 0}&loop=1&playlist=${videoId}&controls=0&modestbranding=1&rel=0&showinfo=0`;
+    }
+    return this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent) {
+    if (this.showReelsView) {
+      if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        this.previousReel();
+      } else if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        this.nextReel();
+      } else if (event.key === 'Escape') {
+        this.closeReelsView();
+      }
+    }
+  }
+
+  onTouchStart(event: TouchEvent): void {
+  this.touchStartY = event.changedTouches[0].clientY;
+}
+
+onTouchEnd(event: TouchEvent): void {
+  this.touchEndY = event.changedTouches[0].clientY;
+
+  const swipeDistance = this.touchStartY - this.touchEndY;
+
+  // Swipe Up → Next Reel
+  if (swipeDistance > 50) {
+    this.nextReel();
+  }
+
+  // Swipe Down → Previous Reel
+  if (swipeDistance < -50) {
+    this.previousReel();
+  }
+}
+
 }
