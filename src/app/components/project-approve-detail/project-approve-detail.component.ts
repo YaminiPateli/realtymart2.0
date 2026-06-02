@@ -56,11 +56,14 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   termsError:boolean=false;
   termsContactError:boolean=false;
   showReelsView: boolean = false;
+  currentSanitizedVideoUrl: SafeResourceUrl | null = null;
+  lastReelSwitchTime: number = 0;
   activeReelIndex: number = 0;
   isReelsMuted: boolean = false;
   reelsLikedStates: boolean[] = [false, false, false, false, false, false];
   reelsLikesCount: number[] = [124, 87, 245, 56, 189, 93];
   showReelComments: boolean = false;
+  showReelDetailCard: boolean = false;
   isSendingOtp: boolean = false;
   isContactSendingOtp: boolean = false;
   isBrochureSendingOtp: boolean = false;
@@ -93,33 +96,13 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   reels = [
     {
       title: 'Luxury Apartments',
-      thumbnail: 'https://images.unsplash.com/photo-1460317442991-0ec209397118?w=800',
-      videoUrl: 'https://youtu.be/example1'
+      thumbnail: '../../../assets/images/aqua_vista_reel_thmbnail.jpg',
+      videoUrl: 'https://youtu.be/LT_CDjb0oQk?si=dGJepre6NvrGC5jQ'
     },
     {
       title: 'Modern Township',
-      thumbnail: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800',
-      videoUrl: 'https://youtu.be/example2'
-    },
-    {
-      title: 'Premium Villas',
-      thumbnail: 'https://images.unsplash.com/photo-1511818966892-d7d671e672a2?w=800',
-      videoUrl: 'https://youtu.be/example3'
-    },
-    {
-      title: 'Commercial Project',
-      thumbnail: 'https://images.unsplash.com/photo-1494526585095-c41746248156?w=800',
-      videoUrl: 'https://youtu.be/example4'
-    },
-    {
-      title: 'Smart Homes',
-      thumbnail: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800',
-      videoUrl: 'https://youtu.be/example5'
-    },
-    {
-      title: 'High Rise Tower',
-      thumbnail: 'https://images.unsplash.com/photo-1462396240927-52058a6a84ec?w=800',
-      videoUrl: 'https://youtu.be/example6'
+      thumbnail: '../../../assets/images/stark_torre_thumbnail.jpg',
+      videoUrl: 'https://youtu.be/HhCJoz8siAQ?feature=shared'
     }
   ];
   selectedType = '2bhk';
@@ -307,8 +290,9 @@ galleryImages = [
 
   currentIndex = 4;
 
-  zoomLevel = 1;
-  touchStartY = 0;
+   zoomLevel = 1;
+   showThumbnails = true;
+   touchStartY = 0;
 touchEndY = 0;
   googleMapUrl =
     'https://www.google.com/maps?q=22.2865,73.1812';
@@ -372,6 +356,171 @@ touchEndY = 0;
   openLightbox(index: number = 0): void {
     this._lightbox.open(this._album, index);
   }
+
+  openViewer(index: number = 0): void {
+    // Merge all album images into galleryImages if albums are populated
+    const allImages = [
+      ...this.photoAlbum.map((a: any) => a.src || a),
+      ...this.layoutAlbum.map((a: any) => a.src || a),
+      ...this.videoAlbum.map((a: any) => a.src || a)
+    ];
+    if (allImages.length > 0) {
+      this.galleryImages = allImages;
+    }
+    this.currentIndex = index;
+    this.showViewer = true;
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeViewer(): void {
+    this.showViewer = false;
+    this.zoomLevel = 1;
+    this.showThumbnails = true;
+    document.body.style.overflow = '';
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(() => {});
+    }
+  }
+
+  prevImage(): void {
+    this.currentIndex = (this.currentIndex - 1 + this.galleryImages.length) % this.galleryImages.length;
+  }
+
+  nextImage(): void {
+    this.currentIndex = (this.currentIndex + 1) % this.galleryImages.length;
+  }
+
+  selectImage(index: number): void {
+    this.currentIndex = index;
+  }
+
+  isVideo(url: any): boolean {
+    if (!url) return false;
+    const urlStr = String(url).toLowerCase();
+    return (
+      urlStr.includes('youtube.com') ||
+      urlStr.includes('youtu.be') ||
+      urlStr.includes('vimeo.com') ||
+      urlStr.endsWith('.mp4') ||
+      urlStr.endsWith('.webm') ||
+      urlStr.endsWith('.ogg') ||
+      urlStr.endsWith('.mov') ||
+      urlStr.includes('.mp4?') ||
+      urlStr.includes('.webm?') ||
+      urlStr.includes('.ogg?') ||
+      urlStr.includes('.mov?')
+    );
+  }
+
+  isYouTube(url: any): boolean {
+    if (!url) return false;
+    const urlStr = String(url).toLowerCase();
+    return urlStr.includes('youtube.com') || urlStr.includes('youtu.be');
+  }
+
+  getThumbnailUrl(url: any): string {
+    if (!url) return '';
+    if (this.isVideo(url)) {
+      if (this.isYouTube(url)) {
+        let videoId = '';
+        const urlStr = String(url);
+        if (urlStr.includes('youtu.be/')) {
+          videoId = urlStr.split('youtu.be/')[1].split('?')[0].split('&')[0];
+        } else if (urlStr.includes('v=')) {
+          videoId = urlStr.split('v=')[1].split('&')[0];
+        } else if (urlStr.includes('embed/')) {
+          videoId = urlStr.split('embed/')[1].split('?')[0];
+        }
+        return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+      }
+      return 'assets/images/play.svg';
+    }
+    return url;
+  }
+
+  getSanitizedGalleryVideoUrl(url: any): SafeResourceUrl {
+    let embedUrl = String(url);
+    if (this.isYouTube(url)) {
+      let videoId = '';
+      const urlStr = String(url);
+      if (urlStr.includes('youtu.be/')) {
+        videoId = urlStr.split('youtu.be/')[1].split('?')[0].split('&')[0];
+      } else if (urlStr.includes('v=')) {
+        videoId = urlStr.split('v=')[1].split('&')[0];
+      } else if (urlStr.includes('embed/')) {
+        videoId = urlStr.split('embed/')[1].split('?')[0];
+      }
+      embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1&rel=0`;
+    }
+    return this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
+  }
+
+  zoomIn(): void {
+    if (this.zoomLevel < 3) {
+      this.zoomLevel += 0.25;
+    }
+  }
+
+  zoomOut(): void {
+    if (this.zoomLevel > 0.5) {
+      this.zoomLevel -= 0.25;
+    }
+  }
+
+  toggleThumbnails(): void {
+    this.showThumbnails = !this.showThumbnails;
+  }
+
+  toggleFullscreen(): void {
+    const element = document.querySelector('.gallery-overlay');
+    if (!element) return;
+    if (!document.fullscreenElement) {
+      element.requestFullscreen().catch(err => {
+        console.error(`Error attempting to enable fullscreen: ${err.message}`);
+      });
+    } else {
+      document.exitFullscreen().catch(() => {});
+    }
+  }
+
+  cleanUrl(url: string): string {
+    if (!url) return '';
+    // Clean up local relative assets containing parent directories (e.g. ../../../assets/...)
+    if (url.includes('assets/images/')) {
+      const idx = url.indexOf('assets/images/');
+      return '/' + url.substring(idx);
+    }
+    // Make absolute URLs root-relative if they match the current domain host,
+    // which eliminates CORS blocks in staging and production environments.
+    try {
+      const parsedUrl = new URL(url);
+      if (parsedUrl.hostname === window.location.hostname) {
+        return parsedUrl.pathname + parsedUrl.search + parsedUrl.hash;
+      }
+    } catch (e) {
+      // Already relative or not a valid absolute URL
+    }
+    return url;
+  }
+
+downloadCurrentImage(): void {
+  const rawUrl = this.galleryImages[this.currentIndex];
+  if (!rawUrl) return;
+
+  if (this.isYouTube(rawUrl)) {
+    this.toastr.warning('Video download is not supported.');
+    return;
+  }
+
+  const currentUrl = this.cleanUrl(rawUrl);
+
+  const link = document.createElement('a');
+  link.href = currentUrl;
+  link.download = currentUrl.split('/').pop() || 'image';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
 
   activeButton: string = 'buy';
 
@@ -1202,7 +1351,7 @@ touchEndY = 0;
             const imageBaseUrl = 'https://realtymart.com/backend/public/images/';
 
             // Project Photos tab: from 3d_project_images (comma-separated filenames)
-            const raw3dImages = this.singleproject?.['3d_project_images'];
+            const raw3dImages = this.singleproject?.['project_images'];
             if (typeof raw3dImages === 'string' && raw3dImages.trim()) {
               this.photoAlbum = raw3dImages.split(',').map((f: string) => imageBaseUrl + '3d_project_images/' + f.trim()).filter((u: string) => u !== imageBaseUrl + '3d_project_images/');
             } else if (Array.isArray(raw3dImages)) {
@@ -1688,27 +1837,11 @@ touchEndY = 0;
     }
   }
 
-  selectImage(index: number) {
-    this.currentIndex = index;
-  }
-
-    nextImage() {
-    this.currentIndex =
-      (this.currentIndex + 1) % this.galleryImages.length;
-  }
-
-  prevImage() {
-    this.currentIndex =
-      (this.currentIndex - 1 + this.galleryImages.length) %
-      this.galleryImages.length;
-  }
-  closeViewer() {
-    this.showViewer = false;
-  }
 
   openGallery() {
     this.showViewer = true;
   }
+
 
   // toggleShowMore(category: string): void {
   //   this.showMore[category] = !this.showMore[category];
@@ -1718,25 +1851,41 @@ touchEndY = 0;
     this.activeReelIndex = index;
     this.showReelsView = true;
     this.showReelComments = false;
+    this.showReelDetailCard = false;
     document.body.style.overflow = 'hidden';
+    this.updateSanitizedReelUrl();
   }
 
   closeReelsView() {
     this.showReelsView = false;
+    this.showReelDetailCard = false;
     document.body.style.overflow = '';
     const urlWithoutParams = window.location.pathname;
     window.history.replaceState({}, '', urlWithoutParams);
   }
 
+  toggleReelDetailCard() {
+    this.showReelDetailCard = !this.showReelDetailCard;
+  }
+
+  viewPropertyFromReel() {
+    this.closeReelsView();
+    setTimeout(() => {
+      this.scrollToSection('overview');
+    }, 100);
+  }
+
  nextReel(): void {
   if (this.activeReelIndex < this.reels.length - 1) {
     this.activeReelIndex++;
+    this.updateSanitizedReelUrl();
   }
 }
 
 previousReel(): void {
   if (this.activeReelIndex > 0) {
     this.activeReelIndex--;
+    this.updateSanitizedReelUrl();
   }
 }
 
@@ -1752,6 +1901,7 @@ previousReel(): void {
 
   toggleReelsMute() {
     this.isReelsMuted = !this.isReelsMuted;
+    this.updateSanitizedReelUrl();
   }
 
   shareReel(index: number) {
@@ -1798,6 +1948,15 @@ previousReel(): void {
     return this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
   }
 
+  updateSanitizedReelUrl(): void {
+    if (this.reels && this.reels[this.activeReelIndex]) {
+      const url = this.reels[this.activeReelIndex].videoUrl;
+      this.currentSanitizedVideoUrl = this.getSanitizedVideoUrl(url);
+    } else {
+      this.currentSanitizedVideoUrl = null;
+    }
+  }
+
   @HostListener('window:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {
     if (this.showReelsView) {
@@ -1814,23 +1973,37 @@ previousReel(): void {
   }
 
   onTouchStart(event: TouchEvent): void {
-  this.touchStartY = event.changedTouches[0].clientY;
-}
-
-onTouchEnd(event: TouchEvent): void {
-  this.touchEndY = event.changedTouches[0].clientY;
-
-  const swipeDistance = this.touchStartY - this.touchEndY;
-
-  // Swipe Up → Next Reel
-  if (swipeDistance > 50) {
-    this.nextReel();
+    this.touchStartY = event.changedTouches[0].clientY;
   }
 
-  // Swipe Down → Previous Reel
-  if (swipeDistance < -50) {
-    this.previousReel();
-  }
-}
+  onTouchEnd(event: TouchEvent): void {
+    this.touchEndY = event.changedTouches[0].clientY;
 
+    const swipeDistance = this.touchStartY - this.touchEndY;
+
+    // Swipe Up → Next Reel
+    if (swipeDistance > 50) {
+      this.nextReel();
+    }
+
+    // Swipe Down → Previous Reel
+    if (swipeDistance < -50) {
+      this.previousReel();
+    }
+  }
+
+  handleWheel(event: WheelEvent): void {
+    event.preventDefault();
+    const now = Date.now();
+    if (now - this.lastReelSwitchTime < 800) {
+      return;
+    }
+    if (event.deltaY > 30) {
+      this.nextReel();
+      this.lastReelSwitchTime = now;
+    } else if (event.deltaY < -30) {
+      this.previousReel();
+      this.lastReelSwitchTime = now;
+    }
+  }
 }

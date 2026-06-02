@@ -11,7 +11,7 @@
 
   <!-- Photos Count -->
   <div class="photo-count shadow-sm cursor-pointer"
-    *ngIf="photoAlbum.length > 0 || layoutAlbum.length > 0 || videoAlbum.length > 0">
+    *ngIf="photoAlbum.length > 0 || layoutAlbum.length > 0 || videoAlbum.length > 0" (click)="openViewer(0)">
     <img src="../../../assets/images/photo.png" alt="" srcset="">
     <span> {{ photoAlbum.length + layoutAlbum.length + videoAlbum.length }} Photos</span>
   </div>
@@ -252,9 +252,9 @@
         <section id="reels" class="reels-section">
           <h3 class="section-title">Watch Our Reels</h3>
 
-          <div class="row g-4">
+          <div class="row g-4 justify-content-center">
 
-            <div class="col-12 col-sm-6 col-lg-4" *ngFor="let reel of reels; let i = index">
+            <div class="col-6 col-md-4 d-flex justify-content-center" *ngFor="let reel of reels; let i = index">
               <div class="reel-card" (click)="openReelsView(i)">
 
                 <img [src]="reel.thumbnail" [alt]="reel.title" class="reel-thumbnail" />
@@ -582,29 +582,49 @@
 <div class="gallery-overlay" *ngIf="showViewer">
   <!-- Header Icons -->
   <div class="viewer-actions">
-    <button><i class="bi bi-zoom-in"></i></button>
-    <button><i class="bi bi-zoom-out"></i></button>
-    <button><i class="bi bi-grid-3x3-gap"></i></button>
-    <button><i class="bi bi-arrows-fullscreen"></i></button>
-    <button><i class="bi bi-download"></i></button>
-    <button (click)="closeViewer()">
-      <i class="bi bi-x-lg"></i>
+    <button (click)="zoomIn()" title="Zoom In"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+    <button (click)="zoomOut()" title="Zoom Out"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
+    <button (click)="toggleThumbnails()" title="Toggle Thumbnails"><i class="fa-solid fa-table-cells"></i></button>
+    <button (click)="toggleFullscreen()" title="Toggle Fullscreen"><i class="fa-solid fa-expand"></i></button>
+    <button (click)="downloadCurrentImage()" title="Download"><i class="fa-solid fa-download"></i></button>
+    <button (click)="closeViewer()" title="Close">
+      <i class="fa-solid fa-xmark"></i>
     </button>
   </div>
 
   <!-- Prev -->
   <button class="nav-btn prev-btn" (click)="prevImage()">
-    <i class="bi bi-chevron-left"></i>
+    <i class="fa-solid fa-chevron-left"></i>
   </button>
 
-  <!-- Main Image -->
+  <!-- Main Image or Video -->
   <div class="viewer-content">
-    <img [src]="galleryImages[currentIndex]" class="main-image" alt="gallery image" />
+    <ng-container *ngIf="isVideo(galleryImages[currentIndex])">
+      <!-- YouTube Video -->
+      <iframe *ngIf="isYouTube(galleryImages[currentIndex])"
+        [src]="getSanitizedGalleryVideoUrl(galleryImages[currentIndex])"
+        class="main-image gallery-video-iframe"
+        [style.transform]="'scale(' + zoomLevel + ')'"
+        frameborder="0"
+        allowfullscreen>
+      </iframe>
+      <!-- Direct Video file -->
+      <video *ngIf="!isYouTube(galleryImages[currentIndex])"
+        [src]="galleryImages[currentIndex]"
+        class="main-image gallery-video-element"
+        [style.transform]="'scale(' + zoomLevel + ')'"
+        controls
+        autoplay>
+      </video>
+    </ng-container>
+    <ng-container *ngIf="!isVideo(galleryImages[currentIndex])">
+      <img [src]="galleryImages[currentIndex]" class="main-image" [style.transform]="'scale(' + zoomLevel + ')'" alt="gallery image" />
+    </ng-container>
   </div>
 
   <!-- Next -->
   <button class="nav-btn next-btn" (click)="nextImage()">
-    <i class="bi bi-chevron-right"></i>
+    <i class="fa-solid fa-chevron-right"></i>
   </button>
 
   <!-- Counter -->
@@ -613,10 +633,20 @@
   </div>
 
   <!-- Thumbnails -->
-  <div class="thumbnail-wrapper">
-    <div class="thumbnail-item" *ngFor="let image of galleryImages; let i = index" [class.active]="i === currentIndex"
+  <div class="thumbnail-wrapper" *ngIf="showThumbnails">
+    <div class="thumbnail-item" *ngFor="let item of galleryImages; let i = index" [class.active]="i === currentIndex"
       (click)="selectImage(i)">
-      <img [src]="image" />
+      <ng-container *ngIf="isVideo(item)">
+        <div class="video-thumbnail-container">
+          <img [src]="getThumbnailUrl(item)" />
+          <div class="play-overlay">
+            <i class="fa-solid fa-play"></i>
+          </div>
+        </div>
+      </ng-container>
+      <ng-container *ngIf="!isVideo(item)">
+        <img [src]="item" />
+      </ng-container>
     </div>
   </div>
 </div>
@@ -800,7 +830,8 @@
      REELS IMMERSIVE OVERLAY
      Layout: [back btn] [card + sidebar] [nav arrows far-right]
      ============================================= -->
-<div class="reels-immersive-overlay" *ngIf="showReelsView">
+<div class="reels-immersive-overlay" *ngIf="showReelsView" (touchstart)="onTouchStart($event)"
+  (touchend)="onTouchEnd($event)" (wheel)="handleWheel($event)">
 
   <!-- Dark backdrop -->
   <div class="reels-backdrop"></div>
@@ -811,22 +842,22 @@
   </button>
 
   <!-- Centre: card + interaction sidebar -->
-  <div class="reels-container-wrapper">
+  <div class="reels-container-wrapper" [class.reels-details-open]="showReelDetailCard">
 
     <!-- ── Phone card ── -->
-    <div class="reels-player-card"
-         (touchstart)="onTouchStart($event)"
-         (touchend)="onTouchEnd($event)">
+    <div class="reels-player-card">
 
       <!-- Media (YouTube or image fallback) -->
       <div class="reels-media-container">
         <iframe
           *ngIf="reels[activeReelIndex].videoUrl.includes('youtube.com') || reels[activeReelIndex].videoUrl.includes('youtu.be')"
-          [src]="getSanitizedVideoUrl(reels[activeReelIndex].videoUrl)"
-          class="reels-video-frame" frameborder="0"
+          [src]="currentSanitizedVideoUrl" class="reels-video-frame" frameborder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowfullscreen>
         </iframe>
+        <div
+          *ngIf="reels[activeReelIndex].videoUrl.includes('youtube.com') || reels[activeReelIndex].videoUrl.includes('youtu.be')"
+          class="reels-video-overlay-blocker"></div>
         <div
           *ngIf="!reels[activeReelIndex].videoUrl.includes('youtube.com') && !reels[activeReelIndex].videoUrl.includes('youtu.be')"
           class="reels-image-wrapper">
@@ -848,9 +879,8 @@
       <div class="reels-card-bottom-details">
         <div class="reels-developer-info">
           <div class="reels-dev-logo-wrap">
-            <img *ngIf="singleproject?.project_logo"
-                 [src]="singleproject?.project_logo"
-                 class="reels-dev-logo" alt="Builder logo">
+            <img *ngIf="singleproject?.project_logo" [src]="singleproject?.project_logo" class="reels-dev-logo"
+              alt="Builder logo">
             <span *ngIf="!singleproject?.project_logo" class="reels-dev-letter">B</span>
           </div>
           <div>
@@ -861,7 +891,7 @@
           </div>
         </div>
         <div class="reels-action-row">
-          <button class="reels-action-btn-red" (click)="closeReelsView()">View Details</button>
+          <button class="reels-action-btn-red" (click)="toggleReelDetailCard()">View Details</button>
           <button class="reels-action-btn-outline" data-bs-toggle="modal" data-bs-target="#get-builder">
             <i class="fa-solid fa-phone me-1"></i>View Contact
           </button>
@@ -875,11 +905,9 @@
 
       <!-- Like -->
       <div class="reels-interact-item">
-        <button class="reels-interact-btn"
-                [class.liked]="reelsLikedStates[activeReelIndex]"
-                (click)="toggleReelsLike(activeReelIndex)">
-          <i class="fa-heart"
-             [ngClass]="reelsLikedStates[activeReelIndex] ? 'fa-solid reel-liked' : 'fa-regular'"></i>
+        <button class="reels-interact-btn" [class.liked]="reelsLikedStates[activeReelIndex]"
+          (click)="toggleReelsLike(activeReelIndex)">
+          <i class="fa-heart" [ngClass]="reelsLikedStates[activeReelIndex] ? 'fa-solid reel-liked' : 'fa-regular'"></i>
         </button>
         <span class="reels-interact-count">{{ reelsLikesCount[activeReelIndex] }}</span>
       </div>
@@ -911,6 +939,61 @@
     </div>
     <!-- end .reels-interaction-bar -->
 
+    <!-- ── Property Detail Card (Floating on right of sidebar) ── -->
+    <div class="reels-property-card animate__animated animate__fadeInRight" *ngIf="showReelDetailCard">
+      <!-- Card Header: Developer/Project info -->
+      <div class="reels-prop-header">
+        <div class="reels-prop-avatar-wrap">
+          <img *ngIf="singleproject?.project_logo" [src]="singleproject?.project_logo" class="reels-prop-avatar"
+            alt="Logo">
+          <span *ngIf="!singleproject?.project_logo" class="reels-prop-letter">B</span>
+        </div>
+        <div class="reels-prop-header-text">
+          <h6 class="reels-prop-title">{{ singleproject?.project_name || 'Binori Aristella' }}</h6>
+          <small class="reels-prop-subtitle">{{ singleproject?.project_localities || 'Ahmedabad' }}</small>
+        </div>
+      </div>
+
+      <!-- Property Image -->
+      <div class="reels-prop-img-container">
+        <img *ngIf="singleproject?.project_banner_image" [src]="singleproject?.project_banner_image"
+          class="reels-prop-img" alt="Property banner">
+        <img *ngIf="!singleproject?.project_banner_image" src="../../../assets/images/slider-img-1.png"
+          class="reels-prop-img" alt="Default banner">
+      </div>
+
+      <!-- Property Info -->
+      <div class="reels-prop-body">
+        <div class="reels-prop-name-price">
+          <span class="reels-prop-name">{{ singleproject?.project_name || 'Binori Aristella' }}</span>
+          <span class="reels-prop-price">Price: <strong class="reels-prop-price-val">₹ {{
+              singleproject?.project_minimum_price || '70 Lac' }} - {{ singleproject?.project_maximum_price || '2 Cr'
+              }}</strong></span>
+        </div>
+
+        <div class="reels-prop-builder">
+          <i class="fa-solid fa-location-dot reels-red-pin-icon"></i>
+          <span>by {{ singleproject?.builderName || 'Binori Group' }}</span>
+        </div>
+
+        <hr class="reels-prop-divider">
+
+        <div class="reels-prop-specs">
+          <div class="reels-prop-type">{{ singleproject?.project_type?.join(', ') || '2, 3 BHK Flat' }}</div>
+          <div class="reels-prop-size">{{ singleproject?.project_size_in_sqft ? singleproject.project_size_in_sqft + '
+            SqFt' : '700 SqFt - 963 SqFt' }}</div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="reels-prop-actions">
+          <button class="reels-prop-btn-red" (click)="viewPropertyFromReel()">View Property</button>
+          <button class="reels-prop-btn-outline" data-bs-toggle="modal" data-bs-target="#get-builder">
+            <i class="fa-solid fa-phone-volume me-2"></i>View Contact
+          </button>
+        </div>
+      </div>
+    </div>
+
   </div>
   <!-- end .reels-container-wrapper -->
 
@@ -925,4 +1008,4 @@
   </div>
 
 </div>
-<!-- end .reels-immersive-overlay -->
+<!-- end .reels-immersive-overlay -->

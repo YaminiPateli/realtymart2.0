@@ -470,10 +470,11 @@ ul.flore_links::-webkit-scrollbar-thumb {
 .reel-card {
   position: relative;
   width: 100%;
+  max-width: 260px;
   aspect-ratio: 9 / 16;
 
   background: #000;
-  border-radius: 24px;
+  border-radius: 20px;
   cursor: pointer;
 
   display: flex;
@@ -486,6 +487,7 @@ ul.flore_links::-webkit-scrollbar-thumb {
 
 .reel-card:hover {
   transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
 }
 
 .reel-thumbnail {
@@ -499,18 +501,27 @@ ul.flore_links::-webkit-scrollbar-thumb {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 70px;
-  height: 70px;
+  width: clamp(44px, 12vw, 64px);
+  height: clamp(44px, 12vw, 64px);
   background: rgba(255, 255, 255, 0.9);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
 }
 
 .play-btn img {
-  width: 28px;
-  height: 28px;
+  width: clamp(16px, 4vw, 24px);
+  height: clamp(16px, 4vw, 24px);
+  margin-left: 2px;
+  /* slight visual balance adjustment for play chevron */
+}
+
+.reel-card:hover .play-btn {
+  background: #ffffff;
+  transform: translate(-50%, -50%) scale(1.08);
 }
 
 .reel-card:hover .reel-thumbnail {
@@ -1469,6 +1480,15 @@ google-map {
   pointer-events: none;
 }
 
+/* Video overlay blocker to prevent native YT overlay playback controls from appearing */
+.reels-video-overlay-blocker {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: transparent;
+  pointer-events: auto;
+}
+
 /* Fallback image */
 .reels-image-wrapper {
   width: 100%;
@@ -1990,3 +2010,663 @@ google-map {
     padding: 30px 14px 14px;
   }
 }
+
+/* --- Floating Property Details Card --- */
+/* --- Floating Property Details Card --- */
+.reels-property-card {
+  background: #ffffff;
+  color: #333333;
+  width: 320px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 50;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  font-family: 'Inter', 'Outfit', sans-serif;
+  animation-duration: 0.3s;
+  flex-shrink: 0;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.reels-prop-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.reels-prop-avatar-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #ff5a3c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1.5px solid #eaeaea;
+  flex-shrink: 0;
+}
+
+.reels-prop-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.reels-prop-letter {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.reels-prop-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.reels-prop-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #111111;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.reels-prop-subtitle {
+  font-size: 12px;
+  color: #777777;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.reels-prop-img-container {
+  width: 100%;
+  height: 160px;
+  overflow: hidden;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.reels-prop-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.reels-property-card:hover .reels-prop-img {
+  transform: scale(1.03);
+}
+
+.reels-prop-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.reels-prop-name-price {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.reels-prop-name {
+  font-size: 14px;
+  color: #777777;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 130px;
+}
+
+.reels-prop-price {
+  font-size: 13px;
+  color: #777777;
+  font-weight: 500;
+}
+
+.reels-prop-price-val {
+  font-size: 14px;
+  color: #333333;
+  font-weight: 700;
+}
+
+.reels-prop-builder {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #777777;
+  font-weight: 500;
+}
+
+.reels-red-pin-icon {
+  color: #e53e3e;
+  font-size: 15px;
+}
+
+.reels-prop-divider {
+  border: 0;
+  border-top: 1px solid #eeeeee;
+  margin: 12px 0;
+}
+
+.reels-prop-specs {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.reels-prop-type {
+  font-size: 14px;
+  color: #444444;
+  font-weight: 600;
+}
+
+.reels-prop-size {
+  font-size: 13px;
+  color: #777777;
+  font-weight: 500;
+}
+
+.reels-prop-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.reels-prop-btn-red {
+  flex: 1;
+  background: #e53e3e;
+  border: none;
+  color: #ffffff;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 8px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  text-align: center;
+}
+
+.reels-prop-btn-red:hover {
+  background: #c53030;
+}
+
+.reels-prop-btn-outline {
+  flex: 1;
+  background: #ffffff;
+  border: 1.5px solid #1a1a1a;
+  color: #1a1a1a;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 9px 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.reels-prop-btn-outline:hover {
+  background: #f7f7f7;
+  border-color: #000000;
+  color: #000000;
+}
+
+/* Responsive Styles for Property Card and Watch Reels overlay */
+@media (max-width: 920px) {
+  .reels-player-card {
+    width: 300px;
+    height: min(540px, 80vh);
+  }
+
+  .reels-property-card {
+    width: 270px;
+    padding: 12px;
+  }
+
+  .reels-prop-img-container {
+    height: 120px;
+  }
+
+  .reels-container-wrapper {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .reels-player-card {
+    width: 260px;
+    height: min(480px, 75vh);
+    border-radius: 20px;
+  }
+
+  .reels-property-card {
+    width: 240px;
+    padding: 10px;
+  }
+
+  .reels-prop-img-container {
+    height: 100px;
+  }
+
+  .reels-prop-title {
+    font-size: 13px;
+  }
+
+  .reels-prop-subtitle {
+    font-size: 11px;
+  }
+
+  .reels-prop-name,
+  .reels-prop-price-val {
+    font-size: 12px;
+  }
+
+  .reels-prop-specs {
+    margin-bottom: 8px;
+  }
+
+  .reels-prop-type,
+  .reels-prop-size {
+    font-size: 12px;
+  }
+
+  .reels-prop-actions {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .reels-prop-btn-red,
+  .reels-prop-btn-outline {
+    padding: 8px 4px;
+    font-size: 11px;
+    width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  .reels-immersive-overlay {
+    align-items: flex-start;
+  }
+
+  .reels-container-wrapper {
+    width: 100vw;
+    height: 100vh;
+    gap: 0;
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+
+  .reels-player-card {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+  }
+
+  /* Reposition interaction bar on mobile */
+  .reels-interaction-bar {
+    position: absolute;
+    right: 15px;
+    bottom: 120px;
+    z-index: 20;
+    gap: 14px;
+    transition: bottom 0.3s ease;
+  }
+
+  /* Shifting interaction sidebar higher when details card drawer is open */
+  .reels-container-wrapper.reels-details-open .reels-interaction-bar {
+    bottom: 375px;
+  }
+
+  /* Hide up/down nav arrows completely on mobile screens */
+  .reels-nav-fixed {
+    display: none !important;
+  }
+
+  /* Elegant absolute bottom drawer property card */
+  .reels-property-card {
+    position: absolute;
+    bottom: 80px;
+    left: 12px;
+    right: 12px;
+    width: calc(100% - 24px) !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    z-index: 100;
+    max-height: 280px;
+    padding: 12px;
+    border-radius: 12px;
+  }
+
+  .reels-prop-img-container {
+    height: 90px;
+    margin-bottom: 8px;
+  }
+
+  .reels-prop-body {
+    gap: 6px;
+  }
+
+  .reels-prop-divider {
+    margin: 8px 0;
+  }
+
+  .reels-prop-specs {
+    margin-bottom: 8px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .reels-prop-actions {
+    flex-direction: row;
+    gap: 8px;
+    margin-top: 2px;
+  }
+
+  .reels-prop-btn-red,
+  .reels-prop-btn-outline {
+    padding: 9px 6px;
+    font-size: 12px;
+    width: auto;
+    flex: 1;
+  }
+}
+
+/* ============================================================
+   GALLERY LIGHTBOX OVERLAY
+   ============================================================ */
+
+.gallery-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.92);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: galleryFadeIn 0.25s ease;
+}
+
+@keyframes galleryFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ---- Top action bar ---- */
+.viewer-actions {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 10;
+}
+
+.viewer-actions button {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  border-radius: 6px;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.viewer-actions button:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.08);
+}
+
+/* ---- Main image area ---- */
+.viewer-content {
+  width: 100%;
+  max-width: 820px;
+  padding: 0 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.main-image {
+  max-width: 100%;
+  max-height: calc(100vh - 220px);
+  object-fit: contain;
+  border-radius: 6px;
+  display: block;
+  user-select: none;
+  pointer-events: none;
+  animation: imageFadeIn 0.2s ease;
+  transition: transform 0.2s ease;
+}
+
+@keyframes imageFadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ---- Prev / Next nav buttons ---- */
+.gallery-overlay .nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+  z-index: 10;
+}
+
+.gallery-overlay .nav-btn:hover {
+  background: rgba(255, 255, 255, 0.30);
+}
+
+.gallery-overlay .prev-btn {
+  left: 18px;
+}
+
+.gallery-overlay .next-btn {
+  right: 18px;
+}
+
+/* ---- Image counter (bottom-left) ---- */
+.image-count {
+  position: absolute;
+  bottom: 105px;
+  left: 22px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  z-index: 10;
+}
+
+/* ---- Thumbnail strip ---- */
+.thumbnail-wrapper {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 20px;
+  background: rgba(0, 0, 0, 0.6);
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.3) transparent;
+}
+
+.thumbnail-wrapper::-webkit-scrollbar {
+  height: 4px;
+}
+
+.thumbnail-wrapper::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
+.thumbnail-item {
+  width: 90px;
+  height: 64px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
+  opacity: 0.6;
+}
+
+.thumbnail-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.thumbnail-item.active {
+  border-color: #ef3f23;
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.thumbnail-item:hover:not(.active) {
+  opacity: 0.85;
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+  .viewer-content {
+    padding: 0 50px;
+  }
+
+  .gallery-overlay .nav-btn {
+    width: 38px;
+    height: 38px;
+    font-size: 18px;
+  }
+
+  .gallery-overlay .prev-btn { left: 8px; }
+  .gallery-overlay .next-btn { right: 8px; }
+
+  .thumbnail-item {
+    width: 70px;
+    height: 50px;
+  }
+
+  .viewer-actions button {
+    width: 34px;
+    height: 34px;
+    font-size: 15px;
+  }
+
+  .image-count {
+    bottom: 88px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .viewer-content {
+    padding: 0 36px;
+  }
+
+  .thumbnail-item {
+    width: 56px;
+    height: 42px;
+  }
+}
+
+/* Custom video styling for gallery lightbox view */
+.gallery-video-iframe,
+.gallery-video-element {
+  max-width: 100%;
+  max-height: calc(100vh - 220px);
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  border: none;
+  transition: transform 0.2s ease;
+}
+
+.video-thumbnail-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.video-thumbnail-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.video-thumbnail-container .play-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.25s ease;
+  z-index: 2;
+}
+
+.video-thumbnail-container:hover .play-overlay {
+  background: rgba(239, 63, 35, 0.6); /* RealtyMart brand accent color */
+}
+
+.video-thumbnail-container .play-overlay i {
+  color: #ffffff;
+  font-size: 26px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+  transition: transform 0.2s ease;
+}
+
+.video-thumbnail-container:hover .play-overlay i {
+  transform: scale(1.2);
+}
