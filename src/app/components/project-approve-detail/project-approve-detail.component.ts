@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy, OnInit, ViewChild  } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Lightbox } from 'ngx-lightbox';
 import { ProjectApproveDetailsService } from '../service/projectapprovedetail.service';
 import { ProjectdetailsService } from '../service/projectdetails.service';
@@ -6,7 +6,7 @@ import { ActivatedRoute } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Location } from '@angular/common';
 // import { DatePipe } from '@angular/common';
-import { ToastrModule,ToastrService } from 'ngx-toastr';
+import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
 import { Fancybox } from "@fancyapps/ui";
 import { Title, Meta, DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
@@ -15,13 +15,14 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { IssponsoredService } from '../service/issponsored.service';
 import { IsverifiedService } from '../service/isverified.service';
 import { ActivityTrackerService } from '../service/activitytracker.service';
+import { FilteredCities } from 'src/app/filteredcities';
 declare var bootstrap: any;
 @Component({
   selector: 'app-project-approve-detail',
   templateUrl: './project-approve-detail.component.html',
   styleUrls: ['./project-approve-detail.component.css']
 })
-export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnDestroy  {
+export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('otpModel') otpModel!: ElementRef;
   @ViewChild('otpContactModel') otpContactModel!: ElementRef;
   private apiUrl: string = environment.apiUrl;
@@ -39,22 +40,52 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   verifyData: any;
   verify: any;
   currentSection: any;
-  showMore: any;
-  activeSection:any='overview';
-  nameError:boolean=false;
-  emailError:boolean=false;
-  phoneError:boolean=false;
-  nameTouched:boolean=false;
-  emailTouched:boolean=false;
-  phoneTouched:boolean=false;
-  nameContactError:boolean=false;
-  emailContactError:boolean=false;
-  phoneContactError:boolean=false;
-  nameContactTouched:boolean=false;
-  emailContactTouched:boolean=false;
-  phoneContactTouched:boolean=false;
-  termsError:boolean=false;
-  termsContactError:boolean=false;
+  private _activeSection: string = 'overview';
+  get activeSection(): any {
+    return this._activeSection;
+  }
+  set activeSection(val: any) {
+    if (this._activeSection !== val) {
+      this._activeSection = val;
+      this.scrollActiveNavLinkIntoView();
+    }
+  }
+
+  scrollActiveNavLinkIntoView(): void {
+    setTimeout(() => {
+      const navbar = document.getElementById('navbar');
+      if (!navbar) return;
+      const activeLink = navbar.querySelector('a.active') as HTMLElement;
+      const activeLi = activeLink ? activeLink.parentElement : null;
+      const scrollContainer = navbar.querySelector('.flore_links') as HTMLElement;
+
+      if (activeLi && scrollContainer) {
+        const containerWidth = scrollContainer.offsetWidth;
+        const activeOffsetLeft = activeLi.offsetLeft;
+        const activeWidth = activeLi.offsetWidth;
+        const scrollToX = activeOffsetLeft - (containerWidth / 2) + (activeWidth / 2);
+
+        scrollContainer.scrollTo({
+          left: scrollToX,
+          behavior: 'smooth'
+        });
+      }
+    }, 50);
+  }
+  nameError: boolean = false;
+  emailError: boolean = false;
+  phoneError: boolean = false;
+  nameTouched: boolean = false;
+  emailTouched: boolean = false;
+  phoneTouched: boolean = false;
+  nameContactError: boolean = false;
+  emailContactError: boolean = false;
+  phoneContactError: boolean = false;
+  nameContactTouched: boolean = false;
+  emailContactTouched: boolean = false;
+  phoneContactTouched: boolean = false;
+  termsError: boolean = false;
+  termsContactError: boolean = false;
   showReelsView: boolean = false;
   currentSanitizedVideoUrl: SafeResourceUrl | null = null;
   lastReelSwitchTime: number = 0;
@@ -71,9 +102,9 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   isSubmitting = false;
   enquirySubmitted = false;
   contactEnquirySubmitted = false;
-  checkToken:any;
-  is_token:boolean=false;
-  formData : any = {
+  checkToken: any;
+  is_token: boolean = false;
+  formData: any = {
     username: '', // Initialize with an empty string
     useremail: '', // Initialize with an empty string
     contact_no: null, // Initialize with null or a default number
@@ -103,18 +134,78 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
       title: 'Modern Township',
       thumbnail: '../../../assets/images/stark_torre_thumbnail.jpg',
       videoUrl: 'https://youtu.be/HhCJoz8siAQ?feature=shared'
+    },
+    {
+      title: 'Modern Township',
+      thumbnail: '../../../assets/images/stark_torre_thumbnail.jpg',
+      videoUrl: 'https://youtu.be/HhCJoz8siAQ?feature=shared'
+    },
+    {
+      title: 'Modern Township',
+      thumbnail: '../../../assets/images/stark_torre_thumbnail.jpg',
+      videoUrl: 'https://youtu.be/HhCJoz8siAQ?feature=shared'
     }
   ];
-  selectedType = '2bhk';
+  selectedType: '2bhk' | '3bhk' = '2bhk';
   floorPlans = {
-  '2bhk': {
-    area: '700 SqFt',
-    image: './assets/images/floor_plan.png'
-  },
-  '3bhk': {
-    area: '950 SqFt',
-    image: './assets/images/floor_plan.png'
-  }
+    '2bhk': {
+      area: '700 SqFt',
+      images: [
+        './assets/images/floor_plan.png',
+        './assets/images/floor_plan_2.png',
+        './assets/images/floor_plan_3.jpg'
+      ]
+    },
+    '3bhk': {
+      area: '950 SqFt',
+      images: [
+        './assets/images/floor_plan_2.png',
+        './assets/images/floor_plan_3.jpg'
+      ]
+    }
+  };
+
+  floorPlanSlideConfig = {
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    dots: true,
+    arrows: true,
+    infinite: false,
+    prevArrow: "<img class='a-left control-c prev slick-prev' src='assets/images/prev.svg'>",
+    nextArrow: "<img class='a-right control-c next slick-next' src='assets/images/next.svg'>"
+  };
+
+  reelsSlideConfig = {
+    slidesToShow: 4,
+    slidesToScroll: 1,
+    dots: true,
+    arrows: true,
+    infinite: false,
+    prevArrow: "<img class='a-left control-c prev slick-prev' src='assets/images/prev.svg'>",
+    nextArrow: "<img class='a-right control-c next slick-next' src='assets/images/next.svg'>",
+    responsive: [
+      {
+        breakpoint: 1200,
+        settings: {
+          slidesToShow: 3,
+          slidesToScroll: 1
+        }
+      },
+      {
+        breakpoint: 992,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 1
+        }
+      },
+      {
+        breakpoint: 576,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1
+        }
+      }
+    ]
   };
 
   markerPosition: google.maps.LatLngLiteral = {
@@ -157,7 +248,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     }
   ];
 
-    developerProjects = [
+  developerProjects = [
     {
       name: 'Sarang Lakeview',
       image: '../../../assets/images/slider-img-1.png'
@@ -277,23 +368,31 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     }
   ];
 
-galleryImages = [
-  '../../../assets/images/gallary_img.png',
-  '../../../assets/images/gallery-2.jpg',
-  '../../../assets/images/gallery-3.jpg',
-  '../../../assets/images/gallery-4.jpg',
-  '../../../assets/images/gallery-5.jpg',
-  '../../../assets/images/gallery-6.jpg'
-];
+  galleryImages = [
+    '../../../assets/images/gallary_img.png',
+    '../../../assets/images/gallery-2.jpg',
+    '../../../assets/images/gallery-3.jpg',
+    '../../../assets/images/gallery-4.jpg',
+    '../../../assets/images/gallery-5.jpg',
+    '../../../assets/images/gallery-6.jpg'
+  ];
 
- showViewer = false;
+  showViewer = false;
 
   currentIndex = 4;
 
-   zoomLevel = 1;
-   showThumbnails = true;
-   touchStartY = 0;
-touchEndY = 0;
+  zoomLevel = 1;
+  showThumbnails = true;
+  touchStartY = 0;
+  touchEndY = 0;
+  showFilters = false;
+  selectedSegments: string[] = ['Buy'];
+  selectedPropertyTypes: string[] = [];
+  selectedBHKs: string[] = ['2 BHK'];
+  city1: { cid: number, cname: string }[] = [];
+  priceTooltipVisible: boolean = false;
+  showStickyHeader = false;
+
   googleMapUrl =
     'https://www.google.com/maps?q=22.2865,73.1812';
   private timer: any;
@@ -336,13 +435,16 @@ touchEndY = 0;
   showReadMore: boolean = false;
   isReadMore: boolean = false;
   charLimit: number = 20;
+  isAboutExpanded: boolean = false;
+  isWhyBuyExpanded: boolean = false;
+  isDeveloperExpanded: boolean = false;
 
   ngAfterViewInit(): void {
     this.checkDescriptionHeight();
     Fancybox.bind('[data-fancybox="gallery"]', {
 
     });
-}
+  }
 
 
   playReel(reel: any) {
@@ -362,10 +464,35 @@ touchEndY = 0;
     const allImages = [
       ...this.photoAlbum.map((a: any) => a.src || a),
       ...this.layoutAlbum.map((a: any) => a.src || a),
-      ...this.videoAlbum.map((a: any) => a.src || a)
+      ...this.videoAlbum.map((a: any) => a.proj_video_link || a.src || a)
     ];
     if (allImages.length > 0) {
       this.galleryImages = allImages;
+    }
+    this.currentIndex = index;
+    this.showViewer = true;
+    document.body.style.overflow = 'hidden';
+  }
+
+  openPhotoViewer(index: number = 0): void {
+    const allImages = [
+      ...this.photoAlbum.map((a: any) => a.src || a),
+      ...this.layoutAlbum.map((a: any) => a.src || a)
+    ];
+    if (allImages.length > 0) {
+      this.galleryImages = allImages;
+    }
+    this.currentIndex = index;
+    this.showViewer = true;
+    document.body.style.overflow = 'hidden';
+  }
+
+  openVideoViewer(index: number = 0): void {
+    const allVideos = [
+      ...this.videoAlbum.map((a: any) => a.proj_video_link || a.src || a)
+    ];
+    if (allVideos.length > 0) {
+      this.galleryImages = allVideos;
     }
     this.currentIndex = index;
     this.showViewer = true;
@@ -378,7 +505,7 @@ touchEndY = 0;
     this.showThumbnails = true;
     document.body.style.overflow = '';
     if (document.fullscreenElement) {
-      document.exitFullscreen().catch(() => {});
+      document.exitFullscreen().catch(() => { });
     }
   }
 
@@ -421,6 +548,16 @@ touchEndY = 0;
   getThumbnailUrl(url: any): string {
     if (!url) return '';
     if (this.isVideo(url)) {
+      // Check if this video has a custom thumbnail in videoAlbum
+      const found = this.videoAlbum.find(v => (v.proj_video_link === url || v.src === url || v === url));
+      if (found && found.proj_video_thumbnail) {
+        let thumb = found.proj_video_thumbnail;
+        if (!thumb.startsWith('http')) {
+          thumb = 'https://realtymart.com/backend/public/images/project_video/' + thumb;
+        }
+        return thumb;
+      }
+
       if (this.isYouTube(url)) {
         let videoId = '';
         const urlStr = String(url);
@@ -479,7 +616,7 @@ touchEndY = 0;
         console.error(`Error attempting to enable fullscreen: ${err.message}`);
       });
     } else {
-      document.exitFullscreen().catch(() => {});
+      document.exitFullscreen().catch(() => { });
     }
   }
 
@@ -503,24 +640,24 @@ touchEndY = 0;
     return url;
   }
 
-downloadCurrentImage(): void {
-  const rawUrl = this.galleryImages[this.currentIndex];
-  if (!rawUrl) return;
+  downloadCurrentImage(): void {
+    const rawUrl = this.galleryImages[this.currentIndex];
+    if (!rawUrl) return;
 
-  if (this.isYouTube(rawUrl)) {
-    this.toastr.warning('Video download is not supported.');
-    return;
+    if (this.isYouTube(rawUrl)) {
+      this.toastr.warning('Video download is not supported.');
+      return;
+    }
+
+    const currentUrl = this.cleanUrl(rawUrl);
+
+    const link = document.createElement('a');
+    link.href = currentUrl;
+    link.download = currentUrl.split('/').pop() || 'image';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
-
-  const currentUrl = this.cleanUrl(rawUrl);
-
-  const link = document.createElement('a');
-  link.href = currentUrl;
-  link.download = currentUrl.split('/').pop() || 'image';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
 
   activeButton: string = 'buy';
 
@@ -704,7 +841,10 @@ downloadCurrentImage(): void {
 
 
 
-  center!: google.maps.LatLngLiteral;
+  center: google.maps.LatLngLiteral = {
+    lat: 22.2865,
+    lng: 73.1812
+  };
   zoom = 15;
 
   ngOnInit(): void {
@@ -726,34 +866,48 @@ downloadCurrentImage(): void {
     this.fetchProjectApproveDetails();
     // this.loadissponsored();
     // this.loadisverified();
-    this.center = {
-      lat: this.singleproject?.latitude,
-      lng: this.singleproject?.longitude,
-    };
+    if (this.latitude && this.longitude) {
+      this.updateMapCoordinates(this.latitude, this.longitude);
+    } else if (this.singleproject?.latitude && this.singleproject?.longitude) {
+      this.updateMapCoordinates(this.singleproject.latitude, this.singleproject.longitude);
+    }
     this.route.fragment.subscribe(fragment => {
-        this.currentSection = fragment;
+      this.currentSection = fragment;
+    });
+    const modalElement = document.getElementById('get-builder');
+    if (modalElement) {
+      modalElement.addEventListener('hide.bs.modal', () => {
+        this.resetContactForm();
       });
-      const modalElement = document.getElementById('get-builder');
-      if (modalElement) {
-        modalElement.addEventListener('hide.bs.modal', () => {
-          this.resetContactForm();
-        });
+    }
+    this.route.queryParams.subscribe(params => {
+      if (params['reels'] === 'true') {
+        const index = params['reel'] ? parseInt(params['reel'], 10) : 0;
+        this.openReelsView(index);
       }
-      this.route.queryParams.subscribe(params => {
-        if (params['reels'] === 'true') {
-          const index = params['reel'] ? parseInt(params['reel'], 10) : 0;
-          this.openReelsView(index);
-        }
-      });
+    });
+    this.fetchCities();
   }
 
   checkLoggedIn() {
     this.checkToken = localStorage.getItem('myrealtylogintoken');
-    if(this.checkToken){
-      this.is_token= true;
+    if (this.checkToken) {
+      this.is_token = true;
     }
     else {
-      this.is_token= false;
+      this.is_token = false;
+    }
+  }
+
+  updateMapCoordinates(latVal: any, lngVal: any) {
+    if (latVal && lngVal) {
+      const lat = parseFloat(String(latVal).trim());
+      const lng = parseFloat(String(lngVal).trim());
+      if (!isNaN(lat) && !isNaN(lng)) {
+        this.center = { lat, lng };
+        this.markerPosition = { lat, lng };
+        this.googleMapUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+      }
     }
   }
 
@@ -764,13 +918,39 @@ downloadCurrentImage(): void {
   //   }
   // }
   checkDescriptionHeight(): void {
-//     const descriptionText = this.item.property_description || '';
-// console.log(descriptionText)
-//     if (descriptionText.length > this.charLimit) {
-//       this.showReadMore = true;
-//     } else {
-//       this.showReadMore = false;
-//     }
+    //     const descriptionText = this.item.property_description || '';
+    // console.log(descriptionText)
+    //     if (descriptionText.length > this.charLimit) {
+    //       this.showReadMore = true;
+    //     } else {
+    //       this.showReadMore = false;
+    //     }
+  }
+
+  getPlainText(html: string): string {
+    if (!html) return '';
+    try {
+      const div = document.createElement('div');
+      div.innerHTML = html;
+      return (div.textContent || div.innerText || '').trim();
+    } catch (e) {
+      return String(html);
+    }
+  }
+
+  shouldTruncate(html: string, wordLimit: number = 150): boolean {
+    const text = this.getPlainText(html);
+    if (!text) return false;
+    const words = text.split(/\s+/).filter(w => w.length > 0);
+    return words.length > wordLimit;
+  }
+
+  getPreviewText(html: string, wordLimit: number = 150): string {
+    const text = this.getPlainText(html);
+    if (!text) return '';
+    const words = text.split(/\s+/).filter(w => w.length > 0);
+    if (words.length <= wordLimit) return text;
+    return words.slice(0, wordLimit).join(' ') + '...';
   }
 
   // hasKeysOrValues(obj: any): boolean {
@@ -778,7 +958,7 @@ downloadCurrentImage(): void {
   //          !Object.values(obj).every(value => value === null || value === undefined || value === '');
   // }
 
-  submitEnquiry(){
+  submitEnquiry() {
     this.nameTouched = true;
     this.emailTouched = true;
     this.phoneTouched = true;
@@ -794,33 +974,33 @@ downloadCurrentImage(): void {
 
     this.spinner.show();
     const payload = {
-      contact_no :this.formData.contact_no,
-      useremail:this.formData.useremail,
-      username:this.formData.username,
-      project_Id:this.singleproject.id,
-      builder_id:'',
-      leads_type:'Project',
-      leads_for:this.singleproject.property_for,
-      receiver_user_id:this.singleproject.user_id,
-      countrycode:'',
-      request_price:0,
+      contact_no: this.formData.contact_no,
+      useremail: this.formData.useremail,
+      username: this.formData.username,
+      project_Id: this.singleproject.id,
+      builder_id: '',
+      leads_type: 'Project',
+      leads_for: this.singleproject.property_for,
+      receiver_user_id: this.singleproject.user_id,
+      countrycode: '',
+      request_price: 0,
     };
     const token = localStorage.getItem('myrealtylogintoken');
     const headers = new HttpHeaders()
       .set('Authorization', `Bearer ${token}`)
       .set('Accept', 'application/json');
-    this.http.post(`${this.apiUrl}storeinquiry`, payload, { headers }).subscribe((response:any)=> {
+    this.http.post(`${this.apiUrl}storeinquiry`, payload, { headers }).subscribe((response: any) => {
       this.spinner.hide();
       if (response.status === true) {
-        this.activityTrackerService.logActivity('Inquiry stored for project','');
+        this.activityTrackerService.logActivity('Inquiry stored for project', '');
         this.enquirySubmitted = true;
         this.resetForm();
-        }
+      }
     },
-  (error)=> {
-    this.spinner.hide();
-    console.log('Error sending data',error)
-  });
+      (error) => {
+        this.spinner.hide();
+        console.log('Error sending data', error)
+      });
   }
 
 
@@ -849,23 +1029,20 @@ downloadCurrentImage(): void {
     this.termsError = false;
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,5}$/;
 
-    if(!this.formData.username?.trim() || this.formData.username.trim().length < 3) {
-      this.nameError=true;
+    if (!this.formData.username?.trim() || this.formData.username.trim().length < 3) {
+      this.nameError = true;
     }
-    if(!this.formData.useremail || !emailPattern.test(this.formData.useremail))
-    {
-      this.emailError=true;
+    if (!this.formData.useremail || !emailPattern.test(this.formData.useremail)) {
+      this.emailError = true;
     }
-    if(!this.formData.contact_no || String(this.formData.contact_no).length < 10)
-    {
-      this.phoneError=true;
+    if (!this.formData.contact_no || String(this.formData.contact_no).length < 10) {
+      this.phoneError = true;
     }
     if (!this.formData.termsAccepted) {
       this.termsError = true;
     }
 
-    if(this.nameError || this.phoneError || this.emailError || this.termsError)
-    {
+    if (this.nameError || this.phoneError || this.emailError || this.termsError) {
       return;
     }
     this.sendOTPToMobile(); // Call this to send OTP to mobile
@@ -881,35 +1058,32 @@ downloadCurrentImage(): void {
     this.termsContactError = false;
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,5}$/;
 
-    if(!this.formDataphone.contactusername?.trim() || this.formDataphone.contactusername.trim().length < 3) {
-      this.nameContactError=true;
+    if (!this.formDataphone.contactusername?.trim() || this.formDataphone.contactusername.trim().length < 3) {
+      this.nameContactError = true;
     }
-    if(!this.formDataphone.contactuseremail || !emailPattern.test(this.formDataphone.contactuseremail))
-    {
-      this.emailContactError=true;
+    if (!this.formDataphone.contactuseremail || !emailPattern.test(this.formDataphone.contactuseremail)) {
+      this.emailContactError = true;
     }
-    if(!this.formDataphone.contactcontact_no || String(this.formDataphone.contactcontact_no).length < 10)
-    {
-      this.phoneContactError=true;
+    if (!this.formDataphone.contactcontact_no || String(this.formDataphone.contactcontact_no).length < 10) {
+      this.phoneContactError = true;
     }
     if (!this.formDataphone.termsContactAccepted) {
       this.termsContactError = true;
     }
-    if(this.nameContactError || this.phoneContactError || this.emailContactError || this.termsContactError)
-    {
+    if (this.nameContactError || this.phoneContactError || this.emailContactError || this.termsContactError) {
       return;
     }
     this.sendOTPContactToMobile(); // Call this to send OTP to mobile
   }
 
   verifyContactOTP() {
-    if(this.formDataphone.contactotp == ''){
+    if (this.formDataphone.contactotp == '') {
       this.toastr.error('Please Enter OTP');
       return
     }
-    let payload  = {
-      contact_no:this.formDataphone.contactcontact_no,
-      otp:this.formDataphone.contactotp,
+    let payload = {
+      contact_no: this.formDataphone.contactcontact_no,
+      otp: this.formDataphone.contactotp,
     }
     this.http
       .post(
@@ -963,7 +1137,7 @@ downloadCurrentImage(): void {
   }
 
   verifyOTP() {
-    if(this.formData.otp == ''){
+    if (this.formData.otp == '') {
       this.toastr.error('Please Enter OTP');
       return
     }
@@ -1043,23 +1217,22 @@ downloadCurrentImage(): void {
       })
       .subscribe(
         (response: any) => {
-          if(response.data=='ok')
-            {
-          this.startTimer();
-          if (response.status === true) {
-            // this.sendOTPToMobile();
-            const modalElement = this.otpModel.nativeElement;
-            const modal = new bootstrap.Modal(modalElement);
-            modal.show();
-            this.toastr.success('OTP Sent Successfully.');
+          if (response.data == 'ok') {
+            this.startTimer();
+            if (response.status === true) {
+              // this.sendOTPToMobile();
+              const modalElement = this.otpModel.nativeElement;
+              const modal = new bootstrap.Modal(modalElement);
+              modal.show();
+              this.toastr.success('OTP Sent Successfully.');
+            }
+            if (response.code === 101) {
+              this.toastr.warning(response.message);
+            }
           }
-          if (response.code === 101) {
-            this.toastr.warning(response.message);
+          else {
+            this.phoneError = true;
           }
-        }
-        else {
-          this.phoneError = true;
-        }
           this.isSendingOtp = false;
           this.spinner.hide();
         },
@@ -1080,23 +1253,22 @@ downloadCurrentImage(): void {
       })
       .subscribe(
         (response: any) => {
-          if(response.data=='ok')
-            {
-          this.startTimer();
-          if (response.status === true) {
-            // this.sendOTPToMobile();
-            const modalElement = this.otpContactModel.nativeElement;
-            const modal = new bootstrap.Modal(modalElement);
-            modal.show();
-            this.toastr.success('OTP Sent Successfully.');
+          if (response.data == 'ok') {
+            this.startTimer();
+            if (response.status === true) {
+              // this.sendOTPToMobile();
+              const modalElement = this.otpContactModel.nativeElement;
+              const modal = new bootstrap.Modal(modalElement);
+              modal.show();
+              this.toastr.success('OTP Sent Successfully.');
+            }
+            if (response.code === 101) {
+              this.toastr.warning(response.message);
+            }
           }
-          if (response.code === 101) {
-            this.toastr.warning(response.message);
+          else {
+            this.phoneContactError = true;
           }
-        }
-        else {
-          this.phoneContactError = true;
-        }
           this.isContactSendingOtp = false;
           this.spinner.hide();
         },
@@ -1161,8 +1333,7 @@ downloadCurrentImage(): void {
     }
   }
 
-  validateName(event:any)
-  {
+  validateName(event: any) {
     this.nameTouched = true;
     const inputValue = event.target.value;
     const companyPattern = /^[a-zA-Z\s]+$/;
@@ -1213,7 +1384,8 @@ downloadCurrentImage(): void {
       });
     }, observerOptions);
     sections.forEach((section) => {
-      return observer.observe(section)});
+      return observer.observe(section)
+    });
   }
 
 
@@ -1228,9 +1400,10 @@ downloadCurrentImage(): void {
 
     if (section) {
       const navbarHeight = navbar ? navbar.offsetHeight : 0;
+      const stickyTop = navbar ? parseFloat(window.getComputedStyle(navbar).top) || 0 : 125;
       const sectionPosition = section.getBoundingClientRect().top + window.scrollY;
-      // Account for navbar's sticky top position (125px) + navbar height + extra padding
-      const scrollToPosition = sectionPosition - 125 - navbarHeight - 20;
+      // Account for navbar's sticky top position + navbar height + extra padding
+      const scrollToPosition = sectionPosition - stickyTop - navbarHeight - 20;
 
       window.scrollTo({
         top: scrollToPosition,
@@ -1244,6 +1417,16 @@ downloadCurrentImage(): void {
   @HostListener('window:scroll', ['$event'])
   onWindowScroll(): void {
     this.detectActiveSectionOnScroll();
+
+    const headerElement = document.getElementById('project-detail-header');
+    const navbar = document.getElementById('navbar');
+    if (headerElement && navbar) {
+      const rect = headerElement.getBoundingClientRect();
+      const stickyTop = parseFloat(window.getComputedStyle(navbar).top) || 125;
+      this.showStickyHeader = rect.bottom <= stickyTop;
+    } else {
+      this.showStickyHeader = window.scrollY > 450;
+    }
   }
   detectActiveSectionOnScroll(): void {
     const sections = [
@@ -1260,7 +1443,8 @@ downloadCurrentImage(): void {
 
     const navbar = document.getElementById('navbar');
     const navbarHeight = navbar ? navbar.offsetHeight : 0;
-    const scrollPosition = window.scrollY + navbarHeight + 150;
+    const stickyTop = navbar ? parseFloat(window.getComputedStyle(navbar).top) || 0 : 125;
+    const scrollPosition = window.scrollY + navbarHeight + stickyTop + 25;
 
     // Find the section that is currently in view
     let activeSection = 'overview';
@@ -1299,8 +1483,7 @@ downloadCurrentImage(): void {
     }
   }
 
-  validateContactName(event:any)
-  {
+  validateContactName(event: any) {
     this.nameContactTouched = true;
     const inputValue = event.target.value;
     const companyPattern = /^[a-zA-Z\s]+$/;
@@ -1328,24 +1511,50 @@ downloadCurrentImage(): void {
       sequentialPattern.test(inputValue) ||          // Reject if sequential
       mirroredPattern.test(inputValue)               // Reject if mirrored/palindromic
     ) {
-      this.phoneContactError =true;
+      this.phoneContactError = true;
     } else {
-      this.phoneContactError= false;
+      this.phoneContactError = false;
       // this.sendOTPToMobile();
     }
   }
 
   fetchProjectApproveDetails() {
-    const projectName : any= this.route.snapshot.paramMap.get('name');
-    const projectId : any= this.route.snapshot.paramMap.get('id');
+    const projectName: any = this.route.snapshot.paramMap.get('name');
+    const projectId: any = this.route.snapshot.paramMap.get('id');
 
     if (projectName && projectId) {
       this.projectdetailsService
-        .getprojectdetail1(projectName,projectId)
+        .getprojectdetail1(projectName, projectId)
         .subscribe(
           (projectData: any) => {
             this.singleprojectData = projectData;
             this.singleproject = this.singleprojectData?.data;
+
+            // Populate FAQs from project_faq if available
+            const rawFaqs = this.singleproject?.project_faq;
+            if (rawFaqs) {
+              let parsedFaqs: any[] = [];
+              if (typeof rawFaqs === 'string') {
+                try {
+                  parsedFaqs = JSON.parse(rawFaqs);
+                } catch (e) {
+                  console.error('Error parsing project_faq:', e);
+                }
+              } else if (Array.isArray(rawFaqs)) {
+                parsedFaqs = rawFaqs;
+              }
+              if (parsedFaqs && parsedFaqs.length > 0) {
+                this.faqs = parsedFaqs.map(f => ({
+                  question: f.faq_que || f.question || '',
+                  answer: f.faq_ans || f.answer || ''
+                }));
+              }
+            }
+
+            // Update map coordinates from loaded project
+            if (this.singleproject) {
+              this.updateMapCoordinates(this.singleproject.latitude, this.singleproject.longitude);
+            }
 
             // Populate gallery albums
             const imageBaseUrl = 'https://realtymart.com/backend/public/images/';
@@ -1402,7 +1611,7 @@ downloadCurrentImage(): void {
               : 'Verified User'
           }));
       },
-      () => {}
+      () => { }
     );
   }
 
@@ -1434,27 +1643,27 @@ downloadCurrentImage(): void {
     }
     this.spinner.show();
     const payload = {
-      contact_no :this.formDataphone.contactcontact_no,
-      useremail:this.formDataphone.contactuseremail,
-      username:this.formDataphone.contactusername,
-      project_Id:this.singleproject.id,
-      builder_id:'',
-      leads_type:'Project',
-      leads_for:this.singleproject.property_for,
-      receiver_user_id:this.singleproject.user_id,
-      countrycode:'',
-      request_price:0,
+      contact_no: this.formDataphone.contactcontact_no,
+      useremail: this.formDataphone.contactuseremail,
+      username: this.formDataphone.contactusername,
+      project_Id: this.singleproject.id,
+      builder_id: '',
+      leads_type: 'Project',
+      leads_for: this.singleproject.property_for,
+      receiver_user_id: this.singleproject.user_id,
+      countrycode: '',
+      request_price: 0,
     }
     const token = localStorage.getItem('myrealtylogintoken');
-           const headers = new HttpHeaders()
-              .set('Authorization', `Bearer ${token}`)
-              .set('Accept', 'application/json');
-    this.http.post(`${this.apiUrl}storeinquiry`,payload,{headers})
+    const headers = new HttpHeaders()
+      .set('Authorization', `Bearer ${token}`)
+      .set('Accept', 'application/json');
+    this.http.post(`${this.apiUrl}storeinquiry`, payload, { headers })
       .subscribe((response: any) => {
         if (response.status === true) {
-          this.activityTrackerService.logActivity('Inquiry stored for project','');
-        this.contactEnquirySubmitted = true;
-      }
+          this.activityTrackerService.logActivity('Inquiry stored for project', '');
+          this.contactEnquirySubmitted = true;
+        }
       }, (error) => {
         console.error('Error sending data', error);
       });
@@ -1481,7 +1690,7 @@ downloadCurrentImage(): void {
   }
 
   onTermsChange(event: Event) {
-     this.termsError = !(event.target as HTMLInputElement).checked;
+    this.termsError = !(event.target as HTMLInputElement).checked;
   }
   onTermsContactChange(event: Event) {
     this.termsContactError = !(event.target as HTMLInputElement).checked;
@@ -1829,7 +2038,7 @@ downloadCurrentImage(): void {
     this.hoveredReviewRating = 0;
   }
 
-   previousImage() {
+  previousImage() {
     if (this.currentIndex > 0) {
       this.currentIndex--;
     } else {
@@ -1864,8 +2073,19 @@ downloadCurrentImage(): void {
     window.history.replaceState({}, '', urlWithoutParams);
   }
 
+  openContactModalFromReels() {
+    const modalEl = document.getElementById('get-builder');
+    if (modalEl) {
+      const modal = new bootstrap.Modal(modalEl);
+      modal.show();
+    }
+  }
+
   toggleReelDetailCard() {
     this.showReelDetailCard = !this.showReelDetailCard;
+    if (this.showReelDetailCard) {
+      this.showFilters = false;
+    }
   }
 
   viewPropertyFromReel() {
@@ -1875,19 +2095,19 @@ downloadCurrentImage(): void {
     }, 100);
   }
 
- nextReel(): void {
-  if (this.activeReelIndex < this.reels.length - 1) {
-    this.activeReelIndex++;
-    this.updateSanitizedReelUrl();
+  nextReel(): void {
+    if (this.activeReelIndex < this.reels.length - 1) {
+      this.activeReelIndex++;
+      this.updateSanitizedReelUrl();
+    }
   }
-}
 
-previousReel(): void {
-  if (this.activeReelIndex > 0) {
-    this.activeReelIndex--;
-    this.updateSanitizedReelUrl();
+  previousReel(): void {
+    if (this.activeReelIndex > 0) {
+      this.activeReelIndex--;
+      this.updateSanitizedReelUrl();
+    }
   }
-}
 
   toggleReelsLike(index: number) {
     this.reelsLikedStates[index] = !this.reelsLikedStates[index];
@@ -2005,5 +2225,207 @@ previousReel(): void {
       this.previousReel();
       this.lastReelSwitchTime = now;
     }
+  }
+
+  @HostListener('click', ['$event'])
+  onComponentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (target && target.classList.contains('read-more-link')) {
+      event.preventDefault();
+      const toggleType = target.getAttribute('data-toggle');
+      if (toggleType === 'about') {
+        this.isAboutExpanded = !this.isAboutExpanded;
+      } else if (toggleType === 'why') {
+        this.isWhyBuyExpanded = !this.isWhyBuyExpanded;
+      }
+    }
+  }
+
+  togglePriceTooltip(event: MouseEvent): void {
+    event.stopPropagation();
+    this.priceTooltipVisible = !this.priceTooltipVisible;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (target && !target.closest('.price-tooltip-container')) {
+      this.priceTooltipVisible = false;
+    }
+  }
+
+  getProcessedHtml(html: string, isAbout: boolean): string {
+    if (!html) return '';
+
+    const wordLimit = 150;
+    const isExpanded = isAbout ? this.isAboutExpanded : this.isWhyBuyExpanded;
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const plainText = doc.body.textContent || '';
+    const words = plainText.split(/\s+/).filter(w => w.length > 0);
+
+    if (words.length <= wordLimit) {
+      return html;
+    }
+
+    let processedDoc = doc;
+    if (!isExpanded) {
+      processedDoc = this.truncateHtmlToWords(html, wordLimit);
+    }
+
+    const anchor = processedDoc.createElement('a');
+    anchor.className = 'read-more-link';
+    anchor.style.cursor = 'pointer';
+    anchor.style.fontWeight = '600';
+    anchor.style.color = '#ef3f23';
+    anchor.style.marginLeft = '5px';
+    anchor.style.textDecoration = 'none';
+    anchor.setAttribute('data-toggle', isAbout ? 'about' : 'why');
+    anchor.innerText = isExpanded ? 'Read Less' : '...Read More';
+
+    this.appendToLastElement(processedDoc.body, anchor);
+
+    return processedDoc.body.innerHTML;
+  }
+
+  truncateHtmlToWords(html: string, limit: number): Document {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+
+    let wordCount = 0;
+
+    function traverse(node: Node): boolean {
+      if (node.nodeType === Node.TEXT_NODE) {
+        const text = node.nodeValue || '';
+        const words = text.split(/\s+/).filter(w => w.length > 0);
+        if (wordCount + words.length >= limit) {
+          const remaining = limit - wordCount;
+          let currentWordIndex = 0;
+          let charIndex = 0;
+          while (currentWordIndex < remaining && charIndex < text.length) {
+            while (charIndex < text.length && /\s/.test(text[charIndex])) {
+              charIndex++;
+            }
+            if (charIndex === text.length) break;
+            while (charIndex < text.length && !/\s/.test(text[charIndex])) {
+              charIndex++;
+            }
+            currentWordIndex++;
+          }
+          node.nodeValue = text.substring(0, charIndex);
+          wordCount = limit;
+          return true;
+        } else {
+          wordCount += words.length;
+        }
+      } else {
+        const children = Array.from(node.childNodes);
+        for (const child of children) {
+          const stop = traverse(child);
+          if (stop) {
+            let sibling = child.nextSibling;
+            while (sibling) {
+              const next = sibling.nextSibling;
+              node.removeChild(sibling);
+              sibling = next;
+            }
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    traverse(doc.body);
+    return doc;
+  }
+
+  appendToLastElement(parent: Node, elementToAppend: HTMLElement): void {
+    const voidElements = ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'source', 'track', 'wbr'];
+    if (parent.hasChildNodes()) {
+      const childNodes = Array.from(parent.childNodes);
+      for (let i = childNodes.length - 1; i >= 0; i--) {
+        const child = childNodes[i];
+        if (child.nodeType === Node.ELEMENT_NODE) {
+          const tagName = (child as HTMLElement).tagName.toLowerCase();
+          if (!voidElements.includes(tagName)) {
+            this.appendToLastElement(child, elementToAppend);
+            return;
+          }
+        } else if (child.nodeType === Node.TEXT_NODE && child.nodeValue && child.nodeValue.trim().length > 0) {
+          parent.appendChild(elementToAppend);
+          return;
+        }
+      }
+    }
+    parent.appendChild(elementToAppend);
+  }
+
+  toggleFilters(): void {
+    this.showFilters = !this.showFilters;
+    if (this.showFilters) {
+      this.showReelDetailCard = false;
+    }
+  }
+
+  resetFilters(): void {
+    this.selectedSegments = [];
+    this.selectedPropertyTypes = [];
+    this.selectedBHKs = [];
+  }
+
+  selectSegment(segment: string): void {
+    const index = this.selectedSegments.indexOf(segment);
+    if (index > -1) {
+      this.selectedSegments.splice(index, 1);
+    } else {
+      this.selectedSegments.push(segment);
+    }
+  }
+
+  selectPropertyType(type: string): void {
+    const index = this.selectedPropertyTypes.indexOf(type);
+    if (index > -1) {
+      this.selectedPropertyTypes.splice(index, 1);
+    } else {
+      this.selectedPropertyTypes.push(type);
+    }
+  }
+
+  selectBHK(bhk: string): void {
+    const index = this.selectedBHKs.indexOf(bhk);
+    if (index > -1) {
+      this.selectedBHKs.splice(index, 1);
+    } else {
+      this.selectedBHKs.push(bhk);
+    }
+  }
+
+  isSegmentSelected(segment: string): boolean {
+    return this.selectedSegments.includes(segment);
+  }
+
+  isPropertyTypeSelected(type: string): boolean {
+    return this.selectedPropertyTypes.includes(type);
+  }
+
+  isBHKSelected(bhk: string): boolean {
+    return this.selectedBHKs.includes(bhk);
+  }
+
+  fetchCities() {
+    this.http.get<{ data: { id: number; name: string }[] }>(`${environment.apiUrl}cities`).subscribe(
+      (response: any) => {
+        response.responseData = response.responseData.filter((city: { id: number; name: string }) => FilteredCities.includes(city.name));
+        this.city1 = response.responseData.map((city: any) => ({
+          cid: city.id,
+          cname: city.name
+        }));
+      },
+      (error: any) => {
+        console.error('API Error:', error);
+      }
+    );
   }
 }
