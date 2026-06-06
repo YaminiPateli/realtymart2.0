@@ -88,6 +88,8 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   termsContactError: boolean = false;
   showReelsView: boolean = false;
   currentSanitizedVideoUrl: SafeResourceUrl | null = null;
+  currentVideoSafeUrl: SafeResourceUrl | null = null;
+  private sanitizedVideoUrlCache = new Map<string, SafeResourceUrl>();
   lastReelSwitchTime: number = 0;
   activeReelIndex: number = 0;
   isReelsMuted: boolean = false;
@@ -171,6 +173,18 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     dots: true,
     arrows: true,
     infinite: false,
+    prevArrow: "<img class='a-left control-c prev slick-prev' src='assets/images/prev.svg'>",
+    nextArrow: "<img class='a-right control-c next slick-next' src='assets/images/next.svg'>"
+  };
+
+  bannerSlideConfig = {
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    dots: true,
+    arrows: true,
+    infinite: true,
+    autoplay: true,
+    autoplaySpeed: 3000,
     prevArrow: "<img class='a-left control-c prev slick-prev' src='assets/images/prev.svg'>",
     nextArrow: "<img class='a-right control-c next slick-next' src='assets/images/next.svg'>"
   };
@@ -470,6 +484,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
       this.galleryImages = allImages;
     }
     this.currentIndex = index;
+    this.updateCurrentVideoSafeUrl();
     this.showViewer = true;
     document.body.style.overflow = 'hidden';
   }
@@ -483,6 +498,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
       this.galleryImages = allImages;
     }
     this.currentIndex = index;
+    this.updateCurrentVideoSafeUrl();
     this.showViewer = true;
     document.body.style.overflow = 'hidden';
   }
@@ -495,6 +511,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
       this.galleryImages = allVideos;
     }
     this.currentIndex = index;
+    this.updateCurrentVideoSafeUrl();
     this.showViewer = true;
     document.body.style.overflow = 'hidden';
   }
@@ -503,6 +520,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     this.showViewer = false;
     this.zoomLevel = 1;
     this.showThumbnails = true;
+    this.currentVideoSafeUrl = null;
     document.body.style.overflow = '';
     if (document.fullscreenElement) {
       document.exitFullscreen().catch(() => { });
@@ -511,14 +529,17 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
 
   prevImage(): void {
     this.currentIndex = (this.currentIndex - 1 + this.galleryImages.length) % this.galleryImages.length;
+    this.updateCurrentVideoSafeUrl();
   }
 
   nextImage(): void {
     this.currentIndex = (this.currentIndex + 1) % this.galleryImages.length;
+    this.updateCurrentVideoSafeUrl();
   }
 
   selectImage(index: number): void {
     this.currentIndex = index;
+    this.updateCurrentVideoSafeUrl();
   }
 
   isVideo(url: any): boolean {
@@ -587,9 +608,24 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
       } else if (urlStr.includes('embed/')) {
         videoId = urlStr.split('embed/')[1].split('?')[0];
       }
-      embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1&rel=0`;
+      embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1&rel=0&enablejsapi=1`;
     }
     return this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
+  }
+
+  updateCurrentVideoSafeUrl(): void {
+    const currentUrl = this.galleryImages && this.galleryImages[this.currentIndex];
+    if (currentUrl && this.isYouTube(currentUrl)) {
+      if (this.sanitizedVideoUrlCache.has(currentUrl)) {
+        this.currentVideoSafeUrl = this.sanitizedVideoUrlCache.get(currentUrl) || null;
+      } else {
+        const sanitized = this.getSanitizedGalleryVideoUrl(currentUrl);
+        this.sanitizedVideoUrlCache.set(currentUrl, sanitized);
+        this.currentVideoSafeUrl = sanitized;
+      }
+    } else {
+      this.currentVideoSafeUrl = null;
+    }
   }
 
   zoomIn(): void {
