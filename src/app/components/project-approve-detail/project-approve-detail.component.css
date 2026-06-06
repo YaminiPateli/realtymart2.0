@@ -3722,3 +3722,14 @@ google-map {
     height: 57vh;
   }
 }
+
+.builder-card.is-expanded {
+  max-height: 380px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.builder-card.is-expanded::-webkit-scrollbar {
+  display: none;
+}

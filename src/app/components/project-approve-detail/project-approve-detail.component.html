@@ -1,19 +1,8 @@
 <section class="project-banner position-relative">
-  <div class="p-0 col-12" *ngIf="photoAlbum && photoAlbum.length > 0; else singleBanner">
-    <ngx-slick-carousel class="carousel banner-slick-slider" #slickModal="slick-carousel"
-      [config]="bannerSlideConfig">
-      <div ngxSlickItem *ngFor="let image of photoAlbum; let i = index" class="slide">
-        <img [src]="image" class="img-fluid w-100 banner-image cursor-pointer" (click)="openPhotoViewer(i)" />
-      </div>
-    </ngx-slick-carousel>
+  <div class="p-0 col-12">
+    <img *ngIf="singleproject?.project_banner_image" [src]="singleproject?.project_banner_image"
+      class="img-fluid w-100 banner-image" />
   </div>
-
-  <ng-template #singleBanner>
-    <div class="p-0 col-12">
-      <img *ngIf="singleproject?.project_banner_image" [src]="singleproject?.project_banner_image"
-        class="img-fluid w-100 banner-image" />
-    </div>
-  </ng-template>
 
   <!-- Logo Card -->
   <div class="logo-card shadow-sm">
@@ -45,7 +34,7 @@
       <div class="col-lg-6 col-md-8">
         <div class="d-flex align-items-start">
 
-          <img src="assets/images/rera_approved_logo.png" alt="RERA Approved" class="rera-logo me-3">
+          <img *ngIf="singleproject.project_rera_id" src="assets/images/rera_approved_logo.png" alt="RERA Approved" class="rera-logo me-3">
 
           <div>
             <div class="d-flex flex-wrap align-items-center">
@@ -91,7 +80,7 @@
             View Contact
           </button>
 
-          <button class="btn btn-success d-flex align-items-center gap-2 action-btn whatsapp-btn">
+          <button data-bs-toggle="modal" data-bs-target="#get-builder" class="btn btn-success d-flex align-items-center gap-2 action-btn whatsapp-btn">
             <span><img src="../../../assets/images/whatsapp.svg" alt="" srcset=""></span>
             WhatsApp
           </button>
@@ -165,7 +154,7 @@
             View Contact
           </button>
 
-          <button class="btn btn-success d-flex align-items-center gap-2 action-btn whatsapp-btn">
+          <button data-bs-toggle="modal" data-bs-target="#get-builder" class="btn btn-success d-flex align-items-center gap-2 action-btn whatsapp-btn">
             <span><img src="../../../assets/images/whatsapp.svg" alt="" srcset=""></span>
             WhatsApp
           </button>
@@ -584,7 +573,7 @@
     <!-- Right Sidebar (last in DOM → bottom on mobile, right column on desktop) -->
     <div class="right-sidebar">
 
-      <div class="builder-card">
+      <div class="builder-card" [class.is-expanded]="isDeveloperExpanded">
 
         <div class="d-flex align-items-center mb-3">
           <div class="builder-logo">
@@ -616,12 +605,12 @@
             View Contact
           </button>
 
-          <button class="btn whatsapp-btn w-100 mb-2">
+          <button data-bs-toggle="modal" data-bs-target="#get-builder" class="btn whatsapp-btn w-100 mb-2">
             <span><img src="../../../assets/images/whatsapp.svg" alt="" srcset=""></span>
             WhatsApp
           </button>
 
-          <button class="btn visit-btn w-100">
+          <button data-bs-toggle="modal" data-bs-target="#get-builder" class="btn visit-btn w-100">
             <span><img src="../../../assets/images/calander.svg" alt="" srcset=""></span>
             Schedule Visit
           </button>
