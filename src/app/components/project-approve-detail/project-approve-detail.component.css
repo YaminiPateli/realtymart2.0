@@ -1157,10 +1157,14 @@ google-map {
   position: sticky;
   top: 292px;
   align-self: start;
+  max-height: calc(100vh - 300px);
+  overflow-y: auto;
 }
 
 .builder-card {
   height: auto;
+  max-height: calc(100vh - 340px);
+  overflow-y: auto;
 }
 
 /* ── Tablet (768px – 991px) ── */
@@ -3435,12 +3439,12 @@ google-map {
     height: 70vh;
   }
 }
-
 @media (max-width:1024px) {
   .project-banner {
     height: 58vh;
   }
 }
+
 
 @media (max-width:768px) {
   .project-banner {
@@ -3722,14 +3726,4 @@ google-map {
     height: 57vh;
   }
 }
-
-.builder-card.is-expanded {
-  max-height: 380px;
-  overflow-y: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.builder-card.is-expanded::-webkit-scrollbar {
-  display: none;
-}
+
