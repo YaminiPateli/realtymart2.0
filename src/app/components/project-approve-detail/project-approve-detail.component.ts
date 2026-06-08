@@ -124,48 +124,16 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   };
   otpError: boolean = false;
   isResendEnabled = false;
+  reels: any[] = [];
   openModel = 0;
   remainingTime: number = 60;
-  reels = [
-    {
-      title: 'Luxury Apartments',
-      thumbnail: '../../../assets/images/aqua_vista_reel_thmbnail.jpg',
-      videoUrl: 'https://youtu.be/LT_CDjb0oQk?si=dGJepre6NvrGC5jQ'
-    },
-    {
-      title: 'Modern Township',
-      thumbnail: '../../../assets/images/stark_torre_thumbnail.jpg',
-      videoUrl: 'https://youtu.be/HhCJoz8siAQ?feature=shared'
-    },
-    {
-      title: 'Modern Township',
-      thumbnail: '../../../assets/images/stark_torre_thumbnail.jpg',
-      videoUrl: 'https://youtu.be/HhCJoz8siAQ?feature=shared'
-    },
-    {
-      title: 'Modern Township',
-      thumbnail: '../../../assets/images/stark_torre_thumbnail.jpg',
-      videoUrl: 'https://youtu.be/HhCJoz8siAQ?feature=shared'
-    }
-  ];
-  selectedType: '2bhk' | '3bhk' = '2bhk';
-  floorPlans = {
-    '2bhk': {
-      area: '700 SqFt',
-      images: [
-        './assets/images/floor_plan.png',
-        './assets/images/floor_plan_2.png',
-        './assets/images/floor_plan_3.jpg'
-      ]
-    },
-    '3bhk': {
-      area: '950 SqFt',
-      images: [
-        './assets/images/floor_plan_2.png',
-        './assets/images/floor_plan_3.jpg'
-      ]
-    }
-  };
+  // Floor plans – populated from API `floor_plans` array
+  floorPlanList: { bhk_type: string; carpet_area: string; image: string }[] = [];
+  selectedFloorPlanIndex: number = 0;
+
+  get selectedFloorPlan() {
+    return this.floorPlanList[this.selectedFloorPlanIndex] || null;
+  }
 
   floorPlanSlideConfig = {
     slidesToShow: 1,
@@ -505,7 +473,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
 
   openVideoViewer(index: number = 0): void {
     const allVideos = [
-      ...this.videoAlbum.map((a: any) => a.proj_video_link || a.src || a)
+      ...this.videoAlbum.map((a: any) => a.proj_video_link)
     ];
     if (allVideos.length > 0) {
       this.galleryImages = allVideos;
@@ -570,7 +538,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     if (!url) return '';
     if (this.isVideo(url)) {
       // Check if this video has a custom thumbnail in videoAlbum
-      const found = this.videoAlbum.find(v => (v.proj_video_link === url || v.src === url || v === url));
+      const found = this.videoAlbum.find(v => (v.proj_video_link === url));
       if (found && found.proj_video_thumbnail) {
         let thumb = found.proj_video_thumbnail;
         if (!thumb.startsWith('http')) {
@@ -844,6 +812,9 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   galleryActiveIndex: number = 0;
   galleryZoom: number = 1;
   galleryFormType: string = ''; // 'contact' | 'brochure' | 'payment' | ''
+
+  // ===== Brochure Images =====
+  projectBrochureImages: string[] = [];
 
   // ===== Gallery Inline Contact Form =====
   galleryContactData: any = { name: '', email: '', mobile: '', termsAccepted: true };
@@ -1566,6 +1537,30 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
             this.singleprojectData = projectData;
             this.singleproject = this.singleprojectData?.data;
 
+            // Populate floor plans from API
+            const rawFloorPlans = this.singleproject?.floor_plans;
+            if (Array.isArray(rawFloorPlans) && rawFloorPlans.length > 0) {
+              this.floorPlanList = rawFloorPlans.map((fp: any) => ({
+                bhk_type: fp.bhk_type || '',
+                carpet_area: fp.carpet_area || '',
+                image: fp.image || ''
+              }));
+            } else if (typeof rawFloorPlans === 'string' && rawFloorPlans.trim()) {
+              try {
+                const parsed = JSON.parse(rawFloorPlans);
+                if (Array.isArray(parsed)) {
+                  this.floorPlanList = parsed.map((fp: any) => ({
+                    bhk_type: fp.bhk_type || '',
+                    carpet_area: fp.carpet_area || '',
+                    image: fp.image || ''
+                  }));
+                }
+              } catch (e) {
+                console.error('Error parsing floor_plans:', e);
+              }
+            }
+            this.selectedFloorPlanIndex = 0;
+
             // Populate FAQs from project_faq if available
             const rawFaqs = this.singleproject?.project_faq;
             if (rawFaqs) {
@@ -1609,10 +1604,29 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
             const rawFloor3d = this.singleproject?.project_floor_plan_3d;
             this.layoutAlbum = Array.isArray(rawFloor3d) ? rawFloor3d : [];
 
-            // Videos tab
-            this.videoAlbum = Array.isArray(this.singleproject?.project_video)
-              ? this.singleproject.project_video
-              : (this.singleproject?.project_video ? [this.singleproject.project_video] : []);
+            // Brochure Images: from project_brochure_images
+            const rawBrochureImages = this.singleproject?.project_brochure_images;
+            if (Array.isArray(rawBrochureImages) && rawBrochureImages.length > 0) {
+              this.projectBrochureImages = rawBrochureImages;
+            } else if (typeof rawBrochureImages === 'string' && rawBrochureImages.trim()) {
+              this.projectBrochureImages = rawBrochureImages.split(',').map((s: string) => s.trim()).filter((s: string) => s);
+            } else {
+              this.projectBrochureImages = [];
+            }
+            if(this.singleproject.project_video.length > 0){
+              this.singleproject.project_video.forEach((element:{
+                video_source:string,
+                proj_video_link:string,
+                proj_video_file:string,
+                proj_video_thumbnail:string
+              }) => {
+                if(element.video_source === "youtube"){
+                  this.videoAlbum.push(element)
+                }else{
+                  this.reels.push(element)
+                }
+              });
+            }
 
             // Auto-select first tab that has content
             if (this.photoAlbum.length > 0) this.galleryActiveTab = 'photos';

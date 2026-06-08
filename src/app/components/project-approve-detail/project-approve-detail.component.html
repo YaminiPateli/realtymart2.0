@@ -34,7 +34,8 @@
       <div class="col-lg-6 col-md-8">
         <div class="d-flex align-items-start">
 
-          <img *ngIf="singleproject.project_rera_id" src="assets/images/rera_approved_logo.png" alt="RERA Approved" class="rera-logo me-3">
+          <img *ngIf="singleproject.project_rera_id" src="assets/images/rera_approved_logo.png" alt="RERA Approved"
+            class="rera-logo me-3">
 
           <div>
             <div class="d-flex flex-wrap align-items-center">
@@ -80,7 +81,8 @@
             View Contact
           </button>
 
-          <button data-bs-toggle="modal" data-bs-target="#get-builder" class="btn btn-success d-flex align-items-center gap-2 action-btn whatsapp-btn">
+          <button data-bs-toggle="modal" data-bs-target="#get-builder"
+            class="btn btn-success d-flex align-items-center gap-2 action-btn whatsapp-btn">
             <span><img src="../../../assets/images/whatsapp.svg" alt="" srcset=""></span>
             WhatsApp
           </button>
@@ -103,7 +105,7 @@
       <div class="col-6 col-md-6 col-lg-3">
         <div class="info-card">
           <div class="label">Project Type</div>
-          <div class="value">{{ ['Apartment','Villa','Bungalow'].join(', ') }}</div>
+          <div class="value">{{ singleproject?.project_type?.join(', ') }}</div>
         </div>
       </div>
 
@@ -154,7 +156,8 @@
             View Contact
           </button>
 
-          <button data-bs-toggle="modal" data-bs-target="#get-builder" class="btn btn-success d-flex align-items-center gap-2 action-btn whatsapp-btn">
+          <button data-bs-toggle="modal" data-bs-target="#get-builder"
+            class="btn btn-success d-flex align-items-center gap-2 action-btn whatsapp-btn">
             <span><img src="../../../assets/images/whatsapp.svg" alt="" srcset=""></span>
             WhatsApp
           </button>
@@ -182,11 +185,11 @@
           <a style="cursor: pointer" (click)="scrollToSection('aboutProject')"
             [ngClass]="{ active: activeSection === 'aboutProject' }">About Project</a>
         </li>
-        <li class="{'active': activeSection === 'reels'}">
+        <li *ngIf="this.reels && this.reels.length > 0" class="{'active': activeSection === 'reels'}">
           <a style="cursor: pointer" (click)="scrollToSection('reels')"
             [ngClass]="{ active: activeSection === 'reels' }">Reels</a>
         </li>
-        <li class="{'active': activeSection === 'floorPlan'}">
+        <li *ngIf="floorPlanList.length > 0" class="{'active': activeSection === 'floorPlan'}">
           <a style="cursor: pointer" (click)="scrollToSection('floorPlan')"
             [ngClass]="{ active: activeSection === 'floorPlan' }">Floor plan</a>
         </li>
@@ -200,7 +203,7 @@
             [ngClass]="{ active: activeSection === 'amenities' }">Amenities</a>
         </li>
         <li class="{'active': activeSection === 'brochure'}"
-          *ngIf="this.hasKeysOrValues(this.singleproject.project_brochure)">
+          *ngIf="this.hasKeysOrValues(this.singleproject.project_brochure_images)">
           <a style="cursor: pointer" (click)="scrollToSection('brochure')"
             [ngClass]="{ active: activeSection === 'brochure' }">Brochure</a>
         </li>
@@ -240,7 +243,7 @@
 
           <div class="col-6">
             <p class="label">Area</p>
-            <h6 class="value">1.33 Acre</h6>
+            <h6 class="value">{{singleproject.project_area}}</h6>
           </div>
 
           <div class="col-6">
@@ -318,7 +321,7 @@
         <hr class="mt-4">
 
       </section>
-      <section id="reels" class="reels-section">
+      <section id="reels" *ngIf="reels && reels.length > 0" class="reels-section">
         <h3 class="section-title">Watch Our Reels</h3>
 
         <div class="floor-plan-card p-3">
@@ -341,40 +344,31 @@
 
         <hr class="mt-4">
       </section>
-      <section id="floorPlan" class="floor-plan-section mb-5">
+      <section id="floorPlan" class="floor-plan-section mb-5" *ngIf="floorPlanList.length > 0">
 
         <h2 class="section-title">Floor Plan</h2>
 
-        <!-- Tabs -->
-        <div class="floor-tabs d-flex align-items-center">
-
-          <button class="floor-tab active" [class.active]="selectedType==='2bhk'" (click)="selectedType='2bhk'">
-            2 BHK Flat
+        <!-- Tabs: one per floor plan entry -->
+        <div class="floor-tabs d-flex align-items-center flex-wrap">
+          <button
+            *ngFor="let plan of floorPlanList; let i = index"
+            class="floor-tab"
+            [class.active]="selectedFloorPlanIndex === i"
+            (click)="selectedFloorPlanIndex = i">
+            {{ plan.bhk_type }}
           </button>
-
-          <button class="floor-tab" [class.active]="selectedType==='3bhk'" (click)="selectedType='3bhk'">
-            3 BHK Flat
-          </button>
-
-          <!-- <div class="flex-grow-1 tab-line d-none d-md-block"></div> -->
-
         </div>
 
         <!-- Area -->
-        <p class="floor-area">
-          Carpet {{ floorPlans[selectedType].area || '700 SqFt' }}
+        <p class="floor-area" *ngIf="selectedFloorPlan?.carpet_area">
+          Carpet {{ selectedFloorPlan!.carpet_area }} SqFt
         </p>
 
-        <!-- Floor Plan Card -->
-        <div class="floor-plan-card p-3">
-          <ngx-slick-carousel class="carousel floor-plan-slick-slider" #slickModal="slick-carousel"
-            [config]="floorPlanSlideConfig">
-            <div ngxSlickItem *ngFor="let image of floorPlans[selectedType].images" class="slide">
-              <div class="floor-image-container">
-                <img [src]="image" class="floor-image" alt="Floor Plan">
-              </div>
-            </div>
-          </ngx-slick-carousel>
+        <!-- Floor Plan Image -->
+        <div class="floor-plan-card p-3" *ngIf="selectedFloorPlan">
+          <div class="floor-image-container">
+            <img [src]="selectedFloorPlan!.image" class="floor-image" alt="Floor Plan {{ selectedFloorPlan!.bhk_type }}">
+          </div>
         </div>
 
       </section>
@@ -425,7 +419,7 @@
         <hr class="section-divider-2">
 
       </section>
-      <section id="brochure" class="brochure-section">
+      <section *ngIf="this.hasKeysOrValues(this.singleproject.project_brochure_images)" id="brochure" class="brochure-section">
 
         <h2 class="section-title">Brochure & Images</h2>
 
@@ -433,17 +427,13 @@
 
           <div class="row g-3">
 
-            <div class="col-12 col-md-6">
-              <div class="brochure-image">
-                <img src="../../../assets/images/brochure-1.png" alt="Brochure Image" class="img-fluid">
+            <ng-container *ngIf="projectBrochureImages.length > 0">
+              <div class="col-12 col-md-6" *ngFor="let img of projectBrochureImages">
+                <div class="brochure-image">
+                  <img [src]="img" alt="Brochure Image" class="img-fluid">
+                </div>
               </div>
-            </div>
-
-            <div class="col-12 col-md-6">
-              <div class="brochure-image">
-                <img src="../../../assets/images/brochure-2.png" alt="Brochure Image" class="img-fluid">
-              </div>
-            </div>
+            </ng-container>
 
           </div>
 
@@ -638,8 +628,7 @@
               {{ faq.question }}
             </button>
           </h2>
-          <div [id]="'faq'+i" class="accordion-collapse collapse" [class.show]="i === 0"
-            data-bs-parent="#faqAccordion">
+          <div [id]="'faq'+i" class="accordion-collapse collapse" [class.show]="i === 0" data-bs-parent="#faqAccordion">
             <div class="accordion-body" [innerHTML]="faq.answer">
             </div>
           </div>
@@ -689,9 +678,9 @@
   <div class="viewer-content" [class.is-video]="isVideo(galleryImages[currentIndex])">
     <ng-container *ngIf="isVideo(galleryImages[currentIndex])">
       <!-- YouTube Video -->
-      <iframe *ngIf="isYouTube(galleryImages[currentIndex])"
-        [src]="currentVideoSafeUrl" class="main-image gallery-video-iframe"
-        frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      <iframe *ngIf="isYouTube(galleryImages[currentIndex])" [src]="currentVideoSafeUrl"
+        class="main-image gallery-video-iframe" frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
         allowfullscreen>
       </iframe>
       <!-- Direct Video file -->
