@@ -28,6 +28,8 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   private apiUrl: string = environment.apiUrl;
   @ViewChild('descriptionElem') descriptionElem!: ElementRef;
   @ViewChild('slider') slider!: ElementRef;
+  @ViewChild('floorSlickModal') floorSlickModal!: any;
+
 
   @Input() item: any;
   @Input() latitude!: any;
@@ -39,6 +41,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   sponsor: any;
   verifyData: any;
   verify: any;
+  isAtEnd = false;
   currentSection: any;
   private _activeSection: string = 'overview';
   get activeSection(): any {
@@ -128,7 +131,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   openModel = 0;
   remainingTime: number = 60;
   // Floor plans – populated from API `floor_plans` array
-  floorPlanList: { bhk_type: string; carpet_area: string; image: string }[] = [];
+  floorPlanList: { bhk_type: string; carpet_area: string; image: string[] }[] = [];
   selectedFloorPlanIndex: number = 0;
 
   get selectedFloorPlan() {
@@ -230,24 +233,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     }
   ];
 
-  developerProjects = [
-    {
-      name: 'Sarang Lakeview',
-      image: '../../../assets/images/slider-img-1.png'
-    },
-    {
-      name: 'Sarang Lakeview',
-      image: '../../../assets/images/slider-img-1.png'
-    },
-    {
-      name: 'Sarang Lakeview',
-      image: '../../../assets/images/slider-img-1.png'
-    },
-    {
-      name: 'Sarang Lakeview',
-      image: '../../../assets/images/slider-img-1.png'
-    }
-  ];
+  developerProjects:any[] = [];
 
 
   specifications = [
@@ -422,9 +408,18 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   isDeveloperExpanded: boolean = false;
 
   ngAfterViewInit(): void {
-    this.checkDescriptionHeight();
+    setTimeout(() => this.checkScrollPosition());
     Fancybox.bind('[data-fancybox="gallery"]', {
 
+    });
+    Fancybox.bind('[data-fancybox="floor-plans"]', {
+      Toolbar: {
+        display: {
+          left: [],
+          middle: [],
+          right: ["zoom", "close"],
+        },
+      },
     });
   }
 
@@ -958,6 +953,26 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     const words = text.split(/\s+/).filter(w => w.length > 0);
     if (words.length <= wordLimit) return text;
     return words.slice(0, wordLimit).join(' ') + '...';
+  }
+
+  goToFloorPlanSlide(index: number): void {
+    this.selectedFloorPlanIndex = index;
+  }
+
+  parseImagesArray(img: any): string[] {
+    if (!img) return [];
+    if (Array.isArray(img)) return img;
+    if (typeof img === 'string') {
+      const trimmed = img.trim();
+      if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+        try {
+          const parsed = JSON.parse(trimmed);
+          if (Array.isArray(parsed)) return parsed;
+        } catch (e) {}
+      }
+      return trimmed.split(',').map(s => s.trim()).filter(s => s.length > 0);
+    }
+    return [];
   }
 
   // hasKeysOrValues(obj: any): boolean {
@@ -1543,7 +1558,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
               this.floorPlanList = rawFloorPlans.map((fp: any) => ({
                 bhk_type: fp.bhk_type || '',
                 carpet_area: fp.carpet_area || '',
-                image: fp.image || ''
+                image: this.parseImagesArray(fp.image)
               }));
             } else if (typeof rawFloorPlans === 'string' && rawFloorPlans.trim()) {
               try {
@@ -1552,7 +1567,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
                   this.floorPlanList = parsed.map((fp: any) => ({
                     bhk_type: fp.bhk_type || '',
                     carpet_area: fp.carpet_area || '',
-                    image: fp.image || ''
+                    image: this.parseImagesArray(fp.image)
                   }));
                 }
               } catch (e) {
@@ -1613,16 +1628,35 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
             } else {
               this.projectBrochureImages = [];
             }
-            if(this.singleproject.project_video.length > 0){
-              this.singleproject.project_video.forEach((element:{
-                video_source:string,
-                proj_video_link:string,
-                proj_video_file:string,
-                proj_video_thumbnail:string
+            this.singleproject.project_video.push({
+              video_source: "video",
+              proj_video_link: "",
+              proj_video_file: "../../../assets/reels/reel-1.mp4",
+              proj_video_thumbnail: "../../../assets/images/reel-1-thumbnail.jpg"
+            },
+              {
+                video_source: "video",
+                proj_video_link: "",
+                proj_video_file: "../../../assets/reels/reel-2.mp4",
+                proj_video_thumbnail: "../../../assets/images/reel-2-thumbnail.jpg"
+              },
+              {
+                video_source: "video",
+                proj_video_link: "",
+                proj_video_file: "../../../assets/reels/reel-3.mp4",
+                proj_video_thumbnail: "../../../assets/images/reel-3-thumbnail.jpg"
+              }
+            )
+            if (this.singleproject.project_video.length > 0) {
+              this.singleproject.project_video.forEach((element: {
+                video_source: string,
+                proj_video_link: string,
+                proj_video_file: string,
+                proj_video_thumbnail: string
               }) => {
-                if(element.video_source === "youtube"){
+                if (element.video_source === "youtube") {
                   this.videoAlbum.push(element)
-                }else{
+                } else {
                   this.reels.push(element)
                 }
               });
@@ -1632,7 +1666,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
             if (this.photoAlbum.length > 0) this.galleryActiveTab = 'photos';
             else if (this.layoutAlbum.length > 0) this.galleryActiveTab = 'layout';
             else if (this.videoAlbum.length > 0) this.galleryActiveTab = 'video';
-
+            this.developerProjects = this.singleproject.aboutDeveloperProjects;
             // Populate reviews via separate API
             this.fetchProjectReviews(this.singleproject.id);
 
@@ -1683,12 +1717,10 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     this.emailContactTouched = true;
     this.phoneContactTouched = true;
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,5}$/;
-    this.nameContactError = !this.formDataphone.contactusername?.trim() || this.formDataphone.contactusername.trim().length < 3;
-    this.emailContactError = !this.formDataphone.contactuseremail || !emailPattern.test(this.formDataphone.contactuseremail);
     this.phoneContactError = !this.formDataphone.contactcontact_no || String(this.formDataphone.contactcontact_no).length < 10;
     this.termsContactError = !this.formDataphone.termsContactAccepted;
 
-    if (this.nameContactError || this.phoneContactError || this.emailContactError || this.termsContactError) {
+    if (this.phoneContactError || this.termsContactError) {
       return;
     }
     this.spinner.show();
@@ -2220,8 +2252,13 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
 
   updateSanitizedReelUrl(): void {
     if (this.reels && this.reels[this.activeReelIndex]) {
-      const url = this.reels[this.activeReelIndex].videoUrl;
-      this.currentSanitizedVideoUrl = this.getSanitizedVideoUrl(url);
+      const reel = this.reels[this.activeReelIndex];
+      // Only sanitize for YouTube iframe; local mp4 uses [src] directly on <video>
+      if (reel.proj_video_link) {
+        this.currentSanitizedVideoUrl = this.getSanitizedVideoUrl(reel.proj_video_link);
+      } else {
+        this.currentSanitizedVideoUrl = null;
+      }
     } else {
       this.currentSanitizedVideoUrl = null;
     }
@@ -2478,4 +2515,12 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
       }
     );
   }
+
+  checkScrollPosition() {
+    const el = this.slider.nativeElement;
+    const maxScrollLeft = el.scrollWidth - el.clientWidth;
+    this.isAtEnd = el.scrollLeft >= (maxScrollLeft - 5);
+  }
+
+
 }

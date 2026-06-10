@@ -73,10 +73,10 @@
       </div>
 
       <!-- Right Section -->
-      <div class="col-lg-6 col-md-4 mt-5 d-flex justify-content-end align-self-end">
+      <div class="col-lg-6 mt-md-5 mt-4 col-md-4 d-flex justify-content-end align-self-end">
         <div class="d-flex flex-wrap justify-content-lg-end gap-2">
           <button data-bs-toggle="modal" data-bs-target="#get-builder"
-            class="btn btn-danger d-flex align-items-center gap-2 action-btn view-contact-btn text-light">
+            class="btn d-flex align-items-center gap-2 action-btn contact-btn text-light">
             <span><img src="../../../assets/images/phone.svg" alt="" srcset=""></span>
             View Contact
           </button>
@@ -151,7 +151,7 @@
         <!-- Right Section: Action Buttons (same color and design) -->
         <div class="col-lg-6 col-md-7 d-flex justify-content-end align-items-center gap-2">
           <button data-bs-toggle="modal" data-bs-target="#get-builder"
-            class="btn btn-danger d-flex align-items-center gap-2 action-btn view-contact-btn text-light">
+            class="btn d-flex align-items-center gap-2 action-btn contact-btn text-light">
             <span><img src="../../../assets/images/phone.svg" alt="" srcset=""></span>
             View Contact
           </button>
@@ -203,7 +203,7 @@
             [ngClass]="{ active: activeSection === 'amenities' }">Amenities</a>
         </li>
         <li class="{'active': activeSection === 'brochure'}"
-          *ngIf="this.hasKeysOrValues(this.singleproject.project_brochure_images)">
+          *ngIf="this.hasKeysOrValues(this.singleproject.project_brochure)">
           <a style="cursor: pointer" (click)="scrollToSection('brochure')"
             [ngClass]="{ active: activeSection === 'brochure' }">Brochure</a>
         </li>
@@ -228,7 +228,7 @@
 
         <h4 class="section-title">Overview</h4>
 
-        <div class="row g-4 mt-1">
+        <div class="row g-2 mt-1">
 
           <div class="col-6">
             <p class="label">Price</p>
@@ -243,7 +243,7 @@
 
           <div class="col-6">
             <p class="label">Area</p>
-            <h6 class="value">{{singleproject.project_area}}</h6>
+            <h6 class="value">{{singleproject.land_size}}</h6>
           </div>
 
           <div class="col-6">
@@ -285,14 +285,14 @@
         <h3 class="section-title">About Project</h3>
 
         <div *ngIf="this.singleproject.project_about !== null" class="investing-desc">
-          <div *ngIf="!isAboutExpanded">
-            <p [innerText]="getPreviewText(this.singleproject.project_about, 25)"></p>
-            <a *ngIf="shouldTruncate(this.singleproject.project_about,25)" (click)="isAboutExpanded = true"
-              class="read-more-link">Read More</a>
+          <div *ngIf="!isAboutExpanded" class="developer-desc-container">
+            <span [innerText]="getPreviewText(this.singleproject.project_about, 50)"></span>
+            <a *ngIf="shouldTruncate(this.singleproject.project_about,50)" (click)="isAboutExpanded = true"
+              class="read-more-link ms-1">Read More</a>
           </div>
-          <div *ngIf="isAboutExpanded">
-            <div [innerHTML]="getProcessedHtml(this.singleproject.project_about, true)"></div>
-            <a (click)="isAboutExpanded = false" class="read-more-link">Read Less</a>
+          <div *ngIf="isAboutExpanded" class="developer-desc-container">
+            <span [innerHTML]="getProcessedHtml(this.singleproject.project_about, true)"></span>
+            <a (click)="isAboutExpanded = false" class="read-more-link ms-1">Read Less</a>
           </div>
         </div>
 
@@ -304,14 +304,14 @@
           </h4>
 
           <div *ngIf="this.singleproject.project_why_buy_sell !== null" class="investing-desc">
-            <div *ngIf="!isWhyBuyExpanded">
-              <p [innerText]="getPreviewText(this.singleproject.project_why_buy_sell, 25)"></p>
-              <a *ngIf="shouldTruncate(this.singleproject.project_why_buy_sell,25)" (click)="isWhyBuyExpanded = true"
-                class="read-more-link">Read More</a>
+            <div *ngIf="!isWhyBuyExpanded" class="developer-desc-container">
+              <span [innerText]="getPreviewText(this.singleproject.project_why_buy_sell, 50)"></span>
+              <a *ngIf="shouldTruncate(this.singleproject.project_why_buy_sell,50)" (click)="isWhyBuyExpanded = true"
+                class="read-more-link ms-1">Read More</a>
             </div>
-            <div *ngIf="isWhyBuyExpanded">
-              <div [innerHTML]="getProcessedHtml(this.singleproject.project_why_buy_sell, false)"></div>
-              <a (click)="isWhyBuyExpanded = false" class="read-more-link">Read Less</a>
+            <div *ngIf="isWhyBuyExpanded" class="developer-desc-container">
+              <span [innerHTML]="getProcessedHtml(this.singleproject.project_why_buy_sell, false)"></span>
+              <a (click)="isWhyBuyExpanded = false" class="read-more-link ms-1">Read Less</a>
             </div>
           </div>
 
@@ -324,13 +324,13 @@
       <section id="reels" *ngIf="reels && reels.length > 0" class="reels-section">
         <h3 class="section-title">Watch Our Reels</h3>
 
-        <div class="floor-plan-card p-3">
-          <ngx-slick-carousel class="carousel floor-plan-slick-slider" #slickModal="slick-carousel"
+        <div class="floor-plan-card">
+          <ngx-slick-carousel class="carousel reels floor-plan-slick-slider" #slickModal="slick-carousel"
             [config]="reelsSlideConfig">
             <div ngxSlickItem *ngFor="let reel of reels; let i = index" class="slide px-2">
               <div class="d-flex justify-content-center">
                 <div class="reel-card" (click)="openReelsView(i)">
-                  <img [src]="reel.thumbnail" [alt]="reel.title" class="reel-thumbnail" />
+                  <img [src]="reel.proj_video_thumbnail" [alt]="reel.title" class="reel-thumbnail" />
                   <div class="play-btn">
                     <span>
                       <img src="../../../assets/images/play.svg" alt="Play">
@@ -350,11 +350,8 @@
 
         <!-- Tabs: one per floor plan entry -->
         <div class="floor-tabs d-flex align-items-center flex-wrap">
-          <button
-            *ngFor="let plan of floorPlanList; let i = index"
-            class="floor-tab"
-            [class.active]="selectedFloorPlanIndex === i"
-            (click)="selectedFloorPlanIndex = i">
+          <button *ngFor="let plan of floorPlanList; let i = index" class="floor-tab"
+            [class.active]="selectedFloorPlanIndex === i" (click)="goToFloorPlanSlide(i)">
             {{ plan.bhk_type }}
           </button>
         </div>
@@ -364,11 +361,22 @@
           Carpet {{ selectedFloorPlan!.carpet_area }} SqFt
         </p>
 
-        <!-- Floor Plan Image -->
-        <div class="floor-plan-card p-3" *ngIf="selectedFloorPlan">
-          <div class="floor-image-container">
-            <img [src]="selectedFloorPlan!.image" class="floor-image" alt="Floor Plan {{ selectedFloorPlan!.bhk_type }}">
-          </div>
+        <!-- Floor Plan Image Slider with Fancybox -->
+        <div class="floor-plan-card p-3 border"
+          *ngIf="selectedFloorPlan && selectedFloorPlan.image && selectedFloorPlan.image.length > 0">
+          <ng-container *ngFor="let plan of floorPlanList; let i = index">
+            <ngx-slick-carousel *ngIf="selectedFloorPlanIndex === i" class="carousel floor-plan-slick-slider"
+              #floorSlickModal="slick-carousel" [config]="floorPlanSlideConfig">
+              <div ngxSlickItem *ngFor="let imgUrl of plan.image; let idx = index" class="slide">
+                <div class="floor-image-wrapper">
+                  <a [href]="imgUrl" data-fancybox="floor-plans"
+                    [attr.data-caption]="plan.bhk_type + (plan.carpet_area ? ' - Carpet ' + plan.carpet_area + ' SqFt' : '') + ' (Image ' + (idx + 1) + ')'">
+                    <img [src]="imgUrl" class="floor-image" alt="Floor Plan {{ plan.bhk_type }} - {{ idx + 1 }}">
+                  </a>
+                </div>
+              </div>
+            </ngx-slick-carousel>
+          </ng-container>
         </div>
 
       </section>
@@ -395,7 +403,7 @@
 
         <h2 class="section-title">Amenities</h2>
 
-        <div class="row g-5">
+        <div class="row g-5 pe-5">
 
           <div class="col-6 col-md-4 col-lg-3 col-xl-2" *ngFor="let amenity of this.singleproject.amenitiess">
 
@@ -419,7 +427,8 @@
         <hr class="section-divider-2">
 
       </section>
-      <section *ngIf="this.hasKeysOrValues(this.singleproject.project_brochure_images)" id="brochure" class="brochure-section">
+      <section *ngIf="this.singleproject.project_brochure_images || this.singleproject.project_brochure" id="brochure"
+        class="brochure-section">
 
         <h2 class="section-title">Brochure & Images</h2>
 
@@ -427,7 +436,7 @@
 
           <div class="row g-3">
 
-            <ng-container *ngIf="projectBrochureImages.length > 0">
+            <ng-container>
               <div class="col-12 col-md-6" *ngFor="let img of projectBrochureImages">
                 <div class="brochure-image">
                   <img [src]="img" alt="Brochure Image" class="img-fluid">
@@ -497,60 +506,60 @@
               <img src="../../../assets/images/arrow-right.png" alt="" srcset="">
             </button>
           </div>
-
         </div>
+        <div class="developer-slider-wrapper" [class.hide-blur]="isAtEnd">
+          <div (scroll)="checkScrollPosition()" class="developer-slider" #slider>
 
-        <div class="developer-slider" #slider>
+            <div class="developer-card" *ngFor="let item of developerProjects;">
 
-          <div class="developer-card" *ngFor="let item of developerProjects">
+              <div class="card h-100">
 
-            <div class="card h-100">
+                <div class="card-img-wrapper">
+                  <img [src]="item.image" alt="" class="img-fluid w-100">
+                </div>
 
-              <div class="card-img-wrapper">
-                <img [src]="item.image" alt="" class="img-fluid w-100">
-              </div>
+                <div class="card-body">
 
-              <div class="card-body">
+                  <h6 class="project-name">
+                    {{ item.developer_name }}
+                  </h6>
 
-                <h6 class="project-name">
-                  {{ item.name }}
-                </h6>
+                  <p class="builder-name mb-1">
+                    {{ item.builder_group_name }}
+                  </p>
 
-                <p class="builder-name mb-1">
-                  Wishlist Builder
-                </p>
+                  <p class="location-developer mb-3">
+                    <i class="bi bi-geo-alt"></i>
+                    {{ item.developer_address }}
+                  </p>
 
-                <p class="location-developer mb-3">
-                  <i class="bi bi-geo-alt"></i>
-                  DPL, Gandhinagar
-                </p>
+                  <hr>
 
-                <hr>
+                  <div class="project-info">
 
-                <div class="project-info">
+                    <div class="d-flex justify-content-between mb-2">
+                      <span>Availability:</span>
+                      <span>{{ item.availability }}</span>
+                    </div>
 
-                  <div class="d-flex justify-content-between mb-2">
-                    <span>Availability:</span>
-                    <span>2023-08-22</span>
-                  </div>
+                    <div class="d-flex justify-content-between" *ngIf="item.area">
+                      <span>Area:</span>
+                      <span>{{ item.area }}</span>
+                    </div>
 
-                  <div class="d-flex justify-content-between">
-                    <span>Area:</span>
-                    <span>1450 Sq-ft</span>
                   </div>
 
                 </div>
 
-              </div>
+                <div class="price-bar">
+                  Price : ₹ {{ item.minprice }} - {{ item.maxprice }}
+                </div>
 
-              <div class="price-bar">
-                Price : ₹ 70 Lac - 2 Cr
               </div>
 
             </div>
 
           </div>
-
         </div>
 
       </section>
@@ -566,8 +575,12 @@
       <div class="builder-card" [class.is-expanded]="isDeveloperExpanded">
 
         <div class="d-flex align-items-center mb-3">
-          <div class="builder-logo">
-            {{singleproject.builderName | slice:0:1}}
+          <div class="builder-logo" [class.has-image]="singleproject.aboutdeveloper?.builderLogo">
+            <img *ngIf="singleproject.aboutdeveloper?.builderLogo" [src]="singleproject.aboutdeveloper.builderLogo"
+              alt="Builder Logo">
+            <span *ngIf="!singleproject.aboutdeveloper?.builderLogo">
+              {{singleproject.builderName | slice:0:1}}
+            </span>
           </div>
 
           <div>
@@ -578,24 +591,25 @@
 
         <div class="accordion-body"
           *ngIf="singleproject.aboutdeveloper && singleproject.aboutdeveloper.developerDescription">
-          <div *ngIf="!isDeveloperExpanded">
-            <p class="mb-2 mt-1">{{ getPreviewText(singleproject.aboutdeveloper.developerDescription, 15) }}</p>
+          <div *ngIf="!isDeveloperExpanded" class="developer-desc-container mb-2 mt-1">
+            <span class="developer-desc-text">{{ getPreviewText(singleproject.aboutdeveloper.developerDescription, 15)
+              }}</span>
             <a *ngIf="shouldTruncate(singleproject.aboutdeveloper.developerDescription,15)"
-              (click)="isDeveloperExpanded = true" class="read-more-link">Read More</a>
+              (click)="isDeveloperExpanded = true" class="read-more-link ms-1">Read More</a>
           </div>
-          <div *ngIf="isDeveloperExpanded">
-            <div [innerHTML]="singleproject.aboutdeveloper.developerDescription"></div>
-            <a (click)="isDeveloperExpanded = false" class="read-more-link">Read Less</a>
+          <div *ngIf="isDeveloperExpanded" class="developer-desc-container mb-2 mt-1">
+            <span [innerHTML]="singleproject.aboutdeveloper.developerDescription"></span>
+            <a (click)="isDeveloperExpanded = false" class="read-more-link ms-1">Read Less</a>
           </div>
         </div>
 
         <div class="mt-4">
-          <button class="btn contact-btn w-100 mb-2" data-bs-toggle="modal" data-bs-target="#get-builder">
+          <button class="btn display-none contact-btn w-100 mb-2" data-bs-toggle="modal" data-bs-target="#get-builder">
             <span><img src="../../../assets/images/phone.svg" alt="" srcset=""></span>
             View Contact
           </button>
 
-          <button data-bs-toggle="modal" data-bs-target="#get-builder" class="btn whatsapp-btn w-100 mb-2">
+          <button data-bs-toggle="modal" data-bs-target="#get-builder" class="btn display-none whatsapp-btn w-100 mb-2">
             <span><img src="../../../assets/images/whatsapp.svg" alt="" srcset=""></span>
             WhatsApp
           </button>
@@ -755,7 +769,7 @@
             We will share advertiser's details over email
           </p>
           <form (submit)="is_token ? submitFormPhone() : openContactOTPModal()">
-            <div class="form-field mt-3">
+            <!-- <div class="form-field mt-3">
               <label class="form-field__label" for="Aname">Name</label>
               <div class="form-field__wrap">
                 <input type="text" id="Aname" name="contactusername" [(ngModel)]="formDataphone.contactusername"
@@ -764,11 +778,11 @@
                 <span class="form-field__check"
                   *ngIf="nameContactTouched && formDataphone.contactusername && !nameContactError">&#10003;</span>
               </div>
-            </div>
-            <div *ngIf="nameContactTouched && nameContactError" class="mgs_error">Please enter a valid name (min. 3
-              characters).</div>
+            </div> -->
+            <!-- <div *ngIf="nameContactTouched && nameContactError" class="mgs_error">Please enter a valid name (min. 3
+              characters).</div> -->
 
-            <div class="form-field mt-3">
+            <!-- <div class="form-field mt-3">
               <label class="form-field__label" for="usermail">Email</label>
               <div class="form-field__wrap">
                 <input type="email" id="usermail" [(ngModel)]="formDataphone.contactuseremail"
@@ -778,7 +792,7 @@
               </div>
             </div>
             <div *ngIf="emailContactTouched && emailContactError" class="mgs_error">Please enter a valid email address.
-            </div>
+            </div> -->
 
             <div class="form-field mt-3">
               <label class="form-field__label" for="usernumber">Mobile Number</label>
@@ -827,33 +841,6 @@
         </p>
 
         <form>
-          <!-- Name -->
-          <div class="form-field mt-3">
-            <label class="form-field__label" for="brochureName">Name</label>
-            <div class="form-field__wrap">
-              <input type="text" id="brochureName" name="brochureName" [(ngModel)]="brochureFormData.name"
-                (input)="validateBrochureName($event)" (keypress)="validateCharInput($event)" required
-                class="gold-form-input my-0" />
-              <span class="form-field__check"
-                *ngIf="brochureNameTouched && brochureFormData.name && !brochureNameError">&#10003;</span>
-            </div>
-          </div>
-          <div *ngIf="brochureNameTouched && brochureNameError" class="mgs_error">Please enter a valid name (min. 3
-            characters).</div>
-
-          <!-- Email -->
-          <div class="form-field mt-3">
-            <label class="form-field__label" for="brochureEmail">Email</label>
-            <div class="form-field__wrap">
-              <input type="email" id="brochureEmail" name="brochureEmail" [(ngModel)]="brochureFormData.email"
-                (blur)="validateBrochureEmail($event)" required class="gold-form-input my-0" />
-              <span class="form-field__check"
-                *ngIf="brochureEmailTouched && brochureFormData.email && !brochureEmailError">&#10003;</span>
-            </div>
-          </div>
-          <div *ngIf="brochureEmailTouched && brochureEmailError" class="mgs_error">Please enter a valid email address.
-          </div>
-
           <!-- Mobile -->
           <div class="form-field mt-3">
             <label class="form-field__label" for="brochureMobile">Mobile Number</label>
@@ -921,20 +908,17 @@
 
       <!-- Media (YouTube or image fallback) -->
       <div class="reels-media-container">
-        <iframe
-          *ngIf="reels[activeReelIndex].videoUrl.includes('youtube.com') || reels[activeReelIndex].videoUrl.includes('youtu.be')"
-          [src]="currentSanitizedVideoUrl" class="reels-video-frame" frameborder="0"
+        <iframe *ngIf="reels[activeReelIndex].proj_video_link" [src]="currentSanitizedVideoUrl"
+          class="reels-video-frame" frameborder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowfullscreen>
         </iframe>
-        <div
-          *ngIf="reels[activeReelIndex].videoUrl.includes('youtube.com') || reels[activeReelIndex].videoUrl.includes('youtu.be')"
-          class="reels-video-overlay-blocker"></div>
-        <div
-          *ngIf="!reels[activeReelIndex].videoUrl.includes('youtube.com') && !reels[activeReelIndex].videoUrl.includes('youtu.be')"
-          class="reels-image-wrapper">
-          <img [src]="reels[activeReelIndex].thumbnail" class="reels-image-fallback" alt="Reel image">
-        </div>
+        <div *ngIf="reels[activeReelIndex].proj_video_link" class="reels-video-overlay-blocker"></div>
+        <!-- Local MP4 asset reel -->
+        <video *ngIf="!reels[activeReelIndex].proj_video_link && reels[activeReelIndex].proj_video_file"
+          [src]="reels[activeReelIndex].proj_video_file" class="reels-video-frame" autoplay loop playsinline
+          [muted]="isReelsMuted">
+        </video>
       </div>
 
       <!-- Top-right: mute + settings (stacked vertically) -->
@@ -976,29 +960,29 @@
     <div class="reels-interaction-bar">
 
       <!-- Like -->
-      <div class="reels-interact-item">
+      <!-- <div class="reels-interact-item">
         <button class="reels-interact-btn" [class.liked]="reelsLikedStates[activeReelIndex]"
           (click)="toggleReelsLike(activeReelIndex)">
           <i class="fa-heart" [ngClass]="reelsLikedStates[activeReelIndex] ? 'fa-solid reel-liked' : 'fa-regular'"></i>
         </button>
         <span class="reels-interact-count">{{ reelsLikesCount[activeReelIndex] }}</span>
-      </div>
+      </div> -->
 
       <!-- Comment -->
-      <div class="reels-interact-item">
+      <!-- <div class="reels-interact-item">
         <button class="reels-interact-btn" (click)="showReelComments = !showReelComments">
           <i class="fa-regular fa-comment"></i>
         </button>
         <span class="reels-interact-count">{{ projectReviews.length }}</span>
-      </div>
+      </div> -->
 
       <!-- Views -->
-      <div class="reels-interact-item">
+      <!-- <div class="reels-interact-item">
         <button class="reels-interact-btn">
           <i class="fa-regular fa-eye"></i>
         </button>
         <span class="reels-interact-count">0</span>
-      </div>
+      </div> -->
 
       <!-- Share -->
       <div class="reels-interact-item">
