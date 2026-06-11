@@ -87,7 +87,7 @@
             WhatsApp
           </button>
 
-          <button data-bs-toggle="modal" data-bs-target="#Brochure"
+          <button data-bs-toggle="modal" data-bs-target="#get-builder"
             (click)="brochureMode='brochure'; resetBrochureForm()" *ngIf="singleproject?.project_brochure"
             class="btn btn-dark d-flex align-items-center gap-2 action-btn download-btn">
             <span><img src="../../../assets/images/download.svg" alt="" srcset=""></span>
@@ -162,7 +162,7 @@
             WhatsApp
           </button>
 
-          <button data-bs-toggle="modal" data-bs-target="#Brochure"
+          <button data-bs-toggle="modal" data-bs-target="#get-builder"
             (click)="brochureMode='brochure'; resetBrochureForm()" *ngIf="singleproject?.project_brochure"
             class="btn btn-dark d-flex align-items-center gap-2 action-btn download-btn">
             <span><img src="../../../assets/images/download.svg" alt="" srcset=""></span>
@@ -324,7 +324,7 @@
       <section id="reels" *ngIf="reels && reels.length > 0" class="reels-section">
         <h3 class="section-title">Watch Our Reels</h3>
 
-        <div class="floor-plan-card">
+        <div class="floor-plan-card ps-0">
           <ngx-slick-carousel class="carousel reels floor-plan-slick-slider" #slickModal="slick-carousel"
             [config]="reelsSlideConfig">
             <div ngxSlickItem *ngFor="let reel of reels; let i = index" class="slide px-2">
@@ -448,7 +448,7 @@
 
           <div class="text-center mt-4">
 
-            <button class="download-btn" data-bs-toggle="modal" data-bs-target="#Brochure"
+            <button class="download-btn" data-bs-toggle="modal" data-bs-target="#get-builder"
               (click)="brochureMode='brochure'; resetBrochureForm()" *ngIf="singleproject?.project_brochure">
 
               <img src="../../../assets/images/download.svg" alt="" srcset="">
@@ -528,8 +528,8 @@
                     {{ item.builder_group_name }}
                   </p>
 
-                  <p class="location-developer mb-3">
-                    <i class="bi bi-geo-alt"></i>
+                  <p class="location-developer mb-3 d-flex align-items-end">
+                    <span class="pe-1"><img src="../../../assets/images/location-icon-2.svg" alt="" srcset=""></span>
                     {{ item.developer_address }}
                   </p>
 
@@ -737,7 +737,7 @@
   </div>
 </div>
 
-<div class="modal fade" id="get-builder" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header sign-in-box">
@@ -827,6 +827,56 @@
     </div>
   </div>
 </div>
+
+<div class="modal fade" id="get-builder" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-body p-2">
+        <div class="position-relative">
+          <button type="button"
+            class="btn-close position-absolute bg-white opacity-100 scale-1 rounded-5 p-2 top-0 end-0"
+            data-bs-dismiss="modal" aria-label="Close" (click)="resetBrochureForm()"></button>
+          <img class="img-fluid" src="../../../assets/images/login_modal_image.png" alt="" srcset="">
+        </div>
+        <div class="p-3">
+          <h2 class="py-2">Login</h2>
+          <div>
+            <div [hidden]="brochureOtpVisible">
+              <label for="mobile_no" class="input-label">Enter Phone Number</label>
+              <div class="d-flex gap-2">
+                <input type="text" value="{{countryCode}}" disabled class="gold-form-input my-0" style="width: 10%;">
+                <input placeholder="Enter Mobile Number" type="tel" id="brochureMobile" name="brochureMobile" maxlength="10"
+                  [(ngModel)]="brochureFormData.mobile" (keypress)="validateNumberInput($event)"
+                  (blur)="validateBrochureMobile($event)" required class="gold-form-input placeholder-gray my-0" />
+              </div>
+            </div>
+            <div class="form-field mt-3" *ngIf="brochureOtpVisible">
+              <label class="input-label" for="brochureOtp">Enter OTP received on your phone number</label>
+              <div class="form-field__wrap">
+                <input type="text" id="brochureOtp" name="brochureOtp" [(ngModel)]="brochureOtp"
+                  (keypress)="validateNumberInput($event)" maxlength="4" class="gold-form-input my-0" />
+              </div>
+            </div>
+            <p class="label" *ngIf="brochureOtpVisible">Resend OTP avilable in <span
+                class="text-danger">{{remainingTime}}</span> Sec</p>
+            <p class="label" *ngIf="brochureOtpVisible">Not Recevied OTP Yet? <button
+                class="text-danger text-decoration-underline cursor-pointer bg-transparent border-0"
+                [disabled]="!isResendEnabled" (click)="resendOTP()">Resend</button></p>
+            <p (click)="backToLogin()" class="label" *ngIf="brochureOtpVisible" class="text-decoration-underline cursor-pointer text-danger">
+              Back to login</p>
+            <button [disabled]="brochureOtp.length !== 4" class="generate_otp_btn mt-3" (click)="closeLoginModal()"
+              *ngIf="brochureOtpVisible">Submit</button>
+            <button class="generate_otp_btn mt-3" *ngIf="!brochureOtpVisible" [disabled]="isBrochureSendingOtp"
+              (click)="sendBrochureOTP()">{{
+              isBrochureSendingOtp ? 'Sending OTP...' : 'Generate OTP' }}</button>
+            <p *ngIf="!brochureOtpVisible" class="text-center mt-1">New to Realitymart ? <span class="text-danger cursor-pointer" (click)="goToSignUp()">Sign Up</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <div class="modal fade" id="Brochure" tabindex="-1" aria-labelledby="brochureModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">

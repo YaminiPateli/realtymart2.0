@@ -19,6 +19,13 @@ export class CountrycodeService {
     );
   }
 
+ getIPCountryCode(): Observable<any> {
+    return this.httpClient.get<any>('https://ipapi.co/json/').pipe(
+      catchError(this.errorHandler)
+    );
+  }
+
+
   errorHandler(error: any) {
     let errorMessage = '';
     if (error.error instanceof ErrorEvent) {

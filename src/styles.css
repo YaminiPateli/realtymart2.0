@@ -7735,3 +7735,6 @@ span.txt {
 body.gallery-open .modal { z-index: 10100 !important; }
 body.gallery-open .modal-backdrop { z-index: 10050 !important; }
 
+.reels .slick-list .slick-track {
+    margin-left: 0 !important;
+}

@@ -2223,7 +2223,7 @@ google-map {
   .reels-interaction-bar {
     position: absolute;
     right: 16px;
-    top: 24%;
+    top: 17%;
     bottom: auto;
     z-index: 20;
     border-radius: 50%;
@@ -2789,11 +2789,6 @@ google-map {
     z-index: 20;
     gap: 14px;
     transition: bottom 0.3s ease;
-    background: rgba(0, 0, 0, 0.18);
-    padding: 10px 8px;
-    border-radius: 16px;
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
   }
 
   /* Shifting interaction sidebar higher when details card drawer is open */
@@ -3881,6 +3876,25 @@ google-map {
   width: 80%;
 }
 
-.reels .slick-list{
-  margin-left: 0px !important;
+.input-label {
+  font-size: 16px;
+}
+
+.generate_otp_btn {
+    background-color: #E53726;
+    color: white;
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    border: none;
+    border-radius: 5px;
+    padding: 4px 0px;
+}
+
+.btn-close{
+  scale: 0.8;
+}
+
+.placeholder-gray::placeholder{
+  color: #808080 !important;
 }

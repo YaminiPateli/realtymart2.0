@@ -2,7 +2,7 @@ import { AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy, O
 import { Lightbox } from 'ngx-lightbox';
 import { ProjectApproveDetailsService } from '../service/projectapprovedetail.service';
 import { ProjectdetailsService } from '../service/projectdetails.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Location } from '@angular/common';
 // import { DatePipe } from '@angular/common';
@@ -16,6 +16,7 @@ import { IssponsoredService } from '../service/issponsored.service';
 import { IsverifiedService } from '../service/isverified.service';
 import { ActivityTrackerService } from '../service/activitytracker.service';
 import { FilteredCities } from 'src/app/filteredcities';
+import { CountrycodeService } from '../service/countrycode.service';
 declare var bootstrap: any;
 @Component({
   selector: 'app-project-approve-detail',
@@ -233,7 +234,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     }
   ];
 
-  developerProjects:any[] = [];
+  developerProjects: any[] = [];
 
 
   specifications = [
@@ -360,10 +361,11 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   city1: { cid: number, cname: string }[] = [];
   priceTooltipVisible: boolean = false;
   showStickyHeader = false;
+  countryCode: any;
 
   googleMapUrl =
     'https://www.google.com/maps?q=22.2865,73.1812';
-  private timer: any;
+  timer: any;
   constructor(
     private titleService: Title,
     private metaService: Meta,
@@ -379,7 +381,9 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     private spinner: NgxSpinnerService,
     private toastr: ToastrService,
     private activityTrackerService: ActivityTrackerService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private router:Router,
+    private contryCodeService:CountrycodeService
   ) {
     this._album.push({
       src: 'assets/images/advertisement.png',
@@ -866,6 +870,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     this.observeSections();
     this.detectActiveSectionOnScroll();
     this.fetchProjectApproveDetails();
+    this.getContryCode();
     // this.loadissponsored();
     // this.loadisverified();
     if (this.latitude && this.longitude) {
@@ -899,6 +904,12 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     else {
       this.is_token = false;
     }
+  }
+
+  getContryCode(){
+    this.contryCodeService.getIPCountryCode().subscribe((res: any) => {
+      this.countryCode = res.country_calling_code;
+    });
   }
 
   updateMapCoordinates(latVal: any, lngVal: any) {
@@ -968,7 +979,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
         try {
           const parsed = JSON.parse(trimmed);
           if (Array.isArray(parsed)) return parsed;
-        } catch (e) {}
+        } catch (e) { }
       }
       return trimmed.split(',').map(s => s.trim()).filter(s => s.length > 0);
     }
@@ -1080,19 +1091,12 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     this.termsContactError = false;
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,5}$/;
 
-    if (!this.formDataphone.contactusername?.trim() || this.formDataphone.contactusername.trim().length < 3) {
-      this.nameContactError = true;
-    }
-    if (!this.formDataphone.contactuseremail || !emailPattern.test(this.formDataphone.contactuseremail)) {
-      this.emailContactError = true;
-    }
+
+
     if (!this.formDataphone.contactcontact_no || String(this.formDataphone.contactcontact_no).length < 10) {
       this.phoneContactError = true;
     }
-    if (!this.formDataphone.termsContactAccepted) {
-      this.termsContactError = true;
-    }
-    if (this.nameContactError || this.phoneContactError || this.emailContactError || this.termsContactError) {
+    if (this.phoneContactError) {
       return;
     }
     this.sendOTPContactToMobile(); // Call this to send OTP to mobile
@@ -1235,7 +1239,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     this.spinner.show();
     this.http
       .post(`${this.apiUrl}genrateinquiryotp`, {
-        contact_no: this.formData.contact_no,
+        contact_no: this.brochureFormData.mobile,
       })
       .subscribe(
         (response: any) => {
@@ -1813,6 +1817,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
 
   // ===== Brochure Form Methods =====
   sendBrochureOTP() {
+    this.startTimer();
     this.brochureNameTouched = true;
     this.brochureEmailTouched = true;
     this.brochureMobileTouched = true;
@@ -1823,7 +1828,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     this.brochureMobileError = !mobilePattern.test(this.brochureFormData.mobile);
     this.brochureTermsError = !this.brochureFormData.termsAccepted;
 
-    if (this.brochureNameError || this.brochureEmailError || this.brochureMobileError || this.brochureTermsError) return;
+    if (this.brochureMobileError) return;
 
     this.isBrochureSendingOtp = true;
     this.spinner.show();
@@ -2522,5 +2527,19 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     this.isAtEnd = el.scrollLeft >= (maxScrollLeft - 5);
   }
 
+  backToLogin(){
+    this.brochureOtpVisible = false;
+    this.brochureOtp = "";
+  }
+
+  goToSignUp() {
+    this.router.navigate(['/registration']);
+  }
+
+  closeLoginModal() {
+    this.brochureOtpVisible = false;
+    const modalEl = document.getElementById('get-builder');
+    if (modalEl) bootstrap.Modal.getInstance(modalEl)?.hide();
+  }
 
 }
