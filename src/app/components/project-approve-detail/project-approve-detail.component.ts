@@ -16,7 +16,6 @@ import { IssponsoredService } from '../service/issponsored.service';
 import { IsverifiedService } from '../service/isverified.service';
 import { ActivityTrackerService } from '../service/activitytracker.service';
 import { FilteredCities } from 'src/app/filteredcities';
-import { CountrycodeService } from '../service/countrycode.service';
 declare var bootstrap: any;
 @Component({
   selector: 'app-project-approve-detail',
@@ -45,6 +44,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   isAtEnd = false;
   currentSection: any;
   private _activeSection: string = 'overview';
+  selectedAction!: "view-contact" | "whatsapp" | "schedule-visit" | "brochure";
   get activeSection(): any {
     return this._activeSection;
   }
@@ -131,6 +131,11 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   reels: any[] = [];
   openModel = 0;
   remainingTime: number = 60;
+  scheduleVisitData: any = {
+    visitDateTime: '',
+    remarks: ''
+  };
+  scheduleVisitDateTimeError: boolean = false;
   // Floor plans – populated from API `floor_plans` array
   floorPlanList: { bhk_type: string; carpet_area: string; image: string[] }[] = [];
   selectedFloorPlanIndex: number = 0;
@@ -362,6 +367,15 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   priceTooltipVisible: boolean = false;
   showStickyHeader = false;
   countryCode: any;
+  otpArray = [0, 1, 2, 3];
+  brochureSlideConfig = {
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    dots: true,
+    arrows: true,
+    infinite: false
+  };
+  brochureOtp: string[] = ['', '', '', ''];
 
   googleMapUrl =
     'https://www.google.com/maps?q=22.2865,73.1812';
@@ -382,8 +396,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     private toastr: ToastrService,
     private activityTrackerService: ActivityTrackerService,
     private sanitizer: DomSanitizer,
-    private router:Router,
-    private contryCodeService:CountrycodeService
+    private router: Router,
   ) {
     this._album.push({
       src: 'assets/images/advertisement.png',
@@ -426,6 +439,47 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
       },
     });
   }
+
+  moveNext(event: Event, index: number) {
+    const input = event.target as HTMLInputElement;
+
+    if (input.value && index < this.otpArray.length - 1) {
+      const nextInput = input.nextElementSibling as HTMLInputElement;
+      nextInput?.focus();
+    }
+  }
+
+  movePrevious(event: KeyboardEvent, index: number) {
+    const input = event.target as HTMLInputElement;
+
+    if (event.key === 'Backspace' && !input.value && index > 0) {
+      const prevInput = input.previousElementSibling as HTMLInputElement;
+      prevInput?.focus();
+    }
+  }
+
+  onOtpPaste(event: ClipboardEvent) {
+    event.preventDefault();
+    const pasteData = event.clipboardData?.getData('text') || '';
+    const digits = pasteData.replace(/\D/g, '').slice(0, 4);
+
+    for (let i = 0; i < this.otpArray.length; i++) {
+      if (i < digits.length) {
+        this.brochureOtp[i] = digits[i];
+      } else {
+        this.brochureOtp[i] = '';
+      }
+    }
+
+    const currentInput = event.target as HTMLInputElement;
+    const parent = currentInput.parentElement;
+    if (parent) {
+      const siblingInputs = Array.from(parent.querySelectorAll('.otp-box')) as HTMLInputElement[];
+      const focusIndex = Math.min(digits.length, siblingInputs.length - 1);
+      siblingInputs[focusIndex]?.focus();
+    }
+  }
+
 
 
   playReel(reel: any) {
@@ -792,11 +846,13 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   brochureMobileError: boolean = false;
   brochureTermsError: boolean = false;
   brochureOtpVisible: boolean = false;
-  brochureOtp: string = '';
   brochureOtpError: boolean = false;
   brochureNameTouched: boolean = false;
   brochureEmailTouched: boolean = false;
   brochureMobileTouched: boolean = false;
+  brochureRegisterVisible: boolean = false;
+  isUserRegistered: boolean = false;
+  showContactDetails: boolean = false;
 
   // Download Brochure otp
   showOTP: boolean = false;
@@ -870,7 +926,6 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     this.observeSections();
     this.detectActiveSectionOnScroll();
     this.fetchProjectApproveDetails();
-    this.getContryCode();
     // this.loadissponsored();
     // this.loadisverified();
     if (this.latitude && this.longitude) {
@@ -904,12 +959,6 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     else {
       this.is_token = false;
     }
-  }
-
-  getContryCode(){
-    this.contryCodeService.getIPCountryCode().subscribe((res: any) => {
-      this.countryCode = res.country_calling_code;
-    });
   }
 
   updateMapCoordinates(latVal: any, lngVal: any) {
@@ -1103,63 +1152,95 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   }
 
   verifyContactOTP() {
-    if (this.formDataphone.contactotp == '') {
+    const otpVal = this.brochureOtp.join('');
+    if (otpVal.length < 4) {
       this.toastr.error('Please Enter OTP');
-      return
+      return;
     }
-    let payload = {
-      contact_no: this.formDataphone.contactcontact_no,
-      otp: this.formDataphone.contactotp,
-    }
-    this.http
-      .post(
-        `${this.apiUrl}verifyinquiryotp`,
-        payload
-      )
-      .subscribe(
+
+    this.spinner.show();
+
+    if (this.isUserRegistered) {
+      const enteredOtp = parseInt(otpVal, 10);
+      const url = `${this.apiUrl}validateotp`;
+      const data = { contact_no: this.brochureFormData.mobile, otp: enteredOtp };
+
+      this.http.post(url, data).subscribe(
         (response: any) => {
-          if (response.status == true) {
-            // this.toastr.success('OTP verified successfully.');
-            const modalElement = this.otpContactModel.nativeElement;
-            const modal = bootstrap.Modal.getInstance(modalElement);
-            if (modal) {
-              modal.hide();
-            } else {
-              const newModal = new bootstrap.Modal(modalElement);
-              newModal.hide();
-            }
+          this.spinner.hide();
+          if (response && response.status === true) {
+            localStorage.setItem('myrealtylogintoken', response.data.token);
+            localStorage.setItem('contact_no', response.data.contact_no);
+            localStorage.setItem('userId', response.data.id);
+            localStorage.setItem('role', response.data.role);
+            localStorage.setItem('name', response.data.name);
+            localStorage.setItem('email', response.data.email);
+            this.is_token = true;
+
+            // Prefill formDataphone from localStorage
+            this.formDataphone.contactusername = response.data.name;
+            this.formDataphone.contactuseremail = response.data.email;
+            this.formDataphone.contactcontact_no = response.data.contact_no;
+
+            // Submit inquiry
             this.submitFormPhone();
-            this.isResendEnabled = false;
-            this.isMobileNumberDisabled = true;
 
-            // Optional: Delay for user feedback before hiding
-            setTimeout(() => {
-              this.spinner.hide();
-            }, 1000); // Adjust the delay as needed
-            // if (
-            //   this.nameContactError||
-            //   this.phoneContactError ||
-            //   this.emailContactError
-            // ) {
-            //   return;
-            // }
-            // else {
-            //   this.submitFormPhone();
-            // }
+            // Close login modal
+            this.closeLoginModal();
 
-            this.spinner.hide();
+            // Open brochure PDF
+            if (this.selectedAction === 'brochure') {
+              const pdfUrl = this.singleproject?.project_brochure;
+              if (pdfUrl) {
+                window.open(pdfUrl, '_blank');
+                setTimeout(() => {
+                  window.location.reload();
+                }, 100);
+              } else {
+                this.toastr.warning('Brochure is not available.');
+              }
+            } else if (this.selectedAction === 'view-contact') {
+              this.showContactDetails = true;
+            } else if (this.selectedAction === 'whatsapp') {
+              this.redirectToWhatsApp();
+              setTimeout(() => {
+                window.location.reload();
+              }, 100);
+            } else if (this.selectedAction === 'schedule-visit') {
+              this.openScheduleVisitModal();
+            }
+            this.toastr.success('Logged in successfully!');
           } else {
             this.toastr.error('Wrong OTP entered. Please try again.');
-            this.isResendEnabled = true;
-            this.isSubmitting = false; // Reset submission flag if failed
           }
         },
         (error) => {
-          console.error('Wrong OTP entered. Please try again.', error);
-          this.isResendEnabled = true;
-          this.isSubmitting = false; // Reset submission flag on error
+          this.spinner.hide();
+          this.toastr.error('Verification failed. Please try again.');
         }
       );
+    } else {
+      let payload = {
+        contact_no: this.brochureFormData.mobile,
+        otp: otpVal,
+      }
+      this.http.post(`${this.apiUrl}verifyinquiryotp`, payload).subscribe(
+        (response: any) => {
+          this.spinner.hide();
+          if (response.status == true) {
+            // OTP verified successfully. Now show the Name and Email form inside the modal.
+            this.brochureOtpVisible = false;
+            this.brochureRegisterVisible = true;
+          } else {
+            this.toastr.error('Wrong OTP entered. Please try again.');
+          }
+        },
+        (error) => {
+          this.spinner.hide();
+          this.toastr.error('Verification failed. Please try again.');
+        }
+      );
+    }
   }
 
   verifyOTP() {
@@ -1815,40 +1896,54 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     return Object.entries(this.singleproject.landmarksnearproject);
   }
 
-  // ===== Brochure Form Methods =====
   sendBrochureOTP() {
-    this.startTimer();
-    this.brochureNameTouched = true;
-    this.brochureEmailTouched = true;
     this.brochureMobileTouched = true;
-    this.brochureNameError = !this.brochureFormData.name?.trim() || this.brochureFormData.name.trim().length < 3;
-    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,5}$/;
-    this.brochureEmailError = !emailPattern.test(this.brochureFormData.email);
     const mobilePattern = /^[0-9]{10}$/;
     this.brochureMobileError = !mobilePattern.test(this.brochureFormData.mobile);
-    this.brochureTermsError = !this.brochureFormData.termsAccepted;
 
     if (this.brochureMobileError) return;
 
     this.isBrochureSendingOtp = true;
-    this.spinner.show();
-    this.http.post(`${this.apiUrl}genrateinquiryotp`, { contact_no: this.brochureFormData.mobile })
-      .subscribe((response: any) => {
-        this.isBrochureSendingOtp = false;
-        this.spinner.hide();
-        if (response.data === 'ok' && response.status === true) {
+
+    // Call generateotp to check if user is registered
+    this.http.post(`${this.apiUrl}generateotp`, { contact_no: this.brochureFormData.mobile })
+      .subscribe((res: any) => {
+        if (res.status === true && res.code !== 1) {
+          // User is registered in the database, generateotp has successfully sent the login OTP
+          this.isBrochureSendingOtp = false;
+          this.isUserRegistered = true;
           this.brochureOtpVisible = true;
+          this.startTimer();
           this.toastr.success('OTP sent successfully.');
         } else {
-          this.toastr.error('Failed to send OTP.');
+          // User is unregistered in the database, send guest inquiry OTP
+          this.isUserRegistered = false;
+          this.http.post(`${this.apiUrl}genrateinquiryotp`, { contact_no: this.brochureFormData.mobile })
+            .subscribe((inqRes: any) => {
+              this.isBrochureSendingOtp = false;
+              if (inqRes.data === 'ok' && inqRes.status === true) {
+                this.brochureOtpVisible = true;
+                this.startTimer();
+                this.toastr.success('OTP sent successfully.');
+              } else {
+                this.toastr.error(inqRes.message || 'Failed to send OTP.');
+              }
+            }, () => {
+              this.isBrochureSendingOtp = false;
+              this.toastr.error('Failed to send OTP.');
+            });
         }
-      }, () => { this.isBrochureSendingOtp = false; this.spinner.hide(); this.toastr.error('Failed to send OTP.'); });
+      }, () => {
+        this.isBrochureSendingOtp = false;
+        this.toastr.error('Failed to send OTP.');
+      });
   }
 
   submitBrochure() {
-    if (!this.brochureOtp) { this.brochureOtpError = true; return; }
+    const otpVal = this.brochureOtp.join('');
+    if (otpVal.length < 4) { this.brochureOtpError = true; return; }
     this.brochureOtpError = false;
-    this.http.post(`${this.apiUrl}verifyinquiryotp`, { contact_no: this.brochureFormData.mobile, otp: this.brochureOtp })
+    this.http.post(`${this.apiUrl}verifyinquiryotp`, { contact_no: this.brochureFormData.mobile, otp: otpVal })
       .subscribe((response: any) => {
         if (response.status === true) {
           const modalEl = document.getElementById('Brochure');
@@ -1872,8 +1967,9 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
 
   resetBrochureForm() {
     this.brochureFormData = { name: '', email: '', mobile: '', termsAccepted: true };
-    this.brochureOtp = '';
+    this.brochureOtp = ['', '', '', ''];
     this.brochureOtpVisible = false;
+    this.brochureRegisterVisible = false;
     this.brochureNameError = false;
     this.brochureEmailError = false;
     this.brochureMobileError = false;
@@ -2527,9 +2623,10 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     this.isAtEnd = el.scrollLeft >= (maxScrollLeft - 5);
   }
 
-  backToLogin(){
+  backToLogin() {
     this.brochureOtpVisible = false;
-    this.brochureOtp = "";
+    this.brochureRegisterVisible = false;
+    this.brochureOtp = ['', '', '', ''];
   }
 
   goToSignUp() {
@@ -2538,8 +2635,253 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
 
   closeLoginModal() {
     this.brochureOtpVisible = false;
+    this.brochureRegisterVisible = false;
     const modalEl = document.getElementById('get-builder');
-    if (modalEl) bootstrap.Modal.getInstance(modalEl)?.hide();
+    if (modalEl) {
+      const bootstrapModal = bootstrap.Modal.getInstance(modalEl);
+      if (bootstrapModal) {
+        bootstrapModal.hide();
+      } else {
+        const newModal = new bootstrap.Modal(modalEl);
+        newModal.hide();
+      }
+    }
   }
 
+  openOtpModal(action: "view-contact" | "whatsapp" | "schedule-visit" | "brochure"): void {
+    this.selectedAction = action;
+  }
+
+  downloadBrochureDirectly() {
+    this.selectedAction = 'brochure';
+    // Prefill formDataphone from localStorage
+    this.formDataphone.contactusername = localStorage.getItem('name') || '';
+    this.formDataphone.contactuseremail = localStorage.getItem('email') || '';
+    this.formDataphone.contactcontact_no = localStorage.getItem('contact_no') || '';
+    this.formDataphone.termsContactAccepted = true;
+
+    // Submit inquiry
+    this.submitFormPhone();
+
+    // Open brochure PDF
+    const pdfUrl = this.singleproject?.project_brochure;
+    if (pdfUrl) {
+      window.open(pdfUrl, '_blank');
+      this.toastr.success('Opening brochure...');
+    } else {
+      this.toastr.warning('Brochure is not available.');
+    }
+  }
+
+  registerAndDownloadBrochure() {
+    this.brochureNameError = !this.brochureFormData.name || this.brochureFormData.name.trim().length < 3;
+    
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,5}$/;
+    this.brochureEmailError = !this.brochureFormData.email || !emailPattern.test(this.brochureFormData.email);
+
+    if (this.brochureNameError || this.brochureEmailError) {
+      return;
+    }
+
+    this.spinner.show();
+
+    // Store inquiry
+    const payload = {
+      contact_no: this.brochureFormData.mobile,
+      useremail: this.brochureFormData.email || '',
+      username: this.brochureFormData.name,
+      project_Id: this.singleproject.id,
+      builder_id: '',
+      leads_type: 'Project',
+      leads_for: this.singleproject.property_for,
+      receiver_user_id: this.singleproject.user_id,
+      countrycode: '',
+      request_price: 0,
+    };
+
+    this.http.post(`${this.apiUrl}storeinquiry`, payload).subscribe(
+      (response: any) => {
+        this.spinner.hide();
+        if (response.status === true) {
+          this.activityTrackerService.logActivity('Inquiry stored for project', '');
+          this.toastr.success('Inquiry stored successfully.');
+
+          // Save details locally and establish login session with all keys
+          if (response.data && response.data.token) {
+            localStorage.setItem('myrealtylogintoken', response.data.token);
+            localStorage.setItem('userId', response.data.id || response.data.userId || '');
+            localStorage.setItem('email', response.data.email || this.brochureFormData.email || '');
+            localStorage.setItem('contact_no', response.data.contact_no || this.brochureFormData.mobile || '');
+            localStorage.setItem('role', response.data.role || 'user');
+            localStorage.setItem('name', response.data.name || this.brochureFormData.name || '');
+            localStorage.setItem('sessionId', response.data.sessionId || '');
+          } else {
+            localStorage.setItem('myrealtylogintoken', 'registered_guest_token');
+            localStorage.setItem('userId', 'guest_user_id');
+            localStorage.setItem('email', this.brochureFormData.email || '');
+            localStorage.setItem('contact_no', this.brochureFormData.mobile || '');
+            localStorage.setItem('role', 'user');
+            localStorage.setItem('name', this.brochureFormData.name || '');
+            localStorage.setItem('sessionId', 'guest_session_id');
+          }
+          this.is_token = true;
+
+          // Close modal
+          this.closeLoginModal();
+
+          // Open brochure PDF
+          if (this.selectedAction === 'brochure') {
+            const pdfUrl = this.singleproject?.project_brochure;
+            if (pdfUrl) {
+              window.open(pdfUrl, '_blank');
+            } else {
+              this.toastr.warning('Brochure is not available.');
+            }
+            setTimeout(() => {
+              window.location.reload();
+            }, 100);
+          } else if (this.selectedAction === 'view-contact') {
+            this.showContactDetails = true;
+          } else if (this.selectedAction === 'whatsapp') {
+            this.redirectToWhatsApp();
+            setTimeout(() => {
+              window.location.reload();
+            }, 100);
+          } else if (this.selectedAction === 'schedule-visit') {
+            this.openScheduleVisitModal();
+          }
+        } else {
+          this.toastr.error('Failed to submit enquiry.');
+        }
+      },
+      (error) => {
+        this.spinner.hide();
+        this.toastr.error('Error submitting enquiry.');
+      }
+    );
+  }
+
+  handleContactClick() {
+    this.showContactDetails = !this.showContactDetails;
+    if (this.showContactDetails) {
+      this.formDataphone.contactusername = localStorage.getItem('name') || '';
+      this.formDataphone.contactuseremail = localStorage.getItem('email') || '';
+      this.formDataphone.contactcontact_no = localStorage.getItem('contact_no') || '';
+      this.formDataphone.termsContactAccepted = true;
+      this.submitFormPhone();
+    }
+  }
+
+  formatContactNumber(num: any): string {
+    if (!num) return '';
+    let clean = String(num).replace(/\s+/g, '').replace(/-/g, '');
+    if (clean.length === 10) {
+      return '+91 ' + clean;
+    }
+    if (clean.length === 12 && clean.startsWith('91')) {
+      return '+' + clean.slice(0, 2) + ' ' + clean.slice(2);
+    }
+    if (clean.startsWith('+91') && clean.length === 13) {
+      return clean.slice(0, 3) + ' ' + clean.slice(3);
+    }
+    return num;
+  }
+
+  redirectToWhatsApp() {
+    this.formDataphone.contactusername = localStorage.getItem('name') || '';
+    this.formDataphone.contactuseremail = localStorage.getItem('email') || '';
+    this.formDataphone.contactcontact_no = localStorage.getItem('contact_no') || '';
+    this.formDataphone.termsContactAccepted = true;
+    this.submitFormPhone();
+
+    const contactNo = this.singleproject?.project_contact_no;
+    if (contactNo) {
+      let clean = String(contactNo).replace(/\D/g, '');
+      if (clean.length === 10) {
+        clean = '91' + clean;
+      }
+      const message = encodeURIComponent(`Hi, I'm interested in the project "${this.singleproject?.project_name}" on RealtyMart.`);
+      const whatsappUrl = `https://wa.me/${clean}?text=${message}`;
+      window.open(whatsappUrl, '_blank');
+    } else {
+      this.toastr.warning('WhatsApp number is not available.');
+    }
+  }
+
+  openScheduleVisitModal() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    this.scheduleVisitData.visitDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+    this.scheduleVisitData.remarks = '';
+    this.scheduleVisitDateTimeError = false;
+
+    const modalEl = document.getElementById('schedule-visit-modal');
+    if (modalEl) {
+      const bootstrapModal = new bootstrap.Modal(modalEl);
+      bootstrapModal.show();
+    }
+  }
+
+  closeScheduleVisitModal() {
+    const modalEl = document.getElementById('schedule-visit-modal');
+    if (modalEl) {
+      const bootstrapModal = bootstrap.Modal.getInstance(modalEl);
+      if (bootstrapModal) {
+        bootstrapModal.hide();
+      }
+    }
+  }
+
+  submitScheduleVisit() {
+    this.scheduleVisitDateTimeError = !this.scheduleVisitData.visitDateTime;
+    if (this.scheduleVisitDateTimeError) {
+      return;
+    }
+
+    this.spinner.show();
+
+    const payload = {
+      contact_no: localStorage.getItem('contact_no') || '',
+      useremail: localStorage.getItem('email') || '',
+      username: localStorage.getItem('name') || '',
+      project_Id: this.singleproject.id,
+      builder_id: '',
+      leads_type: 'Project',
+      leads_for: this.singleproject.property_for,
+      receiver_user_id: this.singleproject.user_id,
+      countrycode: '',
+      request_price: 0,
+      visit_date_time: this.scheduleVisitData.visitDateTime,
+      remarks: this.scheduleVisitData.remarks || '',
+    };
+
+    const token = localStorage.getItem('myrealtylogintoken');
+    const headers = new HttpHeaders()
+      .set('Authorization', `Bearer ${token}`)
+      .set('Accept', 'application/json');
+
+    this.http.post(`${this.apiUrl}storeinquiry`, payload, { headers }).subscribe(
+      (response: any) => {
+        this.spinner.hide();
+        if (response.status === true) {
+          this.activityTrackerService.logActivity('Schedule Visit Inquiry stored', '');
+          this.toastr.success('Visit scheduled successfully!');
+          this.closeScheduleVisitModal();
+          setTimeout(() => {
+            window.location.reload();
+          }, 100);
+        } else {
+          this.toastr.error('Failed to schedule visit. Please try again.');
+        }
+      },
+      (error) => {
+        this.spinner.hide();
+        this.toastr.error('Error scheduling visit.');
+      }
+    );
+  }
 }

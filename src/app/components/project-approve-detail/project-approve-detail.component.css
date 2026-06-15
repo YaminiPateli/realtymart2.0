@@ -1209,7 +1209,7 @@ google-map {
 
 .builder-card {
   height: auto;
-  max-height: calc(100vh - 340px);
+  max-height: calc(100vh - 335px);
   overflow-y: auto;
 }
 
@@ -1246,11 +1246,17 @@ google-map {
     font-size: 18px;
   }
 
+  .contact-container-relative {
+    display: block;
+    width: 100%;
+  }
+
   .contact-btn,
   .whatsapp-btn,
   .visit-btn {
     height: 44px;
     font-size: 15px;
+    width: 100%;
   }
 }
 
@@ -1294,6 +1300,7 @@ google-map {
     height: 42px;
     font-size: 14px;
     border-radius: 6px;
+    width: 100%;
   }
 
   .contact-btn span img,
@@ -2273,11 +2280,12 @@ google-map {
   }
 }
 
-@media(max-width:765px){
-  .project-title{
+@media(max-width:765px) {
+  .project-title {
     font-size: 24px;
   }
-  .builder-name-by{
+
+  .builder-name-by {
     font-size: 14px;
     line-height: 20px;
   }
@@ -3881,20 +3889,562 @@ google-map {
 }
 
 .generate_otp_btn {
-    background-color: #E53726;
-    color: white;
-    display: flex;
-    width: 100%;
-    justify-content: center;
-    border: none;
-    border-radius: 5px;
-    padding: 4px 0px;
+  background-color: #E53726;
+  color: white;
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  border: none;
+  border-radius: 5px;
+  padding: 4px 0px;
 }
 
-.btn-close{
+.btn-close {
   scale: 0.8;
 }
 
-.placeholder-gray::placeholder{
+.placeholder-gray::placeholder {
   color: #808080 !important;
+}
+
+.otp-container {
+  display: flex;
+  gap: 15px;
+  justify-content: flex-start;
+  margin: 15px 0;
+}
+
+.otp-box {
+  width: 46px;
+  height: 46px;
+  font-size: 24px;
+  font-weight: 500;
+  text-align: center;
+  border: 1px solid #dcdcdc;
+  border-radius: 12px;
+  background-color: #ffffff;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.otp-box:focus {
+  border-color: #e53726;
+  box-shadow: 0 0 0 2px rgba(229, 55, 38, 0.1);
+}
+
+/* Contact Popover */
+.contact-container-relative {
+  position: relative;
+  display: inline-block;
+}
+
+.contact-container-relative.w-100 {
+  display: block;
+  width: 100%;
+}
+
+.contact-popover-card {
+  position: absolute;
+  top: 115%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  min-width: 240px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  text-align: center;
+  animation: fadeInPopover 0.2s ease-out;
+}
+
+.contact-popover-card::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 8px;
+  border-style: solid;
+  border-color: transparent transparent #ffffff transparent;
+}
+
+.contact-popover-card::after {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 9px;
+  border-style: solid;
+  border-color: transparent transparent #e0e0e0 transparent;
+  z-index: -1;
+}
+
+.contact-popover-card .title-text {
+  font-size: 11px;
+  color: #888888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.contact-popover-card .sales-team-text {
+  font-size: 13px;
+  color: #e53726;
+  font-weight: 700;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.contact-popover-card .phone-link {
+  display: block;
+  font-size: 16px;
+  color: #111111;
+  font-weight: 700;
+  text-decoration: none;
+  background-color: #f7f7f7;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.contact-popover-card .phone-link:hover {
+  background-color: #e53726;
+  color: #ffffff;
+  border-color: #e53726;
+}
+
+/* Mobile Sticky Footer Specific Popover Styles (goes up instead of down) */
+.mobile-sticky-footer .contact-container-relative {
+  display: block;
+  width: 100%;
+}
+
+.mobile-sticky-footer .contact-popover-card {
+  top: auto;
+  bottom: 125%;
+  animation: fadeInUpPopover 0.2s ease-out;
+}
+
+.mobile-sticky-footer .contact-popover-card::before {
+  bottom: auto;
+  top: 100%;
+  border-color: #ffffff transparent transparent transparent;
+}
+
+.mobile-sticky-footer .contact-popover-card::after {
+  bottom: auto;
+  top: 100%;
+  border-color: #e0e0e0 transparent transparent transparent;
+}
+
+@keyframes fadeInPopover {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes fadeInUpPopover {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+/* Schedule Visit Modal Styling */
+.schedule-visit-modal-content {
+  border-radius: 28px !important;
+  border: none !important;
+  padding: 30px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+  margin-top: 50px;
+}
+
+.schedule-visit-badge-container {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+}
+
+.schedule-visit-badge {
+  width: 100px;
+  height: 100px;
+  background-color: #e53726;
+  /* Brand Theme Color */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(229, 55, 38, 0.3);
+  border: 4px solid #fff;
+}
+
+.icon-stack {
+  position: relative;
+  display: inline-block;
+  color: white;
+}
+
+.calendar-main-icon {
+  font-size: 44px;
+}
+
+.icon-sub {
+  position: absolute;
+  bottom: -6px;
+  right: -6px;
+  background: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.clock-sub-icon {
+  font-size: 14px;
+  color: #e53726;
+  /* Brand Theme Color */
+}
+
+.schedule-visit-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 11;
+  background-color: #fff !important;
+  border-radius: 50% !important;
+  padding: 8px !important;
+  opacity: 0.8 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.schedule-visit-close:hover {
+  opacity: 1 !important;
+  transform: scale(1.05);
+}
+
+.schedule-visit-body {
+  padding-top: 40px !important;
+}
+
+.schedule-visit-title {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 700;
+  color: #0f2942;
+  margin-bottom: 24px;
+  font-family: 'Outfit', sans-serif;
+}
+
+.gold-form-textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  font-size: 15px;
+  color: #1f2937;
+  background-color: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  resize: vertical;
+  min-height: 100px;
+}
+
+.gold-form-textarea:focus {
+  border-color: #e53726;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(229, 55, 38, 0.1);
+}
+
+.btn-outline-cancel {
+  border: 2px solid #0f2942 !important;
+  background-color: transparent !important;
+  color: #0f2942 !important;
+  font-weight: 700 !important;
+  border-radius: 12px !important;
+  padding: 10px 24px !important;
+  font-size: 15px !important;
+  transition: all 0.2s ease;
+  min-width: 110px;
+}
+
+.btn-outline-cancel:hover {
+  background-color: #f3f4f6 !important;
+  color: #0d1e30 !important;
+  border-color: #0d1e30 !important;
+}
+
+.btn-schedule {
+  background-color: #e53726 !important;
+  border: 2px solid #e53726 !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  border-radius: 12px !important;
+  padding: 10px 24px !important;
+  font-size: 15px !important;
+  transition: all 0.2s ease;
+  min-width: 110px;
+}
+
+.btn-schedule:hover {
+  background-color: #db3217 !important;
+  border-color: #db3217 !important;
+}
+
+.mobile-sticky-footer .contact-popover-card::before {
+  bottom: auto;
+  top: 100%;
+  border-color: #ffffff transparent transparent transparent;
+}
+
+.mobile-sticky-footer .contact-popover-card::after {
+  bottom: auto;
+  top: 100%;
+  border-color: #e0e0e0 transparent transparent transparent;
+}
+
+@keyframes fadeInPopover {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes fadeInUpPopover {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+/* Schedule Visit Modal Styling */
+.schedule-visit-modal-content {
+  border-radius: 28px !important;
+  border: none !important;
+  padding: 30px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+  margin-top: 50px;
+}
+
+.schedule-visit-badge-container {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+}
+
+.schedule-visit-badge {
+  width: 100px;
+  height: 100px;
+  background-color: #e53726;
+  /* Brand Theme Color */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(229, 55, 38, 0.3);
+  border: 4px solid #fff;
+}
+
+.icon-stack {
+  position: relative;
+  display: inline-block;
+  color: white;
+}
+
+.calendar-main-icon {
+  font-size: 44px;
+}
+
+.icon-sub {
+  position: absolute;
+  bottom: -6px;
+  right: -6px;
+  background: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.clock-sub-icon {
+  font-size: 14px;
+  color: #e53726;
+  /* Brand Theme Color */
+}
+
+.schedule-visit-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 11;
+  background-color: #fff !important;
+  border-radius: 50% !important;
+  padding: 8px !important;
+  opacity: 0.8 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.schedule-visit-close:hover {
+  opacity: 1 !important;
+  transform: scale(1.05);
+}
+
+.schedule-visit-body {
+  padding-top: 40px !important;
+}
+
+.schedule-visit-title {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 700;
+  color: #0f2942;
+  margin-bottom: 24px;
+  font-family: 'Outfit', sans-serif;
+}
+
+.gold-form-textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  font-size: 15px;
+  color: #1f2937;
+  background-color: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  resize: vertical;
+  min-height: 100px;
+}
+
+.gold-form-textarea:focus {
+  border-color: #e53726;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(229, 55, 38, 0.1);
+}
+
+.btn-outline-cancel {
+  border: 2px solid #0f2942 !important;
+  background-color: transparent !important;
+  color: #0f2942 !important;
+  font-weight: 700 !important;
+  border-radius: 12px !important;
+  padding: 10px 24px !important;
+  font-size: 15px !important;
+  transition: all 0.2s ease;
+  min-width: 110px;
+}
+
+.btn-outline-cancel:hover {
+  background-color: #f3f4f6 !important;
+  color: #0d1e30 !important;
+  border-color: #0d1e30 !important;
+}
+
+.btn-schedule {
+  background-color: #e53726 !important;
+  border: 2px solid #e53726 !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  border-radius: 12px !important;
+  padding: 10px 24px !important;
+  font-size: 15px !important;
+  transition: all 0.2s ease;
+  min-width: 110px;
+}
+
+.btn-schedule:hover {
+  background-color: #db3217 !important;
+  border-color: #db3217 !important;
+}
+
+/* Phone input group with country code prefix */
+.phone-input-group {
+  display: flex;
+  align-items: center;
+  border: 1px solid #dcdcdc;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #ffffff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.phone-input-group:focus-within {
+  border-color: #e53726;
+  box-shadow: 0 0 0 2px rgba(229, 55, 38, 0.1);
+}
+
+.phone-country-code {
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  background: #f5f5f5;
+  border-right: 1px solid #dcdcdc;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+  height: 100%;
+  min-height: 44px;
+  user-select: none;
+  pointer-events: none;
+}
+
+.phone-input-group .gold-form-input {
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  flex: 1;
+  min-width: 0;
+}
+
+.phone-input-group .gold-form-input:focus {
+  outline: none;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.country_code {
+  width: 17%;
+}
+
+.nav-container {
+  width: 90% !important;
+  overflow-x: hidden !important;
 }

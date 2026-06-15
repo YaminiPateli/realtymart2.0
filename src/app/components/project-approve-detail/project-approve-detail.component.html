@@ -75,20 +75,34 @@
       <!-- Right Section -->
       <div class="col-lg-6 mt-md-5 mt-4 col-md-4 d-flex justify-content-end align-self-end">
         <div class="d-flex flex-wrap justify-content-lg-end gap-2">
-          <button data-bs-toggle="modal" data-bs-target="#get-builder"
-            class="btn d-flex align-items-center gap-2 action-btn contact-btn text-light">
-            <span><img src="../../../assets/images/phone.svg" alt="" srcset=""></span>
-            View Contact
-          </button>
+          <div class="contact-container-relative">
+            <button [attr.data-bs-toggle]="is_token ? null : 'modal'"
+              [attr.data-bs-target]="is_token ? null : '#get-builder'"
+              (click)="is_token ? handleContactClick() : openOtpModal('view-contact')"
+              class="btn d-flex align-items-center gap-2 action-btn contact-btn text-light">
+              <span><img src="../../../assets/images/phone.svg" alt="" srcset=""></span>
+              View Contact
+            </button>
+            <div class="contact-popover-card" *ngIf="showContactDetails">
+              <p class="title-text">You can contact on:</p>
+              <p class="sales-team-text">sales team</p>
+              <a href="tel:{{singleproject?.project_contact_no}}" class="phone-link">{{
+                formatContactNumber(singleproject?.project_contact_no) }}</a>
+            </div>
+          </div>
 
-          <button data-bs-toggle="modal" data-bs-target="#get-builder"
+          <button [attr.data-bs-toggle]="is_token ? null : 'modal'"
+            [attr.data-bs-target]="is_token ? null : '#get-builder'"
+            (click)="is_token ? redirectToWhatsApp() : openOtpModal('whatsapp')"
             class="btn btn-success d-flex align-items-center gap-2 action-btn whatsapp-btn">
             <span><img src="../../../assets/images/whatsapp.svg" alt="" srcset=""></span>
             WhatsApp
           </button>
 
-          <button data-bs-toggle="modal" data-bs-target="#get-builder"
-            (click)="brochureMode='brochure'; resetBrochureForm()" *ngIf="singleproject?.project_brochure"
+          <button [attr.data-bs-toggle]="is_token ? null : 'modal'"
+            [attr.data-bs-target]="is_token ? null : '#get-builder'"
+            (click)="is_token ? downloadBrochureDirectly() : openOtpModal('brochure')"
+            *ngIf="singleproject?.project_brochure"
             class="btn btn-dark d-flex align-items-center gap-2 action-btn download-btn">
             <span><img src="../../../assets/images/download.svg" alt="" srcset=""></span>
             Download Brochure
@@ -150,20 +164,34 @@
         </div>
         <!-- Right Section: Action Buttons (same color and design) -->
         <div class="col-lg-6 col-md-7 d-flex justify-content-end align-items-center gap-2">
-          <button data-bs-toggle="modal" data-bs-target="#get-builder"
-            class="btn d-flex align-items-center gap-2 action-btn contact-btn text-light">
-            <span><img src="../../../assets/images/phone.svg" alt="" srcset=""></span>
-            View Contact
-          </button>
+          <div class="contact-container-relative">
+            <button [attr.data-bs-toggle]="is_token ? null : 'modal'"
+              [attr.data-bs-target]="is_token ? null : '#get-builder'"
+              (click)="is_token ? handleContactClick() : openOtpModal('view-contact')"
+              class="btn d-flex align-items-center gap-2 action-btn contact-btn text-light">
+              <span><img src="../../../assets/images/phone.svg" alt="" srcset=""></span>
+              View Contact
+            </button>
+            <div class="contact-popover-card" *ngIf="showContactDetails">
+              <p class="title-text">You can contact on:</p>
+              <p class="sales-team-text">sales team</p>
+              <a href="tel:{{singleproject?.project_contact_no}}" class="phone-link">{{
+                formatContactNumber(singleproject?.project_contact_no) }}</a>
+            </div>
+          </div>
 
-          <button data-bs-toggle="modal" data-bs-target="#get-builder"
+          <button [attr.data-bs-toggle]="is_token ? null : 'modal'"
+            [attr.data-bs-target]="is_token ? null : '#get-builder'"
+            (click)="is_token ? redirectToWhatsApp() : openOtpModal('whatsapp')"
             class="btn btn-success d-flex align-items-center gap-2 action-btn whatsapp-btn">
             <span><img src="../../../assets/images/whatsapp.svg" alt="" srcset=""></span>
             WhatsApp
           </button>
 
-          <button data-bs-toggle="modal" data-bs-target="#get-builder"
-            (click)="brochureMode='brochure'; resetBrochureForm()" *ngIf="singleproject?.project_brochure"
+          <button [attr.data-bs-toggle]="is_token ? null : 'modal'"
+            [attr.data-bs-target]="is_token ? null : '#get-builder'"
+            (click)="is_token ? downloadBrochureDirectly() : openOtpModal('brochure')"
+            *ngIf="singleproject?.project_brochure"
             class="btn btn-dark d-flex align-items-center gap-2 action-btn download-btn">
             <span><img src="../../../assets/images/download.svg" alt="" srcset=""></span>
             Download Brochure
@@ -174,7 +202,7 @@
   </div>
 
   <section class="top_flore">
-    <div class="container">
+    <div class="container nav-container">
       <ul class="flore_links">
         <li>
           <a style="cursor: pointer" (click)="scrollToSection('overview')"
@@ -436,25 +464,26 @@
 
           <div class="row g-3">
 
-            <ng-container>
-              <div class="col-12 col-md-6" *ngFor="let img of projectBrochureImages">
-                <div class="brochure-image">
-                  <img [src]="img" alt="Brochure Image" class="img-fluid">
+            <ng-container *ngIf="projectBrochureImages && projectBrochureImages.length > 0">
+              <ngx-slick-carousel class="carousel brochure-slick-slider" #brochureSlickModal="slick-carousel"
+                [config]="brochureSlideConfig">
+                <div ngxSlickItem *ngFor="let img of projectBrochureImages" class="slide px-2">
+                  <div class="brochure-image">
+                    <img [src]="img" alt="Brochure Image" class="img-fluid">
+                  </div>
                 </div>
-              </div>
+              </ngx-slick-carousel>
             </ng-container>
-
           </div>
 
           <div class="text-center mt-4">
 
-            <button class="download-btn" data-bs-toggle="modal" data-bs-target="#get-builder"
-              (click)="brochureMode='brochure'; resetBrochureForm()" *ngIf="singleproject?.project_brochure">
-
+            <button class="download-btn" [attr.data-bs-toggle]="is_token ? null : 'modal'"
+              [attr.data-bs-target]="is_token ? null : '#get-builder'"
+              (click)="is_token ? downloadBrochureDirectly() : openOtpModal('brochure')"
+              *ngIf="singleproject?.project_brochure">
               <img src="../../../assets/images/download.svg" alt="" srcset="">
-
               Download Brochure
-
             </button>
 
           </div>
@@ -604,17 +633,33 @@
         </div>
 
         <div class="mt-4">
-          <button class="btn display-none contact-btn w-100 mb-2" data-bs-toggle="modal" data-bs-target="#get-builder">
-            <span><img src="../../../assets/images/phone.svg" alt="" srcset=""></span>
-            View Contact
-          </button>
+          <div class="contact-container-relative w-100 mb-2">
+            <button [attr.data-bs-toggle]="is_token ? null : 'modal'"
+              [attr.data-bs-target]="is_token ? null : '#get-builder'"
+              (click)="is_token ? handleContactClick() : openOtpModal('view-contact')"
+              class="btn display-none contact-btn w-100 mb-0">
+              <span><img src="../../../assets/images/phone.svg" alt="" srcset=""></span>
+              View Contact
+            </button>
+            <div class="contact-popover-card" *ngIf="showContactDetails">
+              <p class="title-text">You can contact on:</p>
+              <p class="sales-team-text">sales team</p>
+              <a href="tel:{{singleproject?.project_contact_no}}" class="phone-link">{{
+                formatContactNumber(singleproject?.project_contact_no) }}</a>
+            </div>
+          </div>
 
-          <button data-bs-toggle="modal" data-bs-target="#get-builder" class="btn display-none whatsapp-btn w-100 mb-2">
+          <button [attr.data-bs-toggle]="is_token ? null : 'modal'"
+            [attr.data-bs-target]="is_token ? null : '#get-builder'"
+            (click)="is_token ? redirectToWhatsApp() : openOtpModal('whatsapp')"
+            class="btn display-none whatsapp-btn w-100 mb-2">
             <span><img src="../../../assets/images/whatsapp.svg" alt="" srcset=""></span>
             WhatsApp
           </button>
 
-          <button data-bs-toggle="modal" data-bs-target="#get-builder" class="btn visit-btn w-100">
+          <button [attr.data-bs-toggle]="is_token ? null : 'modal'"
+            [attr.data-bs-target]="is_token ? null : '#get-builder'"
+            (click)="is_token ? openScheduleVisitModal() : openOtpModal('schedule-visit')" class="btn visit-btn w-100">
             <span><img src="../../../assets/images/calander.svg" alt="" srcset=""></span>
             Schedule Visit
           </button>
@@ -656,12 +701,23 @@
 <!-- Mobile Sticky Bottom Bar -->
 <div class="mobile-sticky-footer d-md-none" [class.show]="showStickyHeader">
   <div class="d-flex flex-column flex-md-row gap-2 gap-md-3 w-100">
-    <button data-bs-toggle="modal" data-bs-target="#get-builder"
-      class="btn w-100 contact-btn flex-grow-1 d-flex align-items-center justify-content-center gap-2">
-      <span><img src="../../../assets/images/phone.svg" alt="" srcset=""></span>
-      View Contact
-    </button>
-    <button class="btn whatsapp-btn flex-grow-1 d-flex align-items-center justify-content-center gap-2">
+    <div class="contact-container-relative w-100 flex-grow-1">
+      <button [attr.data-bs-toggle]="is_token ? null : 'modal'" [attr.data-bs-target]="is_token ? null : '#get-builder'"
+        (click)="is_token ? handleContactClick() : openOtpModal('view-contact')"
+        class="btn w-100 contact-btn flex-grow-1 d-flex align-items-center justify-content-center gap-2">
+        <span><img src="../../../assets/images/phone.svg" alt="" srcset=""></span>
+        View Contact
+      </button>
+      <div class="contact-popover-card" *ngIf="showContactDetails">
+        <p class="title-text">You can contact on:</p>
+        <p class="sales-team-text">sales team</p>
+        <a href="tel:{{singleproject?.project_contact_no}}" class="phone-link">{{
+          formatContactNumber(singleproject?.project_contact_no) }}</a>
+      </div>
+    </div>
+    <button [attr.data-bs-toggle]="is_token ? null : 'modal'" [attr.data-bs-target]="is_token ? null : '#get-builder'"
+      (click)="is_token ? redirectToWhatsApp() : openOtpModal('whatsapp')"
+      class="btn whatsapp-btn flex-grow-1 d-flex align-items-center justify-content-center gap-2">
       <span><img src="../../../assets/images/whatsapp.svg" alt="" srcset=""></span>
       WhatsApp
     </button>
@@ -769,31 +825,6 @@
             We will share advertiser's details over email
           </p>
           <form (submit)="is_token ? submitFormPhone() : openContactOTPModal()">
-            <!-- <div class="form-field mt-3">
-              <label class="form-field__label" for="Aname">Name</label>
-              <div class="form-field__wrap">
-                <input type="text" id="Aname" name="contactusername" [(ngModel)]="formDataphone.contactusername"
-                  (input)="validateContactName($event)" (keypress)="validateContactCharInput($event)" required
-                  class="gold-form-input my-0" />
-                <span class="form-field__check"
-                  *ngIf="nameContactTouched && formDataphone.contactusername && !nameContactError">&#10003;</span>
-              </div>
-            </div> -->
-            <!-- <div *ngIf="nameContactTouched && nameContactError" class="mgs_error">Please enter a valid name (min. 3
-              characters).</div> -->
-
-            <!-- <div class="form-field mt-3">
-              <label class="form-field__label" for="usermail">Email</label>
-              <div class="form-field__wrap">
-                <input type="email" id="usermail" [(ngModel)]="formDataphone.contactuseremail"
-                  (blur)="validateContactEmail($event)" required name="contactusermail" class="gold-form-input my-0" />
-                <span class="form-field__check"
-                  *ngIf="emailContactTouched && formDataphone.contactuseremail && !emailContactError">&#10003;</span>
-              </div>
-            </div>
-            <div *ngIf="emailContactTouched && emailContactError" class="mgs_error">Please enter a valid email address.
-            </div> -->
-
             <div class="form-field mt-3">
               <label class="form-field__label" for="usernumber">Mobile Number</label>
               <div class="form-field__wrap">
@@ -813,7 +844,6 @@
                 [(ngModel)]="formDataphone.termsContactAccepted" name="termsContactAccepted" required class="mycheck" />
               <label for="compare" class="compares">I Agree to RealtyMart <a routerLink="/terms-conditions"
                   target="_blank">Terms of Use</a></label>
-              <!-- <span><a routerLink="../terms-conditions">Terms of Use</a></span> <br /> -->
             </div>
             <div *ngIf="termsContactError" class="mgs_error">
               Please agree to the terms and conditions.
@@ -839,35 +869,65 @@
           <img class="img-fluid" src="../../../assets/images/login_modal_image.png" alt="" srcset="">
         </div>
         <div class="p-3">
-          <h2 class="py-2">Login</h2>
+          <h2 class="py-2">{{ brochureRegisterVisible ? 'Complete Registration' : 'Login' }}</h2>
           <div>
-            <div [hidden]="brochureOtpVisible">
-              <label for="mobile_no" class="input-label">Enter Phone Number</label>
-                <!-- <input type="text" value="{{countryCode}}" disabled class="gold-form-input my-0" style="width: 10%;"> -->
-                <input placeholder="Enter Mobile Number" type="tel" id="brochureMobile" name="brochureMobile" maxlength="10"
-                  [(ngModel)]="brochureFormData.mobile" (keypress)="validateNumberInput($event)"
-                  (blur)="validateBrochureMobile($event)" required class="gold-form-input placeholder-gray my-0" />
-            </div>
-            <div class="form-field mt-3" *ngIf="brochureOtpVisible">
-              <label class="input-label" for="brochureOtp">Enter OTP received on your phone number</label>
-              <div class="form-field__wrap">
-                <input type="text" id="brochureOtp" name="brochureOtp" [(ngModel)]="brochureOtp"
-                  (keypress)="validateNumberInput($event)" maxlength="4" class="gold-form-input my-0" />
+            <!-- Registration View for Unregistered Users -->
+            <div *ngIf="brochureRegisterVisible">
+              <div class="form-field mt-3">
+                <label class="input-label" for="brochureName">Name</label>
+                <input placeholder="Enter Name" type="text" id="brochureName" name="brochureName"
+                  [(ngModel)]="brochureFormData.name" required class="gold-form-input placeholder-gray my-0" />
+                <div *ngIf="brochureNameError" class="mgs_error">Please enter a valid name.</div>
               </div>
+              <div class="form-field mt-3">
+                <label class="input-label" for="brochureEmail">Email</label>
+                <input placeholder="Enter Email" type="email" id="brochureEmail" name="brochureEmail"
+                  [(ngModel)]="brochureFormData.email" (blur)="validateBrochureEmail($event)" required
+                  class="gold-form-input placeholder-gray my-0" />
+                <div *ngIf="brochureEmailError" class="mgs_error">Please enter a valid email address.</div>
+              </div>
+              <button class="generate_otp_btn mt-4" (click)="registerAndDownloadBrochure()">
+                {{ selectedAction === 'brochure' ? 'Submit & Download' : 'Submit' }}
+              </button>
             </div>
-            <p class="label" *ngIf="brochureOtpVisible">Resend OTP avilable in <span
-                class="text-danger">{{remainingTime}}</span> Sec</p>
-            <p class="label" *ngIf="brochureOtpVisible">Not Recevied OTP Yet? <button
-                class="text-danger text-decoration-underline cursor-pointer bg-transparent border-0"
-                [disabled]="!isResendEnabled" (click)="resendOTP()">Resend</button></p>
-            <p (click)="backToLogin()" class="label" *ngIf="brochureOtpVisible" class="text-decoration-underline cursor-pointer text-danger">
-              Back to login</p>
-            <button [disabled]="brochureOtp.length !== 4" class="generate_otp_btn mt-3" (click)="closeLoginModal()"
-              *ngIf="brochureOtpVisible">Submit</button>
-            <button class="generate_otp_btn mt-3" *ngIf="!brochureOtpVisible" [disabled]="isBrochureSendingOtp"
-              (click)="sendBrochureOTP()">{{
-              isBrochureSendingOtp ? 'Sending OTP...' : 'Generate OTP' }}</button>
-            <p *ngIf="!brochureOtpVisible" class="text-center mt-1">New to Realitymart ? <span class="text-danger cursor-pointer" (click)="goToSignUp()">Sign Up</span></p>
+
+            <!-- Phone / OTP View -->
+            <div *ngIf="!brochureRegisterVisible">
+              <div [hidden]="brochureOtpVisible">
+                <label for="mobile_no" class="input-label">Enter Phone Number</label>
+                <div class="form-field__wrap d-flex gap-2 justify-content-between">
+                  <input type="text" value="+91" class="gold-form-input text-center country_code" readonly/>
+                  <input placeholder="Enter Mobile Number" type="tel" id="brochureMobile" name="brochureMobile"
+                    maxlength="10" [(ngModel)]="brochureFormData.mobile" (keypress)="validateNumberInput($event)"
+                    (blur)="validateBrochureMobile($event)" required class="gold-form-input placeholder-gray my-0" />
+                </div>
+              </div>
+              <div class="form-field mt-3" *ngIf="brochureOtpVisible">
+                <label class="input-label" for="brochureOtp">Enter OTP received on your phone number</label>
+                <div class="form-field__wrap">
+                  <div class="otp-container">
+                    <input *ngFor="let item of otpArray; let i = index" #otpInput type="text" maxlength="1"
+                      class="otp-box" [(ngModel)]="brochureOtp[i]" (input)="moveNext($event, i)"
+                      (keydown)="movePrevious($event, i)" (paste)="onOtpPaste($event)" />
+                  </div>
+                </div>
+              </div>
+              <p class="label" *ngIf="brochureOtpVisible && remainingTime > 0">Resend OTP avilable in <span
+                  class="text-danger">{{remainingTime}}</span> Sec</p>
+              <p class="label" *ngIf="brochureOtpVisible && remainingTime == 0">Not Recevied OTP Yet? <button
+                  class="text-danger text-decoration-underline cursor-pointer bg-transparent border-0"
+                  [disabled]="!isResendEnabled" (click)="resendOTP()">Resend</button></p>
+              <p (click)="backToLogin()" class="label" *ngIf="brochureOtpVisible"
+                class="text-decoration-underline cursor-pointer text-danger">
+                Back to login</p>
+              <button [disabled]="brochureOtp.join('').length !== 4" class="generate_otp_btn mt-3"
+                (click)="verifyContactOTP()" *ngIf="brochureOtpVisible">Submit</button>
+              <button class="generate_otp_btn mt-3" *ngIf="!brochureOtpVisible" [disabled]="isBrochureSendingOtp"
+                (click)="sendBrochureOTP()">{{
+                isBrochureSendingOtp ? 'Sending OTP...' : 'Generate OTP' }}</button>
+              <p *ngIf="!brochureOtpVisible" class="text-center mt-1">New to Realitymart ? <span
+                  class="text-danger cursor-pointer" (click)="goToSignUp()">Sign Up</span></p>
+            </div>
           </div>
         </div>
       </div>
@@ -929,6 +989,60 @@
             (click)="sendBrochureOTP()">{{ isBrochureSendingOtp ? 'Sending OTP...' : 'Submit' }}</button>
         </form>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Schedule Visit Modal -->
+<div class="modal fade" id="schedule-visit-modal" tabindex="-1" aria-labelledby="scheduleVisitModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content schedule-visit-modal-content position-relative">
+
+      <!-- Overlapping Top Badge -->
+      <div class="schedule-visit-badge-container">
+        <div class="schedule-visit-badge">
+          <span class="icon-stack">
+            <i class="fa-solid fa-calendar calendar-main-icon"></i>
+            <span class="icon-sub">
+              <i class="fa-solid fa-clock clock-sub-icon"></i>
+            </span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Close Button -->
+      <button type="button" class="btn-close schedule-visit-close" data-bs-dismiss="modal" aria-label="Close"
+        (click)="closeScheduleVisitModal()"></button>
+
+      <div class="modal-body schedule-visit-body">
+        <h2 class="schedule-visit-title">Schedule visit</h2>
+
+        <form (submit)="submitScheduleVisit()">
+          <!-- Select Date and Time -->
+          <div class="form-field mt-3">
+            <label class="input-label font-weight-bold" for="visitDateTime">Select Date and Time<span
+                class="text-danger">*</span></label>
+            <input type="datetime-local" id="visitDateTime" name="visitDateTime"
+              [(ngModel)]="scheduleVisitData.visitDateTime" required class="gold-form-input placeholder-gray my-0" />
+            <div *ngIf="scheduleVisitDateTimeError" class="mgs_error">Please select date and time.</div>
+          </div>
+
+          <!-- Remarks -->
+          <div class="form-field mt-3">
+            <label class="input-label font-weight-bold" for="visitRemarks">Remarks</label>
+            <textarea id="visitRemarks" name="visitRemarks" [(ngModel)]="scheduleVisitData.remarks" rows="3"
+              placeholder="Enter remarks" class="gold-form-textarea placeholder-gray my-0"></textarea>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="d-flex justify-content-center gap-3 mt-4">
+            <button type="button" class="btn btn-outline-cancel" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-schedule">Schedule</button>
+          </div>
+        </form>
+      </div>
+
     </div>
   </div>
 </div>

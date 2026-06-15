@@ -255,6 +255,28 @@ export class HeaderComponent implements AfterViewInit{
   logout() {
     const token = localStorage.getItem('myrealtylogintoken');
 
+    const clearLocalSession = () => {
+      localStorage.removeItem('myrealtylogintoken');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('email');
+      localStorage.removeItem('contact_no');
+      localStorage.removeItem('role');
+      localStorage.removeItem('name');
+      localStorage.removeItem('sessionId');
+      const currentUrl = this.location.path();
+      this.headerService.triggerRefresh();
+      if (currentUrl == '') {
+        window.location.reload();
+      } else {
+        window.location.href = '/';
+      }
+    };
+
+    if (!token || token === 'registered_guest_token') {
+      clearLocalSession();
+      return;
+    }
+
     const headers = new HttpHeaders()
       .set('Authorization', `Bearer ${token}`)
       .set('Accept', 'application/json');
@@ -263,24 +285,12 @@ export class HeaderComponent implements AfterViewInit{
 
     this.http.post<ApiResponse>(url, data, {headers}).subscribe(
       (response: any) => {
-        if (response && response.status === true) {
-        localStorage.removeItem('myrealtylogintoken');
-        localStorage.removeItem('userId');
-        localStorage.removeItem('email');
-        localStorage.removeItem('contact_no');
-        localStorage.removeItem('role');
-        localStorage.removeItem('name');
-        localStorage.removeItem('sessionId');
-        const currentUrl = this.location.path();
-          this.headerService.triggerRefresh();
-        if(currentUrl == ''){
-          window.location.reload();
-        }else{
-          // this.route.navigate(['/']);
-          window.location.href = '/'
-        }
+        clearLocalSession();
+      },
+      (error) => {
+        clearLocalSession();
       }
-    });
+    );
   }
 
   getLocations(): void {
