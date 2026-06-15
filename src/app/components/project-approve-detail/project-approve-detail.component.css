@@ -4448,3 +4448,25 @@ google-map {
   width: 90% !important;
   overflow-x: hidden !important;
 }
+
+.reels-filter-search-wrapper {
+  border-bottom: 1px solid #bbbbbb;
+  margin-bottom: 20px;
+}
+
+.reels-filter-search {
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+  flex: 1;
+  min-width: 0;
+  font-size: 18px;
+  line-height: 20px;
+  padding: 9px 0 !important;
+}
+
+.reels-filter-search-wrapper i {
+  font-size: 16px;
+  margin-left: 10px;
+  cursor: pointer;
+}

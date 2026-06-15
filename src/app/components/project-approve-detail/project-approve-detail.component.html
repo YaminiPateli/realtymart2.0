@@ -896,9 +896,9 @@
               <div [hidden]="brochureOtpVisible">
                 <label for="mobile_no" class="input-label">Enter Phone Number</label>
                 <div class="form-field__wrap d-flex gap-2 justify-content-between">
-                  <input type="text" value="+91" class="gold-form-input text-center country_code" readonly/>
-                  <input placeholder="Enter Mobile Number" type="tel" id="brochureMobile" name="brochureMobile"
-                    maxlength="10" [(ngModel)]="brochureFormData.mobile" (keypress)="validateNumberInput($event)"
+                  <input type="text" value="+91" class="gold-form-input text-center country_code" readonly />
+                  <input type="tel" id="brochureMobile" name="brochureMobile" maxlength="10"
+                    [(ngModel)]="brochureFormData.mobile" (keypress)="validateNumberInput($event)"
                     (blur)="validateBrochureMobile($event)" required class="gold-form-input placeholder-gray my-0" />
                 </div>
               </div>
@@ -1091,6 +1091,9 @@
         <button class="reels-icon-btn" title="Settings" (click)="toggleFilters()">
           <i class="fa-solid fa-sliders"></i>
         </button>
+        <button class="reels-icon-btn" title="Share" (click)="shareReel(activeReelIndex)">
+          <i class="fa-solid fa-share-nodes"></i>
+        </button>
       </div>
 
       <!-- Bottom overlay: builder info + CTA buttons -->
@@ -1110,9 +1113,12 @@
         </div>
         <div class="reels-action-row">
           <button class="reels-action-btn-red" (click)="toggleReelDetailCard()">View Details</button>
-          <button class="reels-action-btn-outline" (click)="openContactModalFromReels()">
+          <button *ngIf="!is_token" class="reels-action-btn-outline" (click)="openContactModalFromReels('view-contact')">
             <i class="fa-solid fa-phone me-1"></i>View Contact
           </button>
+          <a *ngIf="is_token" [href]="'tel:' + singleproject?.project_contact_no" class="reels-action-btn-outline text-decoration-none d-flex align-items-center justify-content-center">
+            <i class="fa-solid fa-phone me-1"></i>{{ formatContactNumber(singleproject?.project_contact_no) }}
+          </a>
         </div>
       </div>
     </div>
@@ -1147,12 +1153,12 @@
       </div> -->
 
       <!-- Share -->
-      <div class="reels-interact-item">
+      <!-- <div class="reels-interact-item">
         <button class="reels-interact-btn" (click)="shareReel(activeReelIndex)">
           <i class="fa-solid fa-share-nodes"></i>
         </button>
         <span class="reels-interact-count">Share</span>
-      </div>
+      </div> -->
 
     </div>
     <!-- end .reels-interaction-bar -->
@@ -1208,9 +1214,12 @@
         <!-- Buttons -->
         <div class="reels-prop-actions">
           <button class="reels-prop-btn-red" (click)="viewPropertyFromReel()">View Property</button>
-          <button class="reels-prop-btn-outline" (click)="openContactModalFromReels()">
+          <button *ngIf="!is_token" class="reels-prop-btn-outline" (click)="openContactModalFromReels('view-contact')">
             <i class="fa-solid fa-phone-volume me-2"></i>View Contact
           </button>
+          <a *ngIf="is_token" [href]="'tel:' + singleproject?.project_contact_no" class="reels-prop-btn-outline text-decoration-none d-flex align-items-center justify-content-center">
+            <i class="fa-solid fa-phone-volume me-2"></i>{{ formatContactNumber(singleproject?.project_contact_no) }}
+          </a>
         </div>
       </div>
     </div>
@@ -1237,16 +1246,16 @@
 
       <!-- City Selector -->
       <div class="reels-filter-city-selector">
-        <select class="form-control reels-filter-city-select">
+        <select class="gold-form-input">
           <option selected>Select City</option>
           <option *ngFor="let city of city1" value="{{city.cid}}">{{city.cname}}</option>
         </select>
-        <i class="fa-solid fa-chevron-down"></i>
       </div>
 
       <!-- Search -->
-      <div class="reels-filter-search-wrapper">
-        <input type="text" class="form-control reels-filter-search" placeholder="Search Area, Project or Builder">
+      <div class="reels-filter-search-wrapper d-flex align-items-center mx-3 p-0">
+        <input type="text" class="gold-form-input " placeholder="Search Area, Project or Builder">
+        <i class="text-danger fa-solid fa-magnifying-glass"></i>
       </div>
 
       <!-- Project Segment -->

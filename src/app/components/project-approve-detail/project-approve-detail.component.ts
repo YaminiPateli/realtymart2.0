@@ -2256,7 +2256,8 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     window.history.replaceState({}, '', urlWithoutParams);
   }
 
-  openContactModalFromReels() {
+  openContactModalFromReels(action: "view-contact" | "whatsapp" | "schedule-visit" | "brochure" = "view-contact") {
+    this.selectedAction = action;
     const modalEl = document.getElementById('get-builder');
     if (modalEl) {
       const modal = new bootstrap.Modal(modalEl);
