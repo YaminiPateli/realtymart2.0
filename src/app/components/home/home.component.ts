@@ -408,7 +408,7 @@ export class HomeComponent implements AfterViewInit, OnInit {
   loadAhmedabadProjects() {
     this.http.get<any>(`${environment.apiUrl}projectincity/Ahmedabad?page=1`)
       .subscribe((response) => {
-        this.ahmedabadProjects = response?.data?.data.filter((item: any) => item.is_project_active) || [];
+        this.ahmedabadProjects = response?.data?.data || [];
       });
   }
 

@@ -83,11 +83,10 @@
               <span><img src="../../../assets/images/phone.svg" alt="" srcset=""></span>
               View Contact
             </button>
-            <div class="contact-popover-card" *ngIf="showContactDetails">
+            <div class="contact-popover-card" *ngIf="showContactDetails && !showStickyHeader">
               <p class="title-text">You can contact on:</p>
               <p class="sales-team-text">sales team</p>
-              <a href="tel:{{singleproject?.project_contact_no}}" class="phone-link">{{
-                formatContactNumber(singleproject?.project_contact_no) }}</a>
+              <a href="tel:{{singleproject?.project_contact_no}}" class="phone-link">{{ singleproject?.project_contact_no }}</a>
             </div>
           </div>
 
@@ -102,7 +101,7 @@
           <button [attr.data-bs-toggle]="is_token ? null : 'modal'"
             [attr.data-bs-target]="is_token ? null : '#get-builder'"
             (click)="is_token ? downloadBrochureDirectly() : openOtpModal('brochure')"
-            *ngIf="singleproject?.project_brochure"
+            *ngIf="isPdf(singleproject?.project_brochure)"
             class="btn btn-dark d-flex align-items-center gap-2 action-btn download-btn">
             <span><img src="../../../assets/images/download.svg" alt="" srcset=""></span>
             Download Brochure
@@ -172,11 +171,10 @@
               <span><img src="../../../assets/images/phone.svg" alt="" srcset=""></span>
               View Contact
             </button>
-            <div class="contact-popover-card" *ngIf="showContactDetails">
+            <div class="contact-popover-card" *ngIf="showContactDetails && showStickyHeader">
               <p class="title-text">You can contact on:</p>
               <p class="sales-team-text">sales team</p>
-              <a href="tel:{{singleproject?.project_contact_no}}" class="phone-link">{{
-                formatContactNumber(singleproject?.project_contact_no) }}</a>
+              <a href="tel:{{singleproject?.project_contact_no}}" class="phone-link">{{ singleproject?.project_contact_no }}</a>
             </div>
           </div>
 
@@ -191,7 +189,7 @@
           <button [attr.data-bs-toggle]="is_token ? null : 'modal'"
             [attr.data-bs-target]="is_token ? null : '#get-builder'"
             (click)="is_token ? downloadBrochureDirectly() : openOtpModal('brochure')"
-            *ngIf="singleproject?.project_brochure"
+            *ngIf="isPdf(singleproject?.project_brochure)"
             class="btn btn-dark d-flex align-items-center gap-2 action-btn download-btn">
             <span><img src="../../../assets/images/download.svg" alt="" srcset=""></span>
             Download Brochure
@@ -231,7 +229,7 @@
             [ngClass]="{ active: activeSection === 'amenities' }">Amenities</a>
         </li>
         <li class="{'active': activeSection === 'brochure'}"
-          *ngIf="this.hasKeysOrValues(this.singleproject.project_brochure)">
+          *ngIf="this.hasKeysOrValues(this.singleproject.project_brochure) && this.isPdf(singleproject.project_brochure)">
           <a style="cursor: pointer" (click)="scrollToSection('brochure')"
             [ngClass]="{ active: activeSection === 'brochure' }">Brochure</a>
         </li>
@@ -455,8 +453,8 @@
         <hr class="section-divider-2">
 
       </section>
-      <section *ngIf="this.singleproject.project_brochure_images || this.singleproject.project_brochure" id="brochure"
-        class="brochure-section">
+      <section *ngIf="singleproject.project_brochure_images && isPdf(this.singleproject.project_brochure)"
+        id="brochure" class="brochure-section">
 
         <h2 class="section-title">Brochure & Images</h2>
 
@@ -476,12 +474,11 @@
             </ng-container>
           </div>
 
-          <div class="text-center mt-4">
+          <div class="text-center mt-4" *ngIf="isPdf(singleproject?.project_brochure)">
 
             <button class="download-btn" [attr.data-bs-toggle]="is_token ? null : 'modal'"
               [attr.data-bs-target]="is_token ? null : '#get-builder'"
-              (click)="is_token ? downloadBrochureDirectly() : openOtpModal('brochure')"
-              *ngIf="singleproject?.project_brochure">
+              (click)="is_token ? downloadBrochureDirectly() : openOtpModal('brochure')">
               <img src="../../../assets/images/download.svg" alt="" srcset="">
               Download Brochure
             </button>
@@ -539,7 +536,7 @@
         <div class="developer-slider-wrapper" [class.hide-blur]="isAtEnd">
           <div (scroll)="checkScrollPosition()" class="developer-slider" #slider>
 
-            <div class="developer-card" *ngFor="let item of developerProjects;">
+            <div class="developer-card cursor-pointer" (click)="openDeveloperProject(item)" *ngFor="let item of developerProjects;">
 
               <div class="card h-100">
 
@@ -633,7 +630,7 @@
         </div>
 
         <div class="mt-4">
-          <div class="contact-container-relative w-100 mb-2">
+          <!-- <div class="contact-container-relative w-100 mb-2">
             <button [attr.data-bs-toggle]="is_token ? null : 'modal'"
               [attr.data-bs-target]="is_token ? null : '#get-builder'"
               (click)="is_token ? handleContactClick() : openOtpModal('view-contact')"
@@ -644,8 +641,7 @@
             <div class="contact-popover-card" *ngIf="showContactDetails">
               <p class="title-text">You can contact on:</p>
               <p class="sales-team-text">sales team</p>
-              <a href="tel:{{singleproject?.project_contact_no}}" class="phone-link">{{
-                formatContactNumber(singleproject?.project_contact_no) }}</a>
+              <a href="tel:{{singleproject?.project_contact_no}}" class="phone-link">{{ singleproject?.project_contact_no }}</a>
             </div>
           </div>
 
@@ -655,7 +651,7 @@
             class="btn display-none whatsapp-btn w-100 mb-2">
             <span><img src="../../../assets/images/whatsapp.svg" alt="" srcset=""></span>
             WhatsApp
-          </button>
+          </button> -->
 
           <button [attr.data-bs-toggle]="is_token ? null : 'modal'"
             [attr.data-bs-target]="is_token ? null : '#get-builder'"
@@ -711,8 +707,7 @@
       <div class="contact-popover-card" *ngIf="showContactDetails">
         <p class="title-text">You can contact on:</p>
         <p class="sales-team-text">sales team</p>
-        <a href="tel:{{singleproject?.project_contact_no}}" class="phone-link">{{
-          formatContactNumber(singleproject?.project_contact_no) }}</a>
+        <a href="tel:{{singleproject?.project_contact_no}}" class="phone-link">{{ singleproject?.project_contact_no }}</a>
       </div>
     </div>
     <button [attr.data-bs-toggle]="is_token ? null : 'modal'" [attr.data-bs-target]="is_token ? null : '#get-builder'"
@@ -869,7 +864,7 @@
           <img class="img-fluid" src="../../../assets/images/login_modal_image.png" alt="" srcset="">
         </div>
         <div class="p-3">
-          <h2 class="py-2">{{ brochureRegisterVisible ? 'Complete Registration' : 'Login' }}</h2>
+          <h2 class="py-2">Explore Unlimited Properties</h2>
           <div>
             <!-- Registration View for Unregistered Users -->
             <div *ngIf="brochureRegisterVisible">
@@ -1047,10 +1042,6 @@
   </div>
 </div>
 
-<!-- =============================================
-      REELS IMMERSIVE OVERLAY
-      Layout: [back btn] [card + sidebar] [nav arrows far-right]
-      ============================================= -->
 <div class="reels-immersive-overlay" *ngIf="showReelsView" (touchstart)="onTouchStart($event)"
   (touchend)="onTouchEnd($event)" (wheel)="handleWheel($event)">
 
@@ -1100,14 +1091,14 @@
       <div class="reels-card-bottom-details">
         <div class="reels-developer-info">
           <div class="reels-dev-logo-wrap">
-            <img *ngIf="singleproject?.project_logo" [src]="singleproject?.project_logo" class="reels-dev-logo"
-              alt="Builder logo">
-            <span *ngIf="!singleproject?.project_logo" class="reels-dev-letter">B</span>
+            <img *ngIf="reels[activeReelIndex].project_logo" [src]="reels[activeReelIndex].project_logo"
+              class="reels-dev-logo" alt="Builder logo">
+            <span *ngIf="!reels[activeReelIndex].project_logo" class="reels-dev-letter">{{ reels[activeReelIndex]?.proj_builderName?.charAt(0)?.toUpperCase() }}</span>
           </div>
           <div>
-            <h6 class="reels-dev-name">{{ singleproject?.builderName || 'Binori Group' }}</h6>
+            <h6 class="reels-dev-name">{{ reels[activeReelIndex].proj_builderName}}</h6>
             <small class="reels-dev-location">
-              <i class="fa-solid fa-location-dot me-1"></i>{{ singleproject?.project_localities || 'Ahmedabad' }}
+              <i class="fa-solid fa-location-dot me-1"></i>{{ reels[activeReelIndex].project_localities}}
             </small>
           </div>
         </div>
@@ -1117,7 +1108,7 @@
             <i class="fa-solid fa-phone me-1"></i>View Contact
           </button>
           <a *ngIf="is_token" [href]="'tel:' + singleproject?.project_contact_no" class="reels-action-btn-outline text-decoration-none d-flex align-items-center justify-content-center">
-            <i class="fa-solid fa-phone me-1"></i>{{ formatContactNumber(singleproject?.project_contact_no) }}
+            <i class="fa-solid fa-phone me-1"></i>{{ singleproject?.project_contact_no }}
           </a>
         </div>
       </div>
@@ -1218,7 +1209,7 @@
             <i class="fa-solid fa-phone-volume me-2"></i>View Contact
           </button>
           <a *ngIf="is_token" [href]="'tel:' + singleproject?.project_contact_no" class="reels-prop-btn-outline text-decoration-none d-flex align-items-center justify-content-center">
-            <i class="fa-solid fa-phone-volume me-2"></i>{{ formatContactNumber(singleproject?.project_contact_no) }}
+            <i class="fa-solid fa-phone-volume me-2"></i>{{ singleproject?.project_contact_no }}
           </a>
         </div>
       </div>

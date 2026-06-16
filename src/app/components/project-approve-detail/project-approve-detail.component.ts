@@ -369,7 +369,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   countryCode: any;
   otpArray = [0, 1, 2, 3];
   brochureSlideConfig = {
-    slidesToShow: 1,
+    slidesToShow: 2,
     slidesToScroll: 1,
     dots: true,
     arrows: true,
@@ -1191,7 +1191,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
             // Open brochure PDF
             if (this.selectedAction === 'brochure') {
               const pdfUrl = this.singleproject?.project_brochure;
-              if (pdfUrl) {
+              if (this.isPdf(pdfUrl)) {
                 window.open(pdfUrl, '_blank');
                 setTimeout(() => {
                   window.location.reload();
@@ -1201,6 +1201,9 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
               }
             } else if (this.selectedAction === 'view-contact') {
               this.showContactDetails = true;
+               setTimeout(() => {
+                  window.location.reload();
+                }, 100);
             } else if (this.selectedAction === 'whatsapp') {
               this.redirectToWhatsApp();
               setTimeout(() => {
@@ -1523,6 +1526,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
 
   @HostListener('window:scroll', ['$event'])
   onWindowScroll(): void {
+    this.showContactDetails = false;
     this.detectActiveSectionOnScroll();
 
     const headerElement = document.getElementById('project-detail-header');
@@ -1717,19 +1721,25 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
               video_source: "video",
               proj_video_link: "",
               proj_video_file: "../../../assets/reels/reel-1.mp4",
-              proj_video_thumbnail: "../../../assets/images/reel-1-thumbnail.jpg"
+              proj_video_thumbnail: "../../../assets/images/reel-1-thumbnail.jpg",
+              proj_builderName: "Binori Group",
+              project_localities:"Gota"
             },
               {
                 video_source: "video",
                 proj_video_link: "",
                 proj_video_file: "../../../assets/reels/reel-2.mp4",
-                proj_video_thumbnail: "../../../assets/images/reel-2-thumbnail.jpg"
+                proj_video_thumbnail: "../../../assets/images/reel-2-thumbnail.jpg",
+                proj_builderName: "Aarsh Group",
+                project_localities:"Jagatpur"
               },
               {
                 video_source: "video",
                 proj_video_link: "",
                 proj_video_file: "../../../assets/reels/reel-3.mp4",
-                proj_video_thumbnail: "../../../assets/images/reel-3-thumbnail.jpg"
+                proj_video_thumbnail: "../../../assets/images/reel-3-thumbnail.jpg",
+                proj_builderName: "Shivalik Group",
+                project_localities:"south bopal"
               }
             )
             if (this.singleproject.project_video.length > 0) {
@@ -2441,6 +2451,9 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     if (target && !target.closest('.price-tooltip-container')) {
       this.priceTooltipVisible = false;
     }
+    if (target && !target.closest('.contact-container-relative')) {
+      this.showContactDetails = false;
+    }
   }
 
   getProcessedHtml(html: string, isAbout: boolean): string {
@@ -2773,21 +2786,6 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     }
   }
 
-  formatContactNumber(num: any): string {
-    if (!num) return '';
-    let clean = String(num).replace(/\s+/g, '').replace(/-/g, '');
-    if (clean.length === 10) {
-      return '+91 ' + clean;
-    }
-    if (clean.length === 12 && clean.startsWith('91')) {
-      return '+' + clean.slice(0, 2) + ' ' + clean.slice(2);
-    }
-    if (clean.startsWith('+91') && clean.length === 13) {
-      return clean.slice(0, 3) + ' ' + clean.slice(3);
-    }
-    return num;
-  }
-
   redirectToWhatsApp() {
     this.formDataphone.contactusername = localStorage.getItem('name') || '';
     this.formDataphone.contactuseremail = localStorage.getItem('email') || '';
@@ -2885,4 +2883,22 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
       }
     );
   }
+
+isPdf(url: string): boolean {
+  return !!url && url.toLowerCase().endsWith('.pdf');
+}
+
+openDeveloperProject(item: any) {
+
+  if (item.id === this.singleproject?.id) {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+    return;
+  }
+
+  this.router.navigate(['/project-details', item.project_url]);
+}
+
 }
