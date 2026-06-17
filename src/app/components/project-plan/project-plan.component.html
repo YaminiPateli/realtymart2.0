@@ -1,0 +1,175 @@
+<main>
+    <section class="matching-banner position-relative">
+        <div class="container">
+            <div class="banner-action">
+                <h1 class="banner_title">Pricing Plans</h1>
+                <span class="text-white sub-title">Subscription</span>
+            </div>
+        </div>
+    </section>
+    <section class="container">
+        <div class="py-5">
+
+            <!-- Heading -->
+            <div class="text-center mb-5">
+                <h2 class="pricing-heading">Choose a plan that's right for you</h2>
+                <p class="pricing-text">
+                    Our premium plans are designed for getting your property in front of the right buyers.
+                </p>
+            </div>
+            <div class="d-flex plan-cards flex-wrap justify-content-center">
+                <div (click)="selectPlan(plan)" [class.active-plan]="isSelected(plan)" class="card mb-3 plan-card mx-2"
+                style="width: 18rem;" *ngFor="let plan of plans; let i = index">
+                <div [class.recommended-badge]="isSelected(plan)" *ngIf="isSelected(plan)">
+                        {{ plan.name }}
+                    </div>
+                    <div class="card-body d-flex flex-column justify-content-start">
+                        <h3 *ngIf="!isSelected(plan)">{{plan.name}}</h3>
+                        <hr *ngIf="!isSelected(plan)" class="mt-1">
+                        <div [style.margin-top]="getPriceSectionMargin(plan)">
+                            <div>
+                                <span class="price">₹{{plan.price}} </span><span class="unit">Lac</span><span
+                                    class="per-year"> /per year</span>
+                            </div>
+                            <div class="text-danger">
+                                Property Upto {{plan.range}}
+                            </div>
+                        </div>
+                        <div class="leads my-4 d-flex justify-content-center align-items-center">
+                            <span>{{plan.leads}}&nbsp;</span><span>Leads / Month</span>
+                        </div>
+                        <button class="btn btn-dark">Get Started</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature Matrix -->
+            <!-- Feature Matrix -->
+            <div class="table-responsive mt-5">
+                <table class="table feature-table">
+                    <thead>
+                        <tr>
+                            <th>Feature Matrix</th>
+
+                            <th *ngFor="let plan of plans" [class.active-column]="isSelected(plan)">
+                                {{ plan.name }}
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+                            <td>Property Value</td>
+
+                            <td *ngFor="let plan of plans" [class.active-column]="isSelected(plan)">
+                                {{ plan.features.propertyValue }}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Monthly Leads</td>
+
+                            <td *ngFor="let plan of plans" [class.active-column]="isSelected(plan)">
+                                {{ plan.features.monthlyLeads }}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>CRM / Dashboard</td>
+
+                            <td *ngFor="let plan of plans" [class.active-column]="isSelected(plan)">
+                                <span *ngIf="plan.features.crmDashboard">✔</span>
+                                <span *ngIf="!plan.features.crmDashboard">✖</span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Instagram Reels</td>
+
+                            <td *ngFor="let plan of plans" [class.active-column]="isSelected(plan)">
+                                {{ plan.features.instagramReels }}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Dedicated Blogs</td>
+
+                            <td *ngFor="let plan of plans" [class.active-column]="isSelected(plan)">
+                                {{ plan.features.dedicatedBlogs ? '✔' : '✖' }}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Detailed Project Video<br>
+                                <small>(Shot / Podcast style)</small>
+                            </td>
+
+                            <td *ngFor="let plan of plans" [class.active-column]="isSelected(plan)">
+                                {{ plan.features.detailedProjectVideo }}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Influencer Video</td>
+
+                            <td *ngFor="let plan of plans" [class.active-column]="isSelected(plan)">
+                                {{ plan.features.influencerVideo }}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Drone Shot Video</td>
+
+                            <td *ngFor="let plan of plans" [class.active-column]="isSelected(plan)">
+                                {{ plan.features.droneShotVideo }}
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Notes -->
+            <div class="notes mt-4">
+                <h5>Important Package Notes</h5>
+
+                <ul>
+                    <li>Package validity is 12 months.</li>
+                    <li>Leads are generated based on property category.</li>
+                    <li>GST extra as applicable.</li>
+                    <li>Unused leads cannot be carried forward.</li>
+                </ul>
+            </div>
+
+            <!-- FAQ -->
+            <div class="faq-section mt-5">
+
+                <h2 class="text-center mb-4">FAQ</h2>
+
+                <div class="accordion" id="faqAccordion">
+
+                    <div class="accordion-item" *ngFor="let faq of faqs; let i = index">
+
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                [attr.data-bs-target]="'#faq'+i">
+                                {{faq.question}}
+                            </button>
+                        </h2>
+
+                        <div [id]="'faq'+i" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                {{faq.answer}}
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+</main>

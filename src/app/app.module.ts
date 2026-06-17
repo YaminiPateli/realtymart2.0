@@ -80,6 +80,7 @@ import { PropertyincitybuyComponent } from './components/propertyincitybuy/prope
 import { PropertyincityrentComponent } from './components/propertyincityrent/propertyincityrent.component';
 import { CookieConsentComponent } from './components/cookie-consent/cookie-consent.component';
 import { LocationPermissionComponent } from './components/location-permission/location-permission.component';
+import { ProjectPlanComponent } from './components/project-plan/project-plan.component';
 
 // Page Routing
 const routes: Routes = [
@@ -143,6 +144,7 @@ const routes: Routes = [
   { path: 'login', component:  LoginComponent },
   { path: 'project-approval-details/:name/:id', component: ProjectApproveDetailComponent},
   { path: 'thank-you-register', component:  ThankYouRegisterComponent },
+  { path: 'project-plan', component:  ProjectPlanComponent },
 ];
 
 // register Swiper custom elements
@@ -206,6 +208,7 @@ register();
     PropertyincityrentComponent,
     CookieConsentComponent,
     LocationPermissionComponent,
+    ProjectPlanComponent,
   ],
   imports: [
     LoginComponent,

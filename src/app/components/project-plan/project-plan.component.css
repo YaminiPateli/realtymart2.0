@@ -1,0 +1,113 @@
+.matching-banner {
+  background-image: url(../../../assets/images/pricing_plan_bg_img.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 300px;
+  position: relative;
+}
+
+.matching-banner:before {
+  content: "";
+  width: 100%;
+  position: absolute;
+  height: inherit;
+  background-color: #000;
+  opacity: 0.6;
+}
+
+.sub-title{
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 30px;
+}
+
+.pricing-heading{
+    font-weight: 700;
+    font-size: 52px;
+}
+
+.pricing-text{
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 26px;
+    color: #666666;
+}
+
+.price{
+    font-weight: 700;
+    font-size: 35px;
+}
+
+.unit{
+    font-weight: 700;
+    font-size: 20px;
+}
+
+.leads{
+    background: #FAFAFA;
+    border-radius: 6px;
+    height: 35px;
+}
+
+@media(max-width:320px){
+    .pricing-heading{
+        font-size: 21px;
+    }
+    .pricing-text{
+        font-size: 14px;
+    }
+    .plan-card{
+        margin-bottom: 20px;
+    }
+}
+
+.active-card {
+  border: 2px solid #000;
+}
+
+.active-plan {
+  border: 2px solid #ef3b24 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  position: relative;
+}
+
+.plan-card:hover {
+  transform: translateY(-3px);
+}
+
+.plan-card{
+    cursor: pointer;
+}
+
+.active-column {
+  background: #f8f9fa;
+  font-weight: 600;
+}
+
+.feature-table td,
+.feature-table th {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.feature-table td:first-child,
+.feature-table th:first-child {
+  text-align: left;
+}
+
+.recommended-badge {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ef3b24;
+  color: #fff;
+  font-weight: 600;
+  font-size: 20px;
+  min-width: 150px;
+  text-align: center;
+  padding: 10px 20px;
+  border-radius: 0 0 20px 20px;
+  z-index: 2;
+}
