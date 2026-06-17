@@ -103,7 +103,7 @@ input.sub_phone {
 
 .banner_img {
   width: 100%;
-  height: 350px;
+  height: 481px;
   object-fit: cover;
   display: block;
 }
@@ -118,10 +118,20 @@ input.sub_phone {
 }
 
 .nav_box {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
   overflow-x: auto;
   flex-wrap: nowrap;
   text-wrap: nowrap;
-  gap: 30px;
+  gap: 24px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.nav_box::-webkit-scrollbar {
+  display: none;
 }
 
 .company_overview {
@@ -129,8 +139,11 @@ input.sub_phone {
 }
 
 .serice_flow_img {
-    width: 200px;
-    height: 150px;
+  width: 100%;
+  max-width: 200px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
 }
 .gallery_box {
   margin: 16px;
@@ -349,4 +362,47 @@ input.sub_phone {
 @media only screen and (max-width: 767px){
   ul.dropdown.list-unstyled{margin-top: 30px;}
   /* .ft_area a{padding: 7px 10px;} */
+
+  .banner_img,
+  .provider_flow .slick-slide img {
+    height: 200px !important;
+  }
+
+  .fill_info {
+    padding: 15px !important;
+  }
+
+  .ft_box .col-lg-7 {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+    padding: 0 10px !important;
+  }
+
+  .ft_box .col-lg-7 a {
+    font-size: 13px !important;
+    padding: 8px 12px !important;
+    flex: 1 1 calc(50% - 6px) !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    text-align: center !important;
+    margin: 0 !important;
+  }
+
+  .ft_box .col-lg-7 a.send_enquiry {
+    flex: 1 1 auto !important;
+    width: calc(100% - 58px) !important;
+  }
+
+  .ft_box .col-lg-7 a.share {
+    flex: 0 0 42px !important;
+    width: 42px !important;
+    height: 38px !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
 }

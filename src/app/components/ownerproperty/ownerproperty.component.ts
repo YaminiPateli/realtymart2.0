@@ -14,7 +14,7 @@ import { ToastrService } from 'ngx-toastr';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { Fancybox } from '@fancyapps/ui';
 import { ActivityTrackerService } from '../service/activitytracker.service';
-import { Router,NavigationEnd } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { Title, Meta } from '@angular/platform-browser';
 declare var bootstrap: any;
 import { filter } from 'rxjs/operators';
@@ -98,7 +98,7 @@ export class OwnerpropertyComponent {
   city: any;
   city1: City[] = [];
   validcityforselected: any;
-    breadcrumbs: { label: string, url: string }[] = [];
+  breadcrumbs: { label: string, url: string }[] = [];
 
 
   constructor(
@@ -224,7 +224,7 @@ export class OwnerpropertyComponent {
   }
 
   ngOnInit() {
-   this.generateBreadcrumbs(this.router.url);
+    this.generateBreadcrumbs(this.router.url);
     const token = localStorage.getItem('myrealtylogintoken');
     if (token) {
       this.is_token = true;
@@ -240,20 +240,20 @@ export class OwnerpropertyComponent {
     }
   }
   generateBreadcrumbs(url: string) {
-  console.log("Current URL:", url);
+    console.log("Current URL:", url);
 
-  const cleanUrl = url.split('?')[0];
-  const urlSegments = cleanUrl.split('/').filter(segment => segment);
+    const cleanUrl = url.split('?')[0];
+    const urlSegments = cleanUrl.split('/').filter(segment => segment);
 
-  let accumulatedUrl = '';
-  this.breadcrumbs = urlSegments.map(segment => {
-    accumulatedUrl += '/' + segment;
-    return {
-      label: this.formatLabel(segment),
-      url: accumulatedUrl
-    };
-  });
-}
+    let accumulatedUrl = '';
+    this.breadcrumbs = urlSegments.map(segment => {
+      accumulatedUrl += '/' + segment;
+      return {
+        label: this.formatLabel(segment),
+        url: accumulatedUrl
+      };
+    });
+  }
   scrollToElement(element: Element) {
     const elementRect = element.getBoundingClientRect(); // Element's position relative to the viewport
     const absoluteElementTop = elementRect.top + window.scrollY; // Element's absolute position in the document
@@ -273,18 +273,18 @@ export class OwnerpropertyComponent {
       this.is_token = false;
     }
   }
- 
+
   contactowner(propertyid: any) {
     this.http.get(`${this.apiUrl}contactowner/${propertyid}`).subscribe(
       (contactData: any) => {
         this.contactData = contactData;
         this.contact = this.contactData?.data;
       },
-      (error: any) => {}
+      (error: any) => { }
     );
   }
   submitForm() {
-    
+
     this.spinner.show();
     const payload = {
       contact_no: this.formData.contact_no,
@@ -298,7 +298,7 @@ export class OwnerpropertyComponent {
       leads_type: 'contact-owner',
       leads_for: 'Property',
       location: this.city,
-    
+
     };
     const token = localStorage.getItem('myrealtylogintoken');
 
@@ -425,7 +425,7 @@ export class OwnerpropertyComponent {
           setTimeout(() => {
             this.spinner.hide();
           }, 1000); // Adjust the delay as needed
-         
+
 
           this.spinner.hide();
         } else {
@@ -551,7 +551,7 @@ export class OwnerpropertyComponent {
   }
 
   submitFormPhone() {
-    
+
     this.spinner.show();
     const payload = {
       contact_no: this.formDataphone.contactcontact_no,
@@ -834,7 +834,7 @@ export class OwnerpropertyComponent {
   // fancybox for images
 
   ngAfterViewInit(): void {
-   
+
     const fancyboxOptions = {
       Toolbar: false, // Fancybox v4 uses uppercase `Toolbar`
       infinite: true, // Instead of `loop`, use `infinite`
@@ -904,7 +904,7 @@ export class OwnerpropertyComponent {
     autoplay: true,
   };
 
- 
+
   formatLabel(segment: string): string {
     return segment.replace(/[-_]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
   }

@@ -122,9 +122,9 @@ export class HomeComponent implements AfterViewInit, OnInit {
   activeTab: string = 'buy';
   city: any;
   citySearch: any;
-  city1:City[]=[];
-  contact:any;
-  contactData:any;
+  city1: City[] = [];
+  contact: any;
+  contactData: any;
   formData: any = {
     username: '',
     useremail: '',
@@ -134,51 +134,51 @@ export class HomeComponent implements AfterViewInit, OnInit {
     otp: '',
     termsAccepted: false
   };
-    propertyLabel: string = 'Select Property Type';
-    selectedItemsOrder: any[] = [];
-    selectedItemsPg: Array<{ id: number, name: string }> = [];
-    selectedItemsHostel: Array<{ id: number, name: string }> = [];
-    propertyServices:any;
-    genderOptions = [
-      { id: 1, name: 'Boys' },
-      { id: 2, name: 'Girls' }
-    ];
+  propertyLabel: string = 'Select Property Type';
+  selectedItemsOrder: any[] = [];
+  selectedItemsPg: Array<{ id: number, name: string }> = [];
+  selectedItemsHostel: Array<{ id: number, name: string }> = [];
+  propertyServices: any;
+  genderOptions = [
+    { id: 1, name: 'Boys' },
+    { id: 2, name: 'Girls' }
+  ];
 
-    genderHostelOptions = [
-      { id: 1, name: 'Boys' },
-      { id: 2, name: 'Girls' }
-    ];
+  genderHostelOptions = [
+    { id: 1, name: 'Boys' },
+    { id: 2, name: 'Girls' }
+  ];
 
-    validCities: string[] = [
-      'Ahmedabad',
-      'Rajkot',
-      'Surat',
-      'Vadodara',
-      'Mumbai',
-      'Navi Mumbai',
-      'Pune',
-      'Bangalore',
-      'NCR',
-      'Delhi',
-      'Gurgaon',
-      'Hyderabad',
-    ];
+  validCities: string[] = [
+    'Ahmedabad',
+    'Rajkot',
+    'Surat',
+    'Vadodara',
+    'Mumbai',
+    'Navi Mumbai',
+    'Pune',
+    'Bangalore',
+    'NCR',
+    'Delhi',
+    'Gurgaon',
+    'Hyderabad',
+  ];
 
-    nameError:boolean=false;
-    emailError:boolean=false;
-    phoneError:boolean=false;
-    otpError: boolean = false;
-    isResendEnabled = false;
-    termsError:boolean=false;
-    isMobileNumberDisabled: boolean = false;
-    openModel = 0;
-    remainingTime: number = 60;
-    private timer: any;
-    isSubmitting = false;
-    proj_id:string='';
-    singleProp:any;
-    checkToken:any;
-    is_token:boolean=false;
+  nameError: boolean = false;
+  emailError: boolean = false;
+  phoneError: boolean = false;
+  otpError: boolean = false;
+  isResendEnabled = false;
+  termsError: boolean = false;
+  isMobileNumberDisabled: boolean = false;
+  openModel = 0;
+  remainingTime: number = 60;
+  private timer: any;
+  isSubmitting = false;
+  proj_id: string = '';
+  singleProp: any;
+  checkToken: any;
+  is_token: boolean = false;
 
   constructor(
     public http: HttpClient,
@@ -238,6 +238,30 @@ export class HomeComponent implements AfterViewInit, OnInit {
     this.errorMessages = {
       selectcitysearch: [{ type: 'required', message: 'City is required.' }],
     };
+
+    this.myForm.get('selectcitysearch')?.valueChanges.subscribe((selectedCityId) => {
+      if (!selectedCityId) return;
+      const matchedCity = this.citySearch?.find((city: any) => city.id == selectedCityId);
+      if (matchedCity) {
+        const cityName = matchedCity.name;
+        if (this.city !== cityName) {
+          this.updateCity(cityName);
+          this.headerService.triggerRefresh();
+          // reload home page data
+          this.loadHotDeals();
+          this.loadFeaturedResidentalProjects();
+          this.loadFeaturedCommercialProjects();
+          this.loadFeaturedBunglowsProjects();
+          this.loadFarmHouseProjects();
+          this.loadFeaturedPlotsProjects();
+          this.loadTopBuilders();
+          this.loadHomeBanner();
+          this.loadAhmedabadProjects();
+          // Call search API
+          this.onSubmit(false);
+        }
+      }
+    });
   }
   handleTabClick(tabName: string): void {
     this.activeTab = tabName;
@@ -272,11 +296,11 @@ export class HomeComponent implements AfterViewInit, OnInit {
 
   checkLoggedIn() {
     this.checkToken = localStorage.getItem('myrealtylogintoken');
-    if(this.checkToken){
-      this.is_token= true;
+    if (this.checkToken) {
+      this.is_token = true;
     }
     else {
-      this.is_token= false;
+      this.is_token = false;
     }
   }
 
@@ -362,34 +386,34 @@ export class HomeComponent implements AfterViewInit, OnInit {
   }
 
   loadHomeBanner(): void {
-      this.bannerservice.homepagebannerget(this.city)?.subscribe((bannerData: any)=> {
-        this.bannerData = bannerData;
-        this.bannerbuilder = this.bannerData?.data;
-      })
-    }
+    this.bannerservice.homepagebannerget(this.city)?.subscribe((bannerData: any) => {
+      this.bannerData = bannerData;
+      this.bannerbuilder = this.bannerData?.data;
+    })
+  }
 
   propertyServicesHomePage() {
     this.http.get(`${environment.apiUrl}propertyserviceshomepage`)
-    .subscribe((response: any) => {
-      this.propertyServices = response.data;
-    }, (error: any) => {
-      console.error('Error sending data', error);
-    });
+      .subscribe((response: any) => {
+        this.propertyServices = response.data;
+      }, (error: any) => {
+        console.error('Error sending data', error);
+      });
   }
 
-  contactowner(propertyid:any){
-    this.proj_id=propertyid;
+  contactowner(propertyid: any) {
+    this.proj_id = propertyid;
     this.http
-    .get(`${environment.apiUrl}contactowner/${propertyid}`)
-    .subscribe(
-      (contactData: any) => {
-        this.contactData = contactData;
-        this.contact = this.contactData?.data;
-      },
-      (error: any) => {
-        // Handle the error as needed
-      }
-    );
+      .get(`${environment.apiUrl}contactowner/${propertyid}`)
+      .subscribe(
+        (contactData: any) => {
+          this.contactData = contactData;
+          this.contact = this.contactData?.data;
+        },
+        (error: any) => {
+          // Handle the error as needed
+        }
+      );
   }
 
   trackCustomActivity() {
@@ -399,14 +423,15 @@ export class HomeComponent implements AfterViewInit, OnInit {
   }
 
   loadHotDeals() {
+    this.hotdeals = null;
     this.hotdealsService.hotdealget(this.city)?.subscribe((hotdealData) => {
-        this.hotdealData = hotdealData;
-        this.hotdeals = this.hotdealData?.data;
+      this.hotdealData = hotdealData;
+      this.hotdeals = this.hotdealData?.data;
     });
   }
 
   loadAhmedabadProjects() {
-    this.http.get<any>(`${environment.apiUrl}projectincity/Ahmedabad?page=1`)
+    this.http.get<any>(`${environment.apiUrl}projectincity/${this.city}?page=1`)
       .subscribe((response) => {
         this.ahmedabadProjects = response?.data?.data || [];
       });
@@ -418,90 +443,90 @@ export class HomeComponent implements AfterViewInit, OnInit {
 
   loadFeaturedResidentalProjects() {
     this.featureresidentalService.futureresidentalget(this.city)?.subscribe((featureResidentalData: any) => {
-        this.featureResidentalData = featureResidentalData;
-        this.featuredResidentals = this.featureResidentalData?.data;
+      this.featureResidentalData = featureResidentalData;
+      this.featuredResidentals = this.featureResidentalData?.data;
     });
   }
 
   loadFeaturedCommercialProjects() {
     this.featurecommercialService.featurecommercialget(this.city)?.subscribe((featuredcommercialData: any) => {
-        this.featureCommercialData = featuredcommercialData;
-        this.featuredcommercials = this.featureCommercialData?.data;
+      this.featureCommercialData = featuredcommercialData;
+      this.featuredcommercials = this.featureCommercialData?.data;
     });
   }
 
   loadFeaturedBunglowsProjects() {
     this.featurebunglowsService.featurebunglowsvillasget(this.city)?.subscribe((featureBunglowsData: any) => {
-        this.featureBunglowsData = featureBunglowsData;
-        this.featuredBunglowss = this.featureBunglowsData?.data;
+      this.featureBunglowsData = featureBunglowsData;
+      this.featuredBunglowss = this.featureBunglowsData?.data;
     });
   }
 
   loadFarmHouseProjects() {
     this.farmHouseProjects.featurefarmhouseget(this.city)?.subscribe((featureFarmData: any) => {
-        this.featureFarmData = featureFarmData;
-        this.featurefarmhouse = this.featureFarmData?.data;
+      this.featureFarmData = featureFarmData;
+      this.featurefarmhouse = this.featureFarmData?.data;
     });
   }
 
   loadFeaturedPlotsProjects() {
     this.featureplotsService.featuredplotsget(this.city)?.subscribe((featurePlotsData: any) => {
-        this.featurePlotsData = featurePlotsData;
-        this.featurePlotss = this.featurePlotsData?.data;
+      this.featurePlotsData = featurePlotsData;
+      this.featurePlotss = this.featurePlotsData?.data;
     });
   }
 
   loadTopBuilders() {
     this.topbuildersService.topbuilderget(this.city)?.subscribe((data) => {
-        this.topbuilderData = data;
-        this.topbuilders = this.topbuilderData?.responseData;
+      this.topbuilderData = data;
+      this.topbuilders = this.topbuilderData?.responseData;
     });
   }
 
   loadpropertyresidential(): void {
     this.propertyresidentialservice.getpropertytyperesidential()?.subscribe((propertyresidentialData: any) => {
-        this.propertyresidentialData = propertyresidentialData;
-        this.propertyresidential =
-          this.propertyresidentialData?.data;
+      this.propertyresidentialData = propertyresidentialData;
+      this.propertyresidential =
+        this.propertyresidentialData?.data;
 
-          if (this.activeTab != 'pg' && this.activeTab != 'hostel') {
+      if (this.activeTab != 'pg' && this.activeTab != 'hostel') {
 
-            const defaultSelections = ['Flat', 'Villa'];
-            this.selectedResidentialItems = this.propertyresidential
+        const defaultSelections = ['Flat', 'Villa'];
+        this.selectedResidentialItems = this.propertyresidential
+          ?.filter((item: any) => defaultSelections.includes(item.name))
+          .map((item: any) => item.id);
+        this.selectedItemsOrder = this.propertyresidential?.filter(
+          (item: any) => defaultSelections.includes(item.name)
+        );
+        if (this.activeTab == 'plots') {
+          console.log('Active Tab:', this.activeTab);
+
+          const defaultSelections = ['Residential Land & Plot', 'Commercial Land'];
+          this.selectedPlotItems = this.propertyplot
             ?.filter((item: any) => defaultSelections.includes(item.name))
             .map((item: any) => item.id);
-            this.selectedItemsOrder = this.propertyresidential?.filter(
-              (item: any) => defaultSelections.includes(item.name)
-            );
-            if(this.activeTab == 'plots'){
-            console.log('Active Tab:', this.activeTab);
+          this.selectedItemsOrder = this.propertyplot?.filter(
+            (item: any) => defaultSelections.includes(item.name)
+          );
 
-            const defaultSelections = ['Residential Land & Plot', 'Commercial Land'];
-            this.selectedPlotItems = this.propertyplot
+        }
+        if (this.activeTab == 'commercial') {
+          console.log('Active Tab:', this.activeTab);
+
+          const defaultSelections = ['Office Space', 'Commercial Land'];
+          this.selectedPlotItems = this.propertyplot
             ?.filter((item: any) => defaultSelections.includes(item.name))
             .map((item: any) => item.id);
-            this.selectedItemsOrder = this.propertyplot?.filter(
-              (item: any) => defaultSelections.includes(item.name)
-            );
-           
-          }
-            if(this.activeTab == 'commercial'){
-            console.log('Active Tab:', this.activeTab);
+          this.selectedItemsOrder = this.propertyplot?.filter(
+            (item: any) => defaultSelections.includes(item.name)
+          );
 
-            const defaultSelections = ['Office Space', 'Commercial Land'];
-            this.selectedPlotItems = this.propertyplot
-            ?.filter((item: any) => defaultSelections.includes(item.name))
-            .map((item: any) => item.id);
-            this.selectedItemsOrder = this.propertyplot?.filter(
-              (item: any) => defaultSelections.includes(item.name)
-            );
-           
-          }
-          }
-          else {
-            this.selectedResidentialItems = [];
-            this.selectedItemsOrder = [];
-          }
+        }
+      }
+      else {
+        this.selectedResidentialItems = [];
+        this.selectedItemsOrder = [];
+      }
 
       if (this.selectedResidentialItems.length > 0) {
         this.Residencialvisible = true;
@@ -511,36 +536,36 @@ export class HomeComponent implements AfterViewInit, OnInit {
 
       // Update the label with default selected items
       this.updatePropertyLabel();
-      });
+    });
   }
   loadpropertycommercial(): void {
     this.propertycommercialservice.getpropertytypecommercial()?.subscribe((propertycommercialData: any) => {
-        this.propertycommercialData = propertycommercialData;
-        this.propertycommercial = this.propertycommercialData?.data;
+      this.propertycommercialData = propertycommercialData;
+      this.propertycommercial = this.propertycommercialData?.data;
     });
   }
   loadPropertyOther(): void {
     this.propertyotherservice.getpropertytypeother()?.subscribe((propertyotherData: any) => {
-        this.propertyotherData = propertyotherData;
-        this.propertyother = this.propertyotherData?.data;
+      this.propertyotherData = propertyotherData;
+      this.propertyother = this.propertyotherData?.data;
     });
   }
   loadPropertyPlot(): void {
     this.propertyplotservice.getpropertytypeplot()?.subscribe((propertyplotData: any) => {
-        this.propertyplotData = propertyplotData;
-        this.propertyplot = this.propertyplotData?.data;
+      this.propertyplotData = propertyplotData;
+      this.propertyplot = this.propertyplotData?.data;
     });
   }
   loadPropertyPg(): void {
     this.propertypgservice.getpropertytypepg()?.subscribe((propertypgData: any) => {
-        this.propertypgData = propertypgData;
-        this.propertypg = this.propertypgData?.data;
+      this.propertypgData = propertypgData;
+      this.propertypg = this.propertypgData?.data;
     });
   }
   loadPropertyHostel(): void {
     this.propertyhostelservice.getpropertytypehostel()?.subscribe((propertyhostelData: any) => {
-        this.propertyhostelData = propertyhostelData;
-        this.propertyhostel = this.propertyhostelData?.data;
+      this.propertyhostelData = propertyhostelData;
+      this.propertyhostel = this.propertyhostelData?.data;
     });
   }
   visible: boolean = false;
@@ -587,8 +612,7 @@ export class HomeComponent implements AfterViewInit, OnInit {
       this.visible = false;
     }
 
-    if(!clickedElement.closest('.budget-inner'))
-    {
+    if (!clickedElement.closest('.budget-inner')) {
       this.togglebudget = false;
     }
   }
@@ -615,7 +639,7 @@ export class HomeComponent implements AfterViewInit, OnInit {
     this.Lookingfor = !this.Lookingfor;
   }
 
-  
+
   cars = [
     { id: 0, name: 'Ahmedabad' },
     { id: 1, name: 'Rajkot' },
@@ -679,7 +703,7 @@ export class HomeComponent implements AfterViewInit, OnInit {
           slidesToScroll: 1,
           infinite: true,
           dots: false,
-          arrows:true
+          arrows: true
         },
       },
     ],
@@ -723,7 +747,7 @@ export class HomeComponent implements AfterViewInit, OnInit {
           slidesToScroll: 1,
           infinite: true,
           dots: false,
-          arrows:true
+          arrows: true
         },
       },
     ],
@@ -770,7 +794,7 @@ export class HomeComponent implements AfterViewInit, OnInit {
           slidesToScroll: 1,
           infinite: true,
           dots: false,
-          arrows:true
+          arrows: true
         },
       },
     ],
@@ -862,7 +886,7 @@ export class HomeComponent implements AfterViewInit, OnInit {
           slidesToScroll: 1,
           infinite: true,
           dots: false,
-          arrows:true
+          arrows: true
         },
       },
     ],
@@ -871,7 +895,7 @@ export class HomeComponent implements AfterViewInit, OnInit {
   fetchCities() {
     this.http.get<{ data: { id: number; name: string }[] }>(`${environment.apiUrl}cities`).subscribe(
       (response: any) => {
-        response.responseData = response.responseData.filter((city:{ id: number; name: string }) => FilteredCities.includes(city.name));
+        response.responseData = response.responseData.filter((city: { id: number; name: string }) => FilteredCities.includes(city.name));
         this.city1 = response.responseData.map((city: any) => ({
           cid: city.id,
           cname: city.name
@@ -889,7 +913,7 @@ export class HomeComponent implements AfterViewInit, OnInit {
     );
   }
 
-  onSubmit() {
+  onSubmit(redirect: boolean = true) {
     if (this.myForm.invalid) {
       this.searchError = true;
       return;
@@ -903,7 +927,7 @@ export class HomeComponent implements AfterViewInit, OnInit {
       if (matchedCity) {
         const currentCity = localStorage.getItem('location');
         const getCitys = matchedCity.name;
-        if(currentCity != getCitys){
+        if (currentCity != getCitys) {
           localStorage.setItem('location', matchedCity.name);
           this.headerService.triggerRefresh();
         }
@@ -947,12 +971,14 @@ export class HomeComponent implements AfterViewInit, OnInit {
       .set('Accept', 'application/json');
 
     this.http
-      .post(`${environment.apiUrl}searchproperty`, searchData,{headers})
+      .post(`${environment.apiUrl}searchproperty`, searchData, { headers })
       .subscribe(
         (response: any) => {
           console.log('API Response:', response);
-          const dataToSend = { result: response };
-          this.router.navigate(['search-property'], { state: response });
+          if (redirect) {
+            const dataToSend = { result: response };
+            this.router.navigate(['search-property'], { state: response });
+          }
         },
         (error: any) => {
           console.error('API Error:', error);
@@ -960,33 +986,33 @@ export class HomeComponent implements AfterViewInit, OnInit {
       );
   }
 
-updateSelectedItems(event: any, id: number, selectedItemsArray: number[], itemsList: any[], type?: string): void {
-  const checked = event.target.checked;
-  const selectedItem = itemsList.find(i => i.id === id);
+  updateSelectedItems(event: any, id: number, selectedItemsArray: number[], itemsList: any[], type?: string): void {
+    const checked = event.target.checked;
+    const selectedItem = itemsList.find(i => i.id === id);
 
-  if (!selectedItem) return;
+    if (!selectedItem) return;
 
-  if (checked) {
-    // Add to order list (for label)
-    if (!this.selectedItemsOrder.find(item => item.id === id)) {
-      this.selectedItemsOrder.push(selectedItem);
+    if (checked) {
+      // Add to order list (for label)
+      if (!this.selectedItemsOrder.find(item => item.id === id)) {
+        this.selectedItemsOrder.push(selectedItem);
+      }
+      // Add ID to the specific array
+      if (!selectedItemsArray.includes(id)) {
+        selectedItemsArray.push(id);
+      }
+    } else {
+      // Remove from order list
+      this.selectedItemsOrder = this.selectedItemsOrder.filter(item => item.id !== id);
+      // Remove ID
+      const index = selectedItemsArray.indexOf(id);
+      if (index > -1) {
+        selectedItemsArray.splice(index, 1);
+      }
     }
-    // Add ID to the specific array
-    if (!selectedItemsArray.includes(id)) {
-      selectedItemsArray.push(id);
-    }
-  } else {
-    // Remove from order list
-    this.selectedItemsOrder = this.selectedItemsOrder.filter(item => item.id !== id);
-    // Remove ID
-    const index = selectedItemsArray.indexOf(id);
-    if (index > -1) {
-      selectedItemsArray.splice(index, 1);
-    }
+
+    this.updatePropertyLabel();
   }
-
-  this.updatePropertyLabel();
-}
 
   handleResidentialCheckboxChange(event: any, id: number) {
     this.updateSelectedItems(event, id, this.selectedResidentialItems, this.propertyresidential);
@@ -1017,28 +1043,28 @@ updateSelectedItems(event: any, id: number, selectedItemsArray: number[], itemsL
 
     if (event.target.checked) {
       this.selectedItemsPg.push({ id, name });
-  } else {
-      this.selectedItemsPg = this.selectedItemsPg.filter(item => item.id !== id);
-  }
-  this.pgChangeLabel();
-
-  if (this.activeTab === 'pg' || this.activeTab === 'hostel') {
-    if (name === 'Boys' || name === 'Girls') {
-      // Handle Gender selection
-      if (event.target.checked) {
-        this.selectedGenders.push(name);
-      } else {
-        this.selectedGenders = this.selectedGenders.filter(gender => gender !== name);
-      }
     } else {
-      // Handle Looking For selection
-      if (event.target.checked) {
-        this.selectedLookingFor.push(name);
+      this.selectedItemsPg = this.selectedItemsPg.filter(item => item.id !== id);
+    }
+    this.pgChangeLabel();
+
+    if (this.activeTab === 'pg' || this.activeTab === 'hostel') {
+      if (name === 'Boys' || name === 'Girls') {
+        // Handle Gender selection
+        if (event.target.checked) {
+          this.selectedGenders.push(name);
+        } else {
+          this.selectedGenders = this.selectedGenders.filter(gender => gender !== name);
+        }
       } else {
-        this.selectedLookingFor = this.selectedLookingFor.filter(lookingFor => lookingFor !== name);
+        // Handle Looking For selection
+        if (event.target.checked) {
+          this.selectedLookingFor.push(name);
+        } else {
+          this.selectedLookingFor = this.selectedLookingFor.filter(lookingFor => lookingFor !== name);
+        }
       }
     }
-  }
   }
 
   pgChangeLabel() {
@@ -1047,12 +1073,12 @@ updateSelectedItems(event: any, id: number, selectedItemsArray: number[], itemsL
     if (selectedCount === 0) {
       this.propertyLabel = 'Select Property Type';  // Default label when nothing is selected
     } else if (selectedCount === 1) {
-    
+
       this.propertyLabel = this.selectedItemsPg[0].name;
     } else {
       // Display the first selected item and count of others
       this.propertyLabel = `${this.selectedItemsPg[0].name} + ${selectedCount - 1}`;
-     
+
     }
 
   }
@@ -1068,23 +1094,23 @@ updateSelectedItems(event: any, id: number, selectedItemsArray: number[], itemsL
     this.hostelChangeLabel();
 
 
-  if (this.activeTab === 'pg' || this.activeTab === 'hostel') {
-    if (name === 'Boys' || name === 'Girls') {
-      // Handle Gender selection
-      if (event.target.checked) {
-        this.selectedGenders.push(name);
+    if (this.activeTab === 'pg' || this.activeTab === 'hostel') {
+      if (name === 'Boys' || name === 'Girls') {
+        // Handle Gender selection
+        if (event.target.checked) {
+          this.selectedGenders.push(name);
+        } else {
+          this.selectedGenders = this.selectedGenders.filter(gender => gender !== name);
+        }
       } else {
-        this.selectedGenders = this.selectedGenders.filter(gender => gender !== name);
-      }
-    } else {
-      // Handle Looking For selection
-      if (event.target.checked) {
-        this.selectedLookingFor.push(name);
-      } else {
-        this.selectedLookingFor = this.selectedLookingFor.filter(lookingFor => lookingFor !== name);
+        // Handle Looking For selection
+        if (event.target.checked) {
+          this.selectedLookingFor.push(name);
+        } else {
+          this.selectedLookingFor = this.selectedLookingFor.filter(lookingFor => lookingFor !== name);
+        }
       }
     }
-  }
   }
 
   hostelChangeLabel() {
@@ -1099,14 +1125,14 @@ updateSelectedItems(event: any, id: number, selectedItemsArray: number[], itemsL
     }
   }
 
-    handleCommercialCheckboxChange(event: any, id: number) {
-      this.updateSelectedItems(event, id, this.selectedCommercialItems, this.propertycommercial);
-   
-    }
+  handleCommercialCheckboxChange(event: any, id: number) {
+    this.updateSelectedItems(event, id, this.selectedCommercialItems, this.propertycommercial);
+
+  }
 
   handleOtherCheckboxChange(event: any, id: number) {
     this.updateSelectedItems(event, id, this.selectedOtherItems, this.propertyother);
-   
+
   }
 
   updatePropertyLabel(): void {
@@ -1128,40 +1154,40 @@ updateSelectedItems(event: any, id: number, selectedItemsArray: number[], itemsL
   getSelectedText(selectedItems: number[], itemsList: any[]): string {
     if (!selectedItems.length) return '';
 
-  const firstItem = itemsList.find(item => item.id === selectedItems[0]);
-  return firstItem ? firstItem.name : '';
+    const firstItem = itemsList.find(item => item.id === selectedItems[0]);
+    return firstItem ? firstItem.name : '';
   }
 
   renthandleCommercialCheckboxChange(event: any, id: number, type: any) {
     this.updateSelectedItems(event, id, this.selectedCommercialItems, this.propertycommercial);
     this.updatePropertyLabel();
-  
+
   }
 
   renthandleOtherCheckboxChange(event: any, id: number, type: any) {
     this.updateSelectedItems(event, id, this.selectedOtherItems, this.propertyother);
     this.updatePropertyLabel();
- 
+
   }
 
   farmhousehandleCommercialCheckboxChange(event: any, id: number, type: any) {
     this.updateSelectedItems(event, id, this.selectedCommercialItems, this.propertycommercial);
-   
+
   }
 
   farmhousehandleOtherCheckboxChange(event: any, id: number, type: any) {
     this.updateSelectedItems(event, id, this.selectedOtherItems, this.propertyother);
-   
+
   }
 
   plotshandleCommercialCheckboxChange(event: any, id: number, type: any) {
     this.updateSelectedItems(event, id, this.selectedCommercialItems, this.propertycommercial);
-   
+
   }
 
   plotshandleOtherCheckboxChange(event: any, id: number, type: any) {
     this.updateSelectedItems(event, id, this.selectedOtherItems, this.propertyother);
-   
+
   }
 
   getvaluemin(minval: any, type: any) {
@@ -1192,54 +1218,54 @@ updateSelectedItems(event: any, id: number, selectedItemsArray: number[], itemsL
   }
 
   submitForm() {
-  this.spinner.show();
+    this.spinner.show();
 
     const payload = this.contact.property ? {
 
-      contact_no :this.formData.contact_no,
-      useremail:this.formData.useremail,
-      username:this.formData.username,
-      project_Id:this.contact?.property?.project_id,
-      property_id:this.contact?.property?.property_id,
-      builder_id:this.contact?.property?.builder_id,
-      agent_id:this.contact?.property?.agent_id,
-      receiver_user_id:this.contact?.property?.user_id,
-      leads_type:'Call for Price',
-      leads_for:'Property',
-      location:this.city
+      contact_no: this.formData.contact_no,
+      useremail: this.formData.useremail,
+      username: this.formData.username,
+      project_Id: this.contact?.property?.project_id,
+      property_id: this.contact?.property?.property_id,
+      builder_id: this.contact?.property?.builder_id,
+      agent_id: this.contact?.property?.agent_id,
+      receiver_user_id: this.contact?.property?.user_id,
+      leads_type: 'Call for Price',
+      leads_for: 'Property',
+      location: this.city
     } : {
-      contact_no :this.formData.contact_no,
-      useremail:this.formData.useremail,
-      username:this.formData.username,
-      project_Id:this.contact?.project?.project_id,
-      builder_id:this.contact?.project?.builder_id,
-      agent_id:this.contact?.project?.agent_id,
-      receiver_user_id:this.contact?.project?.user_id,
-      leads_type:'Call for Price',
-      leads_for:'Project',
-      location:this.city
+      contact_no: this.formData.contact_no,
+      useremail: this.formData.useremail,
+      username: this.formData.username,
+      project_Id: this.contact?.project?.project_id,
+      builder_id: this.contact?.project?.builder_id,
+      agent_id: this.contact?.project?.agent_id,
+      receiver_user_id: this.contact?.project?.user_id,
+      leads_type: 'Call for Price',
+      leads_for: 'Project',
+      location: this.city
     }
-      // contact_no :this.formData.contact_no,
+    // contact_no :this.formData.contact_no,
 
     const token = localStorage.getItem('myrealtylogintoken');
 
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`).set('Accept', 'application/json');
 
-    this.http.post(`${environment.apiUrl}storeinquiry`,payload,{headers})
+    this.http.post(`${environment.apiUrl}storeinquiry`, payload, { headers })
       .subscribe((response: any) => {
         if (response.status === true) {
-          this.activityTrackerService.logActivity(`Inquiry stored for ${this.contact.property ? 'property' : 'project'}`,'');
+          this.activityTrackerService.logActivity(`Inquiry stored for ${this.contact.property ? 'property' : 'project'}`, '');
           this.toastr.success('Inquiry Added successfully!');
           const modalElement = document.getElementById('contact-owner');
           const modalElementProp = document.getElementById('contact-owner-prop');
-      if (modalElement) {
-        const modalInstance = bootstrap.Modal.getInstance(modalElement);
-        modalInstance?.hide();
-      }
-      if (modalElementProp) {
-        const modalInstance = bootstrap.Modal.getInstance(modalElementProp);
-        modalInstance?.hide();
-      }
+          if (modalElement) {
+            const modalInstance = bootstrap.Modal.getInstance(modalElement);
+            modalInstance?.hide();
+          }
+          if (modalElementProp) {
+            const modalInstance = bootstrap.Modal.getInstance(modalElementProp);
+            modalInstance?.hide();
+          }
           // this.resetForm();
         }
       }, (error) => {
@@ -1248,8 +1274,8 @@ updateSelectedItems(event: any, id: number, selectedItemsArray: number[], itemsL
   }
 
 
-  fetchProperty(property:any){
-    this.singleProp= property;
+  fetchProperty(property: any) {
+    this.singleProp = property;
   }
 
   validateCharInput(event: KeyboardEvent) {
@@ -1279,8 +1305,7 @@ updateSelectedItems(event: any, id: number, selectedItemsArray: number[], itemsL
     }
   }
 
-  validateName(event:any)
-  {
+  validateName(event: any) {
     const inputValue = event.target.value;
     const companyPattern = /^[a-zA-Z\s]+$/;
     this.nameError = !companyPattern.test(inputValue);
@@ -1318,86 +1343,86 @@ updateSelectedItems(event: any, id: number, selectedItemsArray: number[], itemsL
     this.startTimer();
   }
 
-    verifyOTP() {
+  verifyOTP() {
 
-      if(this.formData.otp == ''){
-        this.toastr.error('Please Enter OTP');
-        return
-      }
-      let payload  = {
-        contact_no:this.formData.contact_no,
-        otp:this.formData.otp,
-      }
+    if (this.formData.otp == '') {
+      this.toastr.error('Please Enter OTP');
+      return
+    }
+    let payload = {
+      contact_no: this.formData.contact_no,
+      otp: this.formData.otp,
+    }
 
-      this.http
-        .post(
-          `${environment.apiUrl}verifyinquiryotp`,
-          payload
-        )
-        .subscribe(
-          (response: any) => {
-            if (response.status == true) {
-              this.toastr.success('OTP verified successfully.');
-              const modalElement = this.otpModel.nativeElement;
-              const modal = bootstrap.Modal.getInstance(modalElement);
-              if (modal) {
-                modal.hide();
-              } else {
-                const newModal = new bootstrap.Modal(modalElement);
-                newModal.hide();
-              }
-              this.submitForm();
-              this.isResendEnabled = false;
-              this.isMobileNumberDisabled = true;
-
-              // Optional: Delay for user feedback before hiding
-              setTimeout(() => {
-                this.spinner.hide();
-              }, 1000); // Adjust the delay as needed
-             
-
-              this.spinner.hide();
+    this.http
+      .post(
+        `${environment.apiUrl}verifyinquiryotp`,
+        payload
+      )
+      .subscribe(
+        (response: any) => {
+          if (response.status == true) {
+            this.toastr.success('OTP verified successfully.');
+            const modalElement = this.otpModel.nativeElement;
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            if (modal) {
+              modal.hide();
             } else {
-              this.toastr.error('Wrong OTP entered. Please try again.');
-              this.isResendEnabled = true;
-              this.isSubmitting = false; // Reset submission flag if failed
+              const newModal = new bootstrap.Modal(modalElement);
+              newModal.hide();
             }
-          },
-          (error) => {
-            console.error('Wrong OTP entered. Please try again.', error);
+            this.submitForm();
+            this.isResendEnabled = false;
+            this.isMobileNumberDisabled = true;
+
+            // Optional: Delay for user feedback before hiding
+            setTimeout(() => {
+              this.spinner.hide();
+            }, 1000); // Adjust the delay as needed
+
+
+            this.spinner.hide();
+          } else {
+            this.toastr.error('Wrong OTP entered. Please try again.');
             this.isResendEnabled = true;
-            this.isSubmitting = false; // Reset submission flag on error
+            this.isSubmitting = false; // Reset submission flag if failed
           }
-        );
-    }
-
-    startTimer() {
-      this.isResendEnabled = false;
-      this.remainingTime = 60;
-      clearInterval(this.timer);
-
-      this.timer = setInterval(() => {
-        this.remainingTime--;
-
-        if (this.remainingTime <= 0) {
-          clearInterval(this.timer);
+        },
+        (error) => {
+          console.error('Wrong OTP entered. Please try again.', error);
           this.isResendEnabled = true;
+          this.isSubmitting = false; // Reset submission flag on error
         }
-      }, 1000);
-    }
-    onTermsChange(event: Event) {
-      this.termsError = !(event.target as HTMLInputElement).checked;
-   }
+      );
+  }
 
-    sendOTPToMobile() {
-      this.spinner.show();
-      this.http
-        .post(`${environment.apiUrl}genrateinquiryotp`, {
-          contact_no: this.formData.contact_no,
-        })
-        .subscribe(
-          (response: any) => {
-            if(response.data =='ok') {
+  startTimer() {
+    this.isResendEnabled = false;
+    this.remainingTime = 60;
+    clearInterval(this.timer);
+
+    this.timer = setInterval(() => {
+      this.remainingTime--;
+
+      if (this.remainingTime <= 0) {
+        clearInterval(this.timer);
+        this.isResendEnabled = true;
+      }
+    }, 1000);
+  }
+  onTermsChange(event: Event) {
+    this.termsError = !(event.target as HTMLInputElement).checked;
+  }
+
+  sendOTPToMobile() {
+    this.spinner.show();
+    this.http
+      .post(`${environment.apiUrl}genrateinquiryotp`, {
+        contact_no: this.formData.contact_no,
+      })
+      .subscribe(
+        (response: any) => {
+          if (response.data == 'ok') {
             this.startTimer();
             if (response.status === true) {
               // this.sendOTPToMobile();
@@ -1410,70 +1435,70 @@ updateSelectedItems(event: any, id: number, selectedItemsArray: number[], itemsL
               this.toastr.warning(response.message);
             }
           }
-            else {
-              this.phoneError = true;
-            }
-            this.spinner.hide();
-          },
-          (error) => {
-            this.toastr.error('Failed to send OTP.');
-            console.error('Error sending OTP', error);
-            this.spinner.hide();
+          else {
+            this.phoneError = true;
           }
-        );
+          this.spinner.hide();
+        },
+        (error) => {
+          this.toastr.error('Failed to send OTP.');
+          console.error('Error sending OTP', error);
+          this.spinner.hide();
+        }
+      );
+  }
+  resetForm() {
+    this.formData = {
+      username: '',
+      useremail: '',
+      contact_no: ''
+    };
+    this.nameError = false;
+    this.phoneError = false;
+    this.emailError = false;
+    this.termsError = false;
+  }
+
+  openOTPModal() {
+    // Reset errors
+    this.nameError = false;
+    this.phoneError = false;
+    this.emailError = false;
+    this.termsError = false;
+
+    // Validation checks
+    if (!this.formData.username) {
+      this.nameError = true;
     }
-    resetForm() {
-      this.formData = {
-        username: '',
-        useremail: '',
-        contact_no: ''
-      };
-      this.nameError = false;
-      this.phoneError = false;
-      this.emailError = false;
-      this.termsError = false;
+    if (!this.formData.useremail) {
+      this.emailError = true;
+    }
+    if (!this.formData.contact_no) {
+      this.phoneError = true;
+    }
+    if (!this.formData.termsAccepted) {
+      this.termsError = true;
     }
 
-    openOTPModal() {
-      // Reset errors
-      this.nameError = false;
-      this.phoneError = false;
-      this.emailError = false;
-      this.termsError = false;
-
-      // Validation checks
-      if (!this.formData.username) {
-        this.nameError = true;
-      }
-      if (!this.formData.useremail) {
-        this.emailError = true;
-      }
-      if (!this.formData.contact_no) {
-        this.phoneError = true;
-      }
-      if (!this.formData.termsAccepted) {
-        this.termsError = true;
-      }
-
-      // Stop function execution if any error exists
-      if (this.nameError || this.phoneError || this.emailError || this.termsError) {
-        return;
-      }
-
-      this.sendOTPToMobile();
-
-      let contactModal = document.getElementById('contact-owner-prop');
-      let otpModal = document.getElementById('otpModel');
-
-      if (contactModal) {
-        let bsModal = bootstrap.Modal.getInstance(contactModal);
-        bsModal?.hide();
-      }
-
-      // Show the OTP modal
-      if (otpModal) {
-        let otpModalInstance = new bootstrap.Modal(otpModal);
-        otpModalInstance.show();
-      }
+    // Stop function execution if any error exists
+    if (this.nameError || this.phoneError || this.emailError || this.termsError) {
+      return;
     }
+
+    this.sendOTPToMobile();
+
+    let contactModal = document.getElementById('contact-owner-prop');
+    let otpModal = document.getElementById('otpModel');
+
+    if (contactModal) {
+      let bsModal = bootstrap.Modal.getInstance(contactModal);
+      bsModal?.hide();
+    }
+
+    // Show the OTP modal
+    if (otpModal) {
+      let otpModalInstance = new bootstrap.Modal(otpModal);
+      otpModalInstance.show();
+    }
+  }
 }

@@ -121,7 +121,7 @@
                     <div class="services_flow mt-3" id="services" *ngIf="singlecompany.PrtSrcSevices?.length > 0">
                         <h3 class="companies-names">Services</h3>
                         <div class="row mt-3">
-                            <div class="col-lg-3 col-md-6 mb-3 text-center" *ngFor="let service of singlecompany.PrtSrcSevices">
+                            <div class="col-lg-3 col-md-4 col-6 mb-3 text-center" *ngFor="let service of singlecompany.PrtSrcSevices">
                                 <img class="img-fluid pb-2 serice_flow_img"
                                     src={{service.services_image}}
                                     alt>
@@ -136,7 +136,7 @@
                     <div class="services_flow mt-3" id="products" *ngIf="singlecompany.PrtSrcProducts?.length > 0">
                         <h3 class="companies-names">Products</h3>
                         <div class="row mt-3">
-                            <div class="col-lg-3 col-md-6 mb-3 text-center" *ngFor="let product of singlecompany.PrtSrcProducts">
+                            <div class="col-lg-3 col-md-4 col-6 mb-3 text-center" *ngFor="let product of singlecompany.PrtSrcProducts">
                                 <img class="img-fluid pb-2 serice_flow_img"
                                     src={{product.products_image}}
                                     alt>
