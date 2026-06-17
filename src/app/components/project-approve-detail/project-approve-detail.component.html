@@ -73,20 +73,21 @@
       </div>
 
       <!-- Right Section -->
-      <div class="col-lg-6 mt-md-5 mt-4 col-md-4 d-flex justify-content-end align-self-end">
+      <div class="col-lg-6 mt-md-5 mt-4 col-md-4 d-flex justify-content-md-center justify-content-lg-end justify-content-center align-self-end">
         <div class="d-flex flex-wrap justify-content-lg-end gap-2">
           <div class="contact-container-relative">
             <button [attr.data-bs-toggle]="is_token ? null : 'modal'"
               [attr.data-bs-target]="is_token ? null : '#get-builder'"
-              (click)="is_token ? handleContactClick() : openOtpModal('view-contact')"
+              (click)="is_token ? handleContactClick('header') : openOtpModal('view-contact', 'header')"
               class="btn d-flex align-items-center gap-2 action-btn contact-btn text-light">
               <span><img src="../../../assets/images/phone.svg" alt="" srcset=""></span>
               View Contact
             </button>
-            <div class="contact-popover-card" *ngIf="showContactDetails && !showStickyHeader">
+            <div class="contact-popover-card" *ngIf="activeContactPopover === 'header' && !showStickyHeader">
               <p class="title-text">You can contact on:</p>
               <p class="sales-team-text">sales team</p>
-              <a href="tel:{{singleproject?.project_contact_no}}" class="phone-link">{{ singleproject?.project_contact_no }}</a>
+              <a href="tel:{{singleproject?.project_contact_no}}" class="phone-link">{{
+                singleproject?.project_contact_no }}</a>
             </div>
           </div>
 
@@ -148,7 +149,7 @@
   </div>
 </section>
 <!-- navbar -->
-<div class="sticky-nav-wrapper" id="navbar" [class.sticky-active]="showStickyHeader">
+<div class="sticky-nav-wrapper" id="navbar" [class.sticky-active]="showStickyHeader" [class.scrolling-down]="!isScrollingUp">
   <!-- Sticky Header Section (scroll state) -->
   <div class="project-sticky-header" *ngIf="showStickyHeader">
     <div class="container">
@@ -166,15 +167,16 @@
           <div class="contact-container-relative">
             <button [attr.data-bs-toggle]="is_token ? null : 'modal'"
               [attr.data-bs-target]="is_token ? null : '#get-builder'"
-              (click)="is_token ? handleContactClick() : openOtpModal('view-contact')"
+              (click)="is_token ? handleContactClick('sticky') : openOtpModal('view-contact', 'sticky')"
               class="btn d-flex align-items-center gap-2 action-btn contact-btn text-light">
               <span><img src="../../../assets/images/phone.svg" alt="" srcset=""></span>
               View Contact
             </button>
-            <div class="contact-popover-card" *ngIf="showContactDetails && showStickyHeader">
+            <div class="contact-popover-card" *ngIf="activeContactPopover === 'sticky' && showStickyHeader">
               <p class="title-text">You can contact on:</p>
               <p class="sales-team-text">sales team</p>
-              <a href="tel:{{singleproject?.project_contact_no}}" class="phone-link">{{ singleproject?.project_contact_no }}</a>
+              <a href="tel:{{singleproject?.project_contact_no}}" class="phone-link">{{
+                singleproject?.project_contact_no }}</a>
             </div>
           </div>
 
@@ -229,7 +231,7 @@
             [ngClass]="{ active: activeSection === 'amenities' }">Amenities</a>
         </li>
         <li class="{'active': activeSection === 'brochure'}"
-          *ngIf="this.hasKeysOrValues(this.singleproject.project_brochure) && this.isPdf(singleproject.project_brochure)">
+          *ngIf="this.hasKeysOrValues(this.singleproject.project_brochure_images) && this.isPdf(singleproject.project_brochure)">
           <a style="cursor: pointer" (click)="scrollToSection('brochure')"
             [ngClass]="{ active: activeSection === 'brochure' }">Brochure</a>
         </li>
@@ -350,7 +352,8 @@
       <section id="reels" *ngIf="reels && reels.length > 0" class="reels-section">
         <h3 class="section-title">Watch Our Reels</h3>
 
-        <div class="floor-plan-card ps-0">
+        <!-- Desktop Carousel (768px and up) -->
+        <div class="floor-plan-card ps-0 d-none d-md-block">
           <ngx-slick-carousel class="carousel reels floor-plan-slick-slider" #slickModal="slick-carousel"
             [config]="reelsSlideConfig">
             <div ngxSlickItem *ngFor="let reel of reels; let i = index" class="slide px-2">
@@ -366,6 +369,20 @@
               </div>
             </div>
           </ngx-slick-carousel>
+        </div>
+
+        <!-- Mobile Horizontal Scrollable View (under 768px) -->
+        <div class="reels-mobile-scroll-container d-md-none">
+          <div class="reels-mobile-scroll-track">
+            <div class="reel-card-mobile" *ngFor="let reel of reels; let i = index" (click)="openReelsView(i)">
+              <img [src]="reel.proj_video_thumbnail" [alt]="reel.title" class="reel-thumbnail" />
+              <div class="play-btn">
+                <span>
+                  <img src="../../../assets/images/play.svg" alt="Play">
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <hr class="mt-4">
@@ -429,20 +446,18 @@
 
         <h2 class="section-title">Amenities</h2>
 
-        <div class="row g-4 g-md-5 pe-md-5">
+        <div class="row g-3 g-md-4">
 
           <div class="col-6 col-md-4 col-lg-3 col-xl-2" *ngFor="let amenity of this.singleproject.amenitiess">
 
-            <div class="amenity-card">
+            <div class="amenity-card d-flex flex-column align-items-center text-center">
 
-              <div class="amenity-icon position-relative ">
+              <div class="amenity-icon mb-2">
                 <img [src]="amenity.image" [alt]="amenity.name" class="img-fluid">
-                <h6 class="amenity-name position-absolute bottom-0 mt-2 start-0 top-100 end-0">
-                  {{ amenity.name }}
-                </h6>
               </div>
-
-
+              <h6 class="amenity-name">
+                {{ amenity.name }}
+              </h6>
 
             </div>
 
@@ -453,8 +468,8 @@
         <hr class="section-divider-2">
 
       </section>
-      <section *ngIf="singleproject.project_brochure_images && isPdf(this.singleproject.project_brochure)"
-        id="brochure" class="brochure-section">
+      <section *ngIf="singleproject.project_brochure_images.length > 0 && isPdf(this.singleproject.project_brochure)" id="brochure"
+        class="brochure-section">
 
         <h2 class="section-title">Brochure & Images</h2>
 
@@ -498,19 +513,7 @@
             Specifications
           </h3>
 
-          <div class="specification-item" *ngFor="let item of specifications">
-
-            <h5 class="specification-heading">
-              {{ item.title }}
-            </h5>
-
-            <ul class="specification-list">
-              <li *ngFor="let point of item.points">
-                {{ point }}
-              </li>
-            </ul>
-
-          </div>
+          <div class="specification-item" [innerHTML]="singleproject.project_specification"></div>
 
         </div>
 
@@ -523,7 +526,7 @@
             About Developer
           </h5>
 
-          <div class="slider-nav">
+          <div class="slider-nav"  *ngIf="showSliderNav">
             <button class="nav-btn" (click)="slideLeft()">
               <img src="../../../assets/images/arrow-left.png" alt="" srcset="">
             </button>
@@ -536,7 +539,8 @@
         <div class="developer-slider-wrapper" [class.hide-blur]="isAtEnd">
           <div (scroll)="checkScrollPosition()" class="developer-slider" #slider>
 
-            <div class="developer-card cursor-pointer" (click)="openDeveloperProject(item)" *ngFor="let item of developerProjects;">
+            <div class="developer-card cursor-pointer" (click)="openDeveloperProject(item)"
+              *ngFor="let item of developerProjects;">
 
               <div class="card h-100">
 
@@ -596,7 +600,7 @@
     <!-- End project-left-col -->
 
     <!-- Right Sidebar (last in DOM → bottom on mobile, right column on desktop) -->
-    <div class="right-sidebar">
+    <div class="right-sidebar" [class.header-hidden]="isHeaderHidden">
 
       <div class="builder-card" [class.is-expanded]="isDeveloperExpanded">
 
@@ -633,12 +637,12 @@
           <!-- <div class="contact-container-relative w-100 mb-2">
             <button [attr.data-bs-toggle]="is_token ? null : 'modal'"
               [attr.data-bs-target]="is_token ? null : '#get-builder'"
-              (click)="is_token ? handleContactClick() : openOtpModal('view-contact')"
+              (click)="is_token ? handleContactClick('sidebar') : openOtpModal('view-contact', 'sidebar')"
               class="btn display-none contact-btn w-100 mb-0">
               <span><img src="../../../assets/images/phone.svg" alt="" srcset=""></span>
               View Contact
             </button>
-            <div class="contact-popover-card" *ngIf="showContactDetails">
+            <div class="contact-popover-card" *ngIf="activeContactPopover === 'sidebar'">
               <p class="title-text">You can contact on:</p>
               <p class="sales-team-text">sales team</p>
               <a href="tel:{{singleproject?.project_contact_no}}" class="phone-link">{{ singleproject?.project_contact_no }}</a>
@@ -696,18 +700,19 @@
 
 <!-- Mobile Sticky Bottom Bar -->
 <div class="mobile-sticky-footer d-md-none" [class.show]="showStickyHeader">
-  <div class="d-flex flex-column flex-md-row gap-2 gap-md-3 w-100">
+  <div class="d-flex flex-md-row gap-2 gap-md-3 w-100">
     <div class="contact-container-relative w-100 flex-grow-1">
       <button [attr.data-bs-toggle]="is_token ? null : 'modal'" [attr.data-bs-target]="is_token ? null : '#get-builder'"
-        (click)="is_token ? handleContactClick() : openOtpModal('view-contact')"
+        (click)="is_token ? handleContactClick('mobile') : openOtpModal('view-contact', 'mobile')"
         class="btn w-100 contact-btn flex-grow-1 d-flex align-items-center justify-content-center gap-2">
         <span><img src="../../../assets/images/phone.svg" alt="" srcset=""></span>
         View Contact
       </button>
-      <div class="contact-popover-card" *ngIf="showContactDetails">
+      <div class="contact-popover-card" *ngIf="activeContactPopover === 'mobile'">
         <p class="title-text">You can contact on:</p>
         <p class="sales-team-text">sales team</p>
-        <a href="tel:{{singleproject?.project_contact_no}}" class="phone-link">{{ singleproject?.project_contact_no }}</a>
+        <a href="tel:{{singleproject?.project_contact_no}}" class="phone-link">{{ singleproject?.project_contact_no
+          }}</a>
       </div>
     </div>
     <button [attr.data-bs-toggle]="is_token ? null : 'modal'" [attr.data-bs-target]="is_token ? null : '#get-builder'"
@@ -914,14 +919,12 @@
                   [disabled]="!isResendEnabled" (click)="resendOTP()">Resend</button></p>
               <p (click)="backToLogin()" class="label" *ngIf="brochureOtpVisible"
                 class="text-decoration-underline cursor-pointer text-danger">
-                Back to login</p>
+                Back</p>
               <button [disabled]="brochureOtp.join('').length !== 4" class="generate_otp_btn mt-3"
                 (click)="verifyContactOTP()" *ngIf="brochureOtpVisible">Submit</button>
               <button class="generate_otp_btn mt-3" *ngIf="!brochureOtpVisible" [disabled]="isBrochureSendingOtp"
                 (click)="sendBrochureOTP()">{{
                 isBrochureSendingOtp ? 'Sending OTP...' : 'Generate OTP' }}</button>
-              <p *ngIf="!brochureOtpVisible" class="text-center mt-1">New to Realitymart ? <span
-                  class="text-danger cursor-pointer" (click)="goToSignUp()">Sign Up</span></p>
             </div>
           </div>
         </div>
@@ -1093,7 +1096,8 @@
           <div class="reels-dev-logo-wrap">
             <img *ngIf="reels[activeReelIndex].project_logo" [src]="reels[activeReelIndex].project_logo"
               class="reels-dev-logo" alt="Builder logo">
-            <span *ngIf="!reels[activeReelIndex].project_logo" class="reels-dev-letter">{{ reels[activeReelIndex]?.proj_builderName?.charAt(0)?.toUpperCase() }}</span>
+            <span *ngIf="!reels[activeReelIndex].project_logo" class="reels-dev-letter">{{
+              reels[activeReelIndex]?.proj_builderName?.charAt(0)?.toUpperCase() }}</span>
           </div>
           <div>
             <h6 class="reels-dev-name">{{ reels[activeReelIndex].proj_builderName}}</h6>
@@ -1104,10 +1108,12 @@
         </div>
         <div class="reels-action-row">
           <button class="reels-action-btn-red" (click)="toggleReelDetailCard()">View Details</button>
-          <button *ngIf="!is_token" class="reels-action-btn-outline" (click)="openContactModalFromReels('view-contact')">
+          <button *ngIf="!is_token" class="reels-action-btn-outline"
+            (click)="openContactModalFromReels('view-contact')">
             <i class="fa-solid fa-phone me-1"></i>View Contact
           </button>
-          <a *ngIf="is_token" [href]="'tel:' + singleproject?.project_contact_no" class="reels-action-btn-outline text-decoration-none d-flex align-items-center justify-content-center">
+          <a *ngIf="is_token" [href]="'tel:' + singleproject?.project_contact_no"
+            class="reels-action-btn-outline text-decoration-none d-flex align-items-center justify-content-center">
             <i class="fa-solid fa-phone me-1"></i>{{ singleproject?.project_contact_no }}
           </a>
         </div>
@@ -1159,13 +1165,15 @@
       <!-- Card Header: Developer/Project info -->
       <div class="reels-prop-header">
         <div class="reels-prop-avatar-wrap">
-          <img *ngIf="singleproject?.project_logo" [src]="singleproject?.project_logo" class="reels-prop-avatar"
+          <img *ngIf="reels[activeReelIndex].project_about_developer.logo" [src]="reels[activeReelIndex].project_about_developer.logo" class="reels-prop-avatar"
             alt="Logo">
+             <span *ngIf="!reels[activeReelIndex].project_about_developer.logo" class="reels-dev-letter">{{
+              reels[activeReelIndex]?.project_about_developer.project_name?.charAt(0)?.toUpperCase() }}</span>
           <span *ngIf="!singleproject?.project_logo" class="reels-prop-letter">B</span>
         </div>
         <div class="reels-prop-header-text">
-          <h6 class="reels-prop-title">{{ singleproject?.project_name || 'Binori Aristella' }}</h6>
-          <small class="reels-prop-subtitle">{{ singleproject?.project_localities || 'Ahmedabad' }}</small>
+          <h6 class="reels-prop-title">{{ reels[activeReelIndex].project_about_developer.project_name }}</h6>
+          <small class="reels-prop-subtitle">{{ reels[activeReelIndex].project_about_developer.city }}</small>
         </div>
         <button class="reels-prop-close-btn" (click)="toggleReelDetailCard()" title="Close">
           <i class="fa-solid fa-xmark"></i>
@@ -1183,23 +1191,23 @@
       <!-- Property Info -->
       <div class="reels-prop-body">
         <div class="reels-prop-name-price">
-          <span class="reels-prop-name">{{ singleproject?.project_name || 'Binori Aristella' }}</span>
+          <span class="reels-prop-name">{{ reels[activeReelIndex].project_about_developer.project_name }}</span>
           <span class="reels-prop-price">Price: <strong class="reels-prop-price-val">₹ {{
-              singleproject?.project_minimum_price || '70 Lac' }} - {{ singleproject?.project_maximum_price || '2 Cr'
+              reels[activeReelIndex].project_about_developer.minPrice || '70 Lac' }} - {{ reels[activeReelIndex].project_about_developer.maxPrice || '2 Cr'
               }}</strong></span>
         </div>
 
         <div class="reels-prop-builder">
           <i class="fa-solid fa-location-dot reels-red-pin-icon"></i>
-          <span>by {{ singleproject?.builderName || 'Binori Group' }}</span>
+          <span>by {{reels[activeReelIndex].proj_builderName}}</span>
         </div>
 
         <hr class="reels-prop-divider">
 
         <div class="reels-prop-specs">
-          <div class="reels-prop-type">{{ singleproject?.project_type?.join(', ') || '2, 3 BHK Flat' }}</div>
-          <div class="reels-prop-size">{{ singleproject?.project_size_in_sqft ? singleproject.project_size_in_sqft + '
-            SqFt' : '700 SqFt - 963 SqFt' }}</div>
+          <div class="reels-prop-type">{{ reels[activeReelIndex].project_about_developer.type }}</div>
+          <div class="reels-prop-size">{{ reels[activeReelIndex].project_about_developer.minSize + ' - '
+            + reels[activeReelIndex].project_about_developer.maxSize }}</div>
         </div>
 
         <!-- Buttons -->
@@ -1208,7 +1216,8 @@
           <button *ngIf="!is_token" class="reels-prop-btn-outline" (click)="openContactModalFromReels('view-contact')">
             <i class="fa-solid fa-phone-volume me-2"></i>View Contact
           </button>
-          <a *ngIf="is_token" [href]="'tel:' + singleproject?.project_contact_no" class="reels-prop-btn-outline text-decoration-none d-flex align-items-center justify-content-center">
+          <a *ngIf="is_token" [href]="'tel:' + singleproject?.project_contact_no"
+            class="reels-prop-btn-outline text-decoration-none d-flex align-items-center justify-content-center">
             <i class="fa-solid fa-phone-volume me-2"></i>{{ singleproject?.project_contact_no }}
           </a>
         </div>

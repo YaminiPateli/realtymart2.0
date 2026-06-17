@@ -42,6 +42,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   verifyData: any;
   verify: any;
   isAtEnd = false;
+  isHeaderHidden = false;
   currentSection: any;
   private _activeSection: string = 'overview';
   selectedAction!: "view-contact" | "whatsapp" | "schedule-visit" | "brochure";
@@ -204,41 +205,6 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     lng: 73.1812
   };
 
-  amenities = [
-    {
-      name: 'Parking',
-      icon: '../../assets/images/parking_icon.png'
-    },
-    {
-      name: 'Lift',
-      icon: '../../assets/images/lift.png'
-    },
-    {
-      name: 'Power Backup',
-      icon: '../../assets/images/power_backup.png'
-    },
-    {
-      name: 'Gas Pipeline',
-      icon: '../../assets/images/gas_pipeline.png'
-    },
-    {
-      name: 'Park',
-      icon: '../../assets/images/park.png'
-    },
-    {
-      name: 'Gymnasium',
-      icon: '../../assets/images/gym.png'
-    },
-    {
-      name: 'Swimming Pool',
-      icon: '../../assets/images/pool.png'
-    },
-    {
-      name: 'Club House',
-      icon: '../../assets/images/club_house.png'
-    }
-  ];
-
   developerProjects: any[] = [];
 
 
@@ -380,6 +346,8 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   googleMapUrl =
     'https://www.google.com/maps?q=22.2865,73.1812';
   timer: any;
+  isMobileView = false;
+
   constructor(
     private titleService: Title,
     private metaService: Meta,
@@ -853,6 +821,10 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   brochureRegisterVisible: boolean = false;
   isUserRegistered: boolean = false;
   showContactDetails: boolean = false;
+  activeContactPopover: 'header' | 'sticky' | 'mobile' | 'sidebar' | null = null;
+  pendingContactPopover: 'header' | 'sticky' | 'mobile' | 'sidebar' | null = null;
+  lastScrollTop: number = 0;
+  isScrollingUp: boolean = false;
 
   // Download Brochure otp
   showOTP: boolean = false;
@@ -910,6 +882,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   zoom = 15;
 
   ngOnInit(): void {
+    this.checkScreenSize();
     const token = localStorage.getItem('myrealtylogintoken');
     if (token) {
       this.is_token = true;
@@ -1201,9 +1174,10 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
               }
             } else if (this.selectedAction === 'view-contact') {
               this.showContactDetails = true;
-               setTimeout(() => {
-                  window.location.reload();
-                }, 100);
+              this.activeContactPopover = this.pendingContactPopover;
+              setTimeout(() => {
+                window.location.reload();
+              }, 100);
             } else if (this.selectedAction === 'whatsapp') {
               this.redirectToWhatsApp();
               setTimeout(() => {
@@ -1527,7 +1501,19 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   @HostListener('window:scroll', ['$event'])
   onWindowScroll(): void {
     this.showContactDetails = false;
+    this.activeContactPopover = null;
     this.detectActiveSectionOnScroll();
+
+    const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+    if (currentScroll < this.lastScrollTop) {
+      this.isScrollingUp = true;
+    } else {
+      this.isScrollingUp = false;
+    }
+    this.lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
+
+    const header = document.querySelector('header');
+    this.isHeaderHidden = header ? header.classList.contains('header-hidden') : false;
 
     const headerElement = document.getElementById('project-detail-header');
     const navbar = document.getElementById('navbar');
@@ -1536,7 +1522,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
       const stickyTop = parseFloat(window.getComputedStyle(navbar).top) || 125;
       this.showStickyHeader = rect.bottom <= stickyTop;
     } else {
-      this.showStickyHeader = window.scrollY > 450;
+      this.showStickyHeader = currentScroll > 450;
     }
   }
   detectActiveSectionOnScroll(): void {
@@ -1723,7 +1709,19 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
               proj_video_file: "../../../assets/reels/reel-1.mp4",
               proj_video_thumbnail: "../../../assets/images/reel-1-thumbnail.jpg",
               proj_builderName: "Binori Group",
-              project_localities:"Gota"
+              project_localities: "Gota",
+              project_about_developer:{
+                logo:null,
+                project_name:"Aquavista",
+                city:"Ahemdabad",
+                image:"../../../assets/images/",
+                minPrice:"7 lac",
+                maxPrice:"2 cr",
+                type:"3BHK",
+                minSize:"700 SqFt",
+                maxSize:"963 SqFt",
+                contact_no:""  
+              }
             },
               {
                 video_source: "video",
@@ -1731,7 +1729,19 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
                 proj_video_file: "../../../assets/reels/reel-2.mp4",
                 proj_video_thumbnail: "../../../assets/images/reel-2-thumbnail.jpg",
                 proj_builderName: "Aarsh Group",
-                project_localities:"Jagatpur"
+                project_localities: "Jagatpur",
+                project_about_developer: {
+                  logo: null,
+                  project_name: "Stark Torre",
+                  city: "Ahemdabad",
+                  image: "../../../assets/images/",
+                  minPrice: "23 lac",
+                  maxPrice: "5 cr",
+                  type: "2,3 BHK",
+                  minSize: "800 SqFt",
+                  maxSize: "1290 SqFt",
+                  contact_no: ""
+                }
               },
               {
                 video_source: "video",
@@ -1739,7 +1749,19 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
                 proj_video_file: "../../../assets/reels/reel-3.mp4",
                 proj_video_thumbnail: "../../../assets/images/reel-3-thumbnail.jpg",
                 proj_builderName: "Shivalik Group",
-                project_localities:"south bopal"
+                project_localities: "south bopal",
+                project_about_developer: {
+                  logo: null,
+                  project_name: "shivalik shilp",
+                  city: "Ahemdabad",
+                  image: "../../../assets/images/",
+                  minPrice: "50 lac",
+                  maxPrice: "78 lac",
+                  type: "2,3,4 BHK",
+                  minSize: "1000 SqFt",
+                  maxSize: "1500 SqFt",
+                  contact_no: ""
+                }
               }
             )
             if (this.singleproject.project_video.length > 0) {
@@ -2453,6 +2475,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     }
     if (target && !target.closest('.contact-container-relative')) {
       this.showContactDetails = false;
+      this.activeContactPopover = null;
     }
   }
 
@@ -2662,8 +2685,11 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     }
   }
 
-  openOtpModal(action: "view-contact" | "whatsapp" | "schedule-visit" | "brochure"): void {
+  openOtpModal(action: "view-contact" | "whatsapp" | "schedule-visit" | "brochure", type?: 'header' | 'sticky' | 'mobile' | 'sidebar'): void {
     this.selectedAction = action;
+    if (action === 'view-contact' && type) {
+      this.pendingContactPopover = type;
+    }
   }
 
   downloadBrochureDirectly() {
@@ -2689,7 +2715,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
 
   registerAndDownloadBrochure() {
     this.brochureNameError = !this.brochureFormData.name || this.brochureFormData.name.trim().length < 3;
-    
+
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,5}$/;
     this.brochureEmailError = !this.brochureFormData.email || !emailPattern.test(this.brochureFormData.email);
 
@@ -2756,6 +2782,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
             }, 100);
           } else if (this.selectedAction === 'view-contact') {
             this.showContactDetails = true;
+            this.activeContactPopover = this.pendingContactPopover;
           } else if (this.selectedAction === 'whatsapp') {
             this.redirectToWhatsApp();
             setTimeout(() => {
@@ -2775,9 +2802,10 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     );
   }
 
-  handleContactClick() {
-    this.showContactDetails = !this.showContactDetails;
-    if (this.showContactDetails) {
+  handleContactClick(type: 'header' | 'sticky' | 'mobile' | 'sidebar') {
+    this.activeContactPopover = this.activeContactPopover === type ? null : type;
+    this.showContactDetails = this.activeContactPopover !== null;
+    if (this.activeContactPopover) {
       this.formDataphone.contactusername = localStorage.getItem('name') || '';
       this.formDataphone.contactuseremail = localStorage.getItem('email') || '';
       this.formDataphone.contactcontact_no = localStorage.getItem('contact_no') || '';
@@ -2884,21 +2912,38 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     );
   }
 
-isPdf(url: string): boolean {
-  return !!url && url.toLowerCase().endsWith('.pdf');
-}
-
-openDeveloperProject(item: any) {
-
-  if (item.id === this.singleproject?.id) {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-    return;
+  isPdf(url: string): boolean {
+    return !!url && url.toLowerCase().endsWith('.pdf');
   }
 
-  this.router.navigate(['/project-details', item.project_url]);
-}
+  openDeveloperProject(item: any) {
+
+    if (item.id === this.singleproject?.id) {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+      return;
+    }
+
+    this.router.navigate(['/project-details', item.project_url]);
+  }
+
+  @HostListener('window:resize')
+  onResize() {
+    this.checkScreenSize();
+  }
+
+  checkScreenSize() {
+    this.isMobileView = window.innerWidth < 992; // adjust breakpoint if needed
+  }
+
+  get showSliderNav(): boolean {
+    const length = this.developerProjects?.length || 0;
+
+    return this.isMobileView
+      ? length > 2 // Mobile: show arrows if more than 2 cards
+      : length > 3; // Desktop: show arrows if more than 3 cards
+  }
 
 }

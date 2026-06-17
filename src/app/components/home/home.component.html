@@ -24,7 +24,7 @@
                 Rent
               </button>
             </li>
-             <li class="nav-item" role="presentation">
+            <li class="nav-item" role="presentation">
               <button class="nav-link" id="pills-Hostel-tab" data-bs-toggle="pill" data-bs-target="#pills-Hostel"
                 type="button" role="tab" aria-controls="pills-Hostel" aria-selected="false"
                 (click)="handleTabClick('commercial')">
@@ -101,7 +101,7 @@
                             </div>
                           </div>
                         </div>
-                      
+
                         <div class="mb-search-other w-100">
                           <div class="mb-search__property__title" (click)="OtherPropertyTypes()">
                             <label for="">Other Property Types</label>
@@ -458,7 +458,7 @@
                             </div>
                           </div>
                         </div>
-                      
+
                         <div class="mb-search-other  w-100">
                           <div class="mb-search__property__title" (click)="OtherPropertyTypes()">
                             <label for="">Other Property Types</label>
@@ -776,7 +776,7 @@
                             </div>
                           </div>
                         </div>
-                        
+
                         <div class="mb-search-other  w-100">
                           <div class="mb-search__property__title  " (click)="OtherPropertyTypes()">
                             <label for="">Other Property Types</label>
@@ -1647,40 +1647,42 @@
                       </ng-select>
                     </div>
                   </div>
-                 <div class="property_drop">
+                  <div class="property_drop">
                     <img src="../../../assets/images/property-icon.svg" class="me-2" alt="" />
 
                     <div (click)="toggleDisplayDivcom()" class="property_wrapper">
                       <p class="property_tabs" id="property_tabs_hostel">
-                         {{propertyLabel}}
+                        {{propertyLabel}}
                       </p>
                     </div>
                     <div *ngIf="visible" class="ccc property_inner">
                       <div class="serch-propert">
-                       <div class="mb-search-commercial">
+                        <div class="mb-search-commercial">
                           <div class="mb-search-commercial">
-                          <div class="mb-search__property__data">
-                            <div class="data-overflow">
-                              <div class="mb-search__property__item" *ngFor="
+                            <div class="mb-search__property__data">
+                              <div class="data-overflow">
+                                <div class="mb-search__property__item" *ngFor="
                                   let propertycommercial of propertycommercial
                                 ">
-                                <input class="mb-search__property__item__input" type="checkbox" *ngIf="propertycommercial.id != 17" [checked]="
+                                  <input class="mb-search__property__item__input" type="checkbox"
+                                    *ngIf="propertycommercial.id != 17" [checked]="
                                     selectedCommercialItems.includes(
                                       propertycommercial.id
                                     )
                                   " name="bar_propertyType_new_buy" id="{{ propertycommercial.id }}"
-                                  title="{{ propertycommercial.name }}" (change)="
+                                    title="{{ propertycommercial.name }}" (change)="
                                     handleCommercialCheckboxChange(
                                       $event,
                                       propertycommercial.id
                                     )
                                   " />
-                                <label class="mb-search__property__item__label" *ngIf="propertycommercial.id != 17" for="{{ propertycommercial.id }}"
-                                  id="{{ propertycommercial.id }}">{{ propertycommercial.name }}</label>
+                                  <label class="mb-search__property__item__label" *ngIf="propertycommercial.id != 17"
+                                    for="{{ propertycommercial.id }}" id="{{ propertycommercial.id }}">{{
+                                    propertycommercial.name }}</label>
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
                         </div>
                       </div>
                     </div>
@@ -1836,13 +1838,13 @@
               <ngx-slick-carousel class="carousel" #slickModal="slick-carousel" [config]="slideConfig4">
                 <div ngxSlickItem class="slide" *ngFor="let property of propertyServices">
                   <div class="allpropertyes">
-                    <a target="_blank" routerLink="property-services/{{ property.prpsrcurl }}"><img src={{property.image}}
-                        alt={{property.name}} class="img_slider_serviceprovider" />
+                    <a target="_blank" routerLink="property-services/{{ property.prpsrcurl }}"><img
+                        src={{property.image}} alt={{property.name}} class="img_slider_serviceprovider" />
                       <p class="title-img-property">{{property.name}}</p>
                     </a>
                   </div>
                 </div>
-              
+
               </ngx-slick-carousel>
             </div>
             <div class="property-services mt-5 mt-md-2">
@@ -1929,46 +1931,51 @@
         <div class="all-main-hots">
           <ngx-slick-carousel class="carousel" #slickModal="slick-carousel" [config]="slideConfig2">
             <ng-container *ngFor="let proj of ahmedabadProjects">
-            <div ngxSlickItem class="slide" *ngIf="proj?.project_minimum_price != null && proj?.project_maximum_price != null">
-              <div class="deal-slider-bar">
-                <div class="main-deals">
-                  <div class="deal-imgs">
-                    <img src="{{ proj?.project_images }}" class="img-fluid" alt="" />
-                    <div class="hot-details">
-                      <a target="_blank" routerLink="/project-details/{{ proj?.firstUrlPart }}/{{ proj?.secondUrlPart }}" class="detail-head">
-                        <h2 class="proj-Mhead">{{ proj?.project_name }}</h2>
+              <div ngxSlickItem class="slide"
+                *ngIf="proj?.project_minimum_price != null && proj?.project_maximum_price != null">
+                <div class="deal-slider-bar">
+                  <div class="main-deals">
+                    <div class="deal-imgs">
+                      <img src="{{ proj?.project_images }}" class="img-fluid" alt="" />
+                      <div class="hot-details">
+                        <a target="_blank"
+                          routerLink="/project-details/{{ proj?.firstUrlPart }}/{{ proj?.secondUrlPart }}"
+                          class="detail-head">
+                          <h2 class="proj-Mhead">{{ proj?.project_name }}</h2>
 
-                        <p class="detail-pera">
-                          {{ proj?.builderName }}
-                        </p>
-                        <p class="ongoing-location">
-                          <span class="locator-icon">
-                            <i class="fa-sharp fa-solid fa-location-dot" style="color: #000000"></i> </span>{{
-                          proj?.prjlocalities }}
-                        </p>
-                        <div class="area-detail">
-                          <div class="availabilty">
-                            <p class="area-title">Possession:</p>
+                          <p class="detail-pera">
+                            {{ proj?.builderName }}
+                          </p>
+                          <p class="ongoing-location">
+                            <span class="locator-icon">
+                              <i class="fa-sharp fa-solid fa-location-dot" style="color: #000000"></i> </span>{{
+                            proj?.prjlocalities }}
+                          </p>
+                          <div class="area-detail">
+                            <div class="availabilty">
+                              <p class="area-title">Possession:</p>
+                            </div>
+                            <div class="area">
+                              <p class="main-area">
+                                {{ getFormattedDate(proj?.project_possession_date) }}
+                              </p>
+                            </div>
                           </div>
-                          <div class="area">
-                            <p class="main-area">
-                              {{ getFormattedDate(proj?.project_possession_date) }}
-                            </p>
-                          </div>
-                        </div>
-                      </a>
+                        </a>
+                      </div>
+                      <div class="deal-price">
+                        <p class="main-price-one">
+                          <span class="me-3">Price:</span>₹ {{ proj?.project_minimum_price }} - ₹ {{
+                          proj?.project_maximum_price }}
+                        </p>
+                      </div>
                     </div>
-                    <div class="deal-price">
-                      <p class="main-price-one">
-                        <span class="me-3">Price:</span>₹ {{ proj?.project_minimum_price }} - ₹ {{ proj?.project_maximum_price }}
-                      </p>
-                    </div>
+
+                    <a target="_blank" routerLink="/project-details/{{ proj?.firstUrlPart }}/{{ proj?.secondUrlPart }}"
+                      class="show-deals"><i class="fa fa-thin fa-chevron-right" style="color: #ffffff"></i></a>
                   </div>
-
-                  <a target="_blank" routerLink="/project-details/{{ proj?.firstUrlPart }}/{{ proj?.secondUrlPart }}" class="show-deals"><i class="fa fa-thin fa-chevron-right" style="color: #ffffff"></i></a>
                 </div>
               </div>
-            </div>
             </ng-container>
           </ngx-slick-carousel>
         </div>
@@ -1984,7 +1991,8 @@
           <div ngxSlickItem class="slide" *ngFor="let featuredResidentals of featuredResidentals">
             <div class="proj-gallery__card">
               <div class="proj-link">
-                <a target="_blank" routerLink="/project-details/{{ featuredResidentals?.firstUrlPart }}/{{ featuredResidentals?.secondUrlPart }}">
+                <a target="_blank"
+                  routerLink="/project-details/{{ featuredResidentals?.firstUrlPart }}/{{ featuredResidentals?.secondUrlPart }}">
                   <div class="proj-gallery-image">
                     <img src="{{ featuredResidentals?.project_banner_image }}" alt="" />
                   </div>
@@ -2043,9 +2051,9 @@
   <section class="highlight-group" *ngIf="bannerbuilder">
     <div class="container">
       <div class="row">
-       
+
         <div class="col-lg-12 col-md-12 col-sm-12 ps-0 ps-lg-0 ps-md-3">
-          <a target="_blank" *ngIf = "bannerbuilder[0]"
+          <a target="_blank" *ngIf="bannerbuilder[0]"
             routerLink="project-details/{{ bannerbuilder[0].projectfirstUrlPart }}/{{ bannerbuilder[0].projectsecondUrlPart }}">
             <img src="{{ bannerbuilder[0].project_banner_img }}" alt="" class="img-fluid group-main-img" />
           </a>
@@ -2505,8 +2513,9 @@
           <div class="check-compare mt-3">
             <input type="checkbox" [(ngModel)]="formData.termsAccepted" (change)="onTermsChange($event)"
               name="termsAccepted" id="compare" [disabled]="is_token" value="compare add" class="mycheck" />
-            <label for="compare" class="compares" style="display: inline-flex; gap:5px;">I Agree to RealtyMart <a routerLink="/terms-conditions" target="_blank">Terms of Use</a>
-            
+            <label for="compare" class="compares" style="display: inline-flex; gap:5px;">I Agree to RealtyMart <a
+                routerLink="/terms-conditions" target="_blank">Terms of Use</a>
+
             </label>
             <br />
           </div>
@@ -2608,7 +2617,8 @@
           <div class="check-compare mt-3">
             <input type="checkbox" [(ngModel)]="formData.termsAccepted" (change)="onTermsChange($event)"
               name="termsAccepted" id="compare" [disabled]="is_token" value="compare add" class="mycheck" />
-            <label for="compare" class="compares" style="display: inline-flex; gap:5px;">I Agree to RealtyMart <a routerLink="/terms-conditions" target="_blank">Terms of Use</a>
+            <label for="compare" class="compares" style="display: inline-flex; gap:5px;">I Agree to RealtyMart <a
+                routerLink="/terms-conditions" target="_blank">Terms of Use</a>
 
             </label>
             <br />
@@ -2626,12 +2636,14 @@
 </div>
 
 
-<div #otpModel class="modal fade" tabindex="-1" role="dialog" aria-bs-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+<div #otpModel class="modal fade" tabindex="-1" role="dialog" aria-bs-hidden="true" data-bs-backdrop="static"
+  data-bs-keyboard="false">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Verify Your Mobile Number</h5>
-        <button type="button" class="btn-close position-absolute top-0 end-0 mt-3 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close position-absolute top-0 end-0 mt-3 me-3" data-bs-dismiss="modal"
+          aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <div>

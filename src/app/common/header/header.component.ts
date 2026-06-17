@@ -341,10 +341,39 @@ export class HeaderComponent implements AfterViewInit{
       }
     }
 
+let lastScrollTopGlobal = 0;
+let lastHeaderClickTime = 0;
+
+document.addEventListener('click', (event) => {
+  const target = event.target as HTMLElement;
+  if (target && target.closest('header')) {
+    lastHeaderClickTime = Date.now();
+  }
+});
+
 function handleScroll() {
   const header = document.querySelector('header');
   if (header) {
-    header.classList.toggle('scrolled', window.scrollY > 150);
+    const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+    header.classList.toggle('scrolled', currentScroll > 150);
+    
+    // Ignore scroll events for 1 second after clicking inside the header (e.g. menu items)
+    if (Date.now() - lastHeaderClickTime < 1000) {
+      lastScrollTopGlobal = currentScroll <= 0 ? 0 : currentScroll;
+      return;
+    }
+
+    if (currentScroll > 100) {
+      if (currentScroll > lastScrollTopGlobal) {
+        header.classList.add('header-hidden');
+      } else {
+        header.classList.remove('header-hidden');
+      }
+    } else {
+      header.classList.remove('header-hidden');
+    }
+    
+    lastScrollTopGlobal = currentScroll <= 0 ? 0 : currentScroll;
   }
 }
 

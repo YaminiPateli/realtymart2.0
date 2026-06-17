@@ -91,7 +91,7 @@
     left: auto;
     top: auto;
     bottom: 10px;
-    flex-direction: column;
+    flex-direction: row;
     align-items: flex-end;
     gap: 6px;
   }
@@ -271,6 +271,10 @@
   background-color: #fff;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
   transition: all 0.3s ease;
+}
+
+.sticky-nav-wrapper.scrolling-down {
+  top: 0 !important;
 }
 
 .project-sticky-header {
@@ -990,7 +994,7 @@ google-map {
 @media (max-width: 576px) {
 
   .amenity-icon {
-    width: auto;
+    width: 150px;
     height: 121px;
   }
 
@@ -1205,6 +1209,11 @@ google-map {
   align-self: start;
   max-height: calc(100vh - 300px);
   overflow-y: auto;
+  transition: top 0.3s ease;
+}
+
+.right-sidebar.header-hidden {
+  top: 180px;
 }
 
 .builder-card {
@@ -2624,7 +2633,7 @@ google-map {
 
 .reels-prop-divider {
   border: 0;
-  border-top: 1px solid #eeeeee;
+  border-top: 1px solid #828282;
   margin: 12px 0;
 }
 
@@ -3645,6 +3654,8 @@ google-map {
   z-index: 98;
   padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
   transition: bottom 0.3s ease-in-out;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  background: white;
 }
 
 .mobile-sticky-footer.show {
@@ -4469,4 +4480,50 @@ google-map {
   font-size: 16px;
   margin-left: 10px;
   cursor: pointer;
+}
+
+.reels-mobile-scroll-container {
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 15px;
+  margin-top: 15px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.reels-mobile-scroll-track {
+  display: flex;
+  gap: 16px;
+  padding: 0 4px;
+}
+
+.reel-card-mobile {
+  flex: 0 0 calc((100% - 16px) / 1.5);
+  position: relative;
+  aspect-ratio: 9 / 16;
+  background: #000;
+  border-radius: 20px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.reel-card-mobile:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+}
+
+.reel-card-mobile .reel-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.reel-card-mobile:hover .reel-thumbnail {
+  transform: scale(1.05);
+}
+
+.reel-card-mobile:hover .play-btn {
+  background: #ffffff;
+  transform: translate(-50%, -50%) scale(1.08);
 }

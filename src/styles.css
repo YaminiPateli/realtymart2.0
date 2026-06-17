@@ -433,6 +433,11 @@ select[id="ownerISD"]:focus-visible {
   width: 100%;
   z-index: 99;
   background-color: white;
+  transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+}
+
+.header_wrapper.header-hidden {
+  transform: translateY(-100%);
 }
 
 .header_wrapper.scrolled {
@@ -7875,4 +7880,26 @@ body.gallery-open .modal-backdrop {
 
 .modal-dialog-centered {
   justify-content: center !important;
+}
+
+/* Custom Scrollbar for Mobile Reels in Project Approve Detail */
+.reels-mobile-scroll-container {
+  scrollbar-width: thin !important;
+  scrollbar-color: #ef3f23 #eaeaea !important;
+}
+
+.reels-mobile-scroll-container::-webkit-scrollbar {
+  -webkit-appearance: none !important;
+  display: block !important;
+  height: 6px !important;
+}
+
+.reels-mobile-scroll-container::-webkit-scrollbar-track {
+  background: #eaeaea !important;
+  border-radius: 3px !important;
+}
+
+.reels-mobile-scroll-container::-webkit-scrollbar-thumb {
+  background: #ef3f23 !important;
+  border-radius: 3px !important;
 }
