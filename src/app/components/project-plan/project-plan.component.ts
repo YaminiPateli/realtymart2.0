@@ -1,15 +1,18 @@
-import { Component, HostListener } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 
 @Component({
   selector: 'app-project-plan',
   templateUrl: './project-plan.component.html',
   styleUrls: ['./project-plan.component.css']
 })
-export class ProjectPlanComponent {
-isMobile = window.innerWidth <= 767;
-isTablet = window.innerWidth >= 768 && window.innerWidth < 992;
+export class ProjectPlanComponent implements OnInit, AfterViewInit {
+  @ViewChild('tableContainer')
+  tableContainer!: ElementRef;
 
- plans = [
+  isMobile = window.innerWidth <= 767;
+  isTablet = window.innerWidth >= 768 && window.innerWidth < 992;
+
+  plans = [
     {
       id: 1,
       name: 'Affordable',
@@ -115,17 +118,50 @@ isTablet = window.innerWidth >= 768 && window.innerWidth < 992;
   ];
 
 
-   constructor() {}
+  constructor() { }
 
   ngOnInit(): void {
     this.selectedPlan =
       this.plans.find(plan => plan.recommended) || this.plans[0];
+    this.scrollToSelectedPlan();
   }
 
-  selectPlan(plan: any): void {
+  ngAfterViewInit() {
+    if (window.innerWidth < 768) {
+      setTimeout(() => {
+        this.scrollToSelectedPlan();
+      }, 300);
+    }
+  }
+
+  scrollToSelectedPlan() {
+    const planIndex = this.plans.findIndex(
+      p => p.id === this.selectedPlan.id
+    );
+
+    const firstColumnWidth = 20;
+;
+    const planColumnWidth = 183;
+
+    this.tableContainer.nativeElement.scrollTo({
+      left: firstColumnWidth + (planIndex * planColumnWidth),
+      behavior: 'smooth'
+    });
+  }
+
+  selectPlan(plan: any) {
     this.selectedPlan = plan;
-  }
+    this.scrollToSelectedPlan();
+    if(this.isMobile || this.isTablet ){
+      setTimeout(() => {
+        this.tableContainer.nativeElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }, 100);
 
+    }
+  }
   isSelected(plan: any): boolean {
     return this.selectedPlan?.id === plan.id;
   }
@@ -137,23 +173,11 @@ isTablet = window.innerWidth >= 768 && window.innerWidth < 992;
   }
 
   getPriceSectionMargin(plan: any): string {
-
-  if (!this.isSelected(plan)) {
-    return 'auto';
+    if (!this.isSelected(plan)) {
+      return 'auto';
+    }
+    return '59px';
   }
-
-  if (this.isMobile) {
-    return '44px';
-  }
-
-  const lastPlan = this.plans[this.plans.length - 1];
-
-  if (this.isTablet && plan.id === lastPlan.id) {
-    return '44px';
-  }
-
-  return 'auto';
-}
 
 
 }

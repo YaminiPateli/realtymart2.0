@@ -8,35 +8,35 @@
         </div>
     </section>
     <section class="container">
-        <div class="py-5">
+        <div class="whole-section">
 
             <!-- Heading -->
-            <div class="text-center mb-5">
+            <div class="text-center header-section">
                 <h2 class="pricing-heading">Choose a plan that's right for you</h2>
                 <p class="pricing-text">
                     Our premium plans are designed for getting your property in front of the right buyers.
                 </p>
             </div>
-            <div class="d-flex plan-cards flex-wrap justify-content-center">
-                <div (click)="selectPlan(plan)" [class.active-plan]="isSelected(plan)" class="card mb-3 plan-card mx-2"
-                style="width: 18rem;" *ngFor="let plan of plans; let i = index">
-                <div [class.recommended-badge]="isSelected(plan)" *ngIf="isSelected(plan)">
+            <div class="d-flex plan-cards flex-wrap">
+                <div (click)="selectPlan(plan)" [class.active-plan]="isSelected(plan)" class="mb-3 plan-card"
+                    style="width: 19rem;" *ngFor="let plan of plans; let i = index">
+                    <div class="header-card" [class.recommended-badge]="isSelected(plan)" *ngIf="isSelected(plan)">
                         {{ plan.name }}
                     </div>
-                    <div class="card-body d-flex flex-column justify-content-start">
-                        <h3 *ngIf="!isSelected(plan)">{{plan.name}}</h3>
+                    <div class="d-flex flex-column justify-content-start">
+                        <h3 class="header-card" *ngIf="!isSelected(plan)">{{plan.name}}</h3>
                         <hr *ngIf="!isSelected(plan)" class="mt-1">
                         <div [style.margin-top]="getPriceSectionMargin(plan)">
                             <div>
                                 <span class="price">₹{{plan.price}} </span><span class="unit">Lac</span><span
                                     class="per-year"> /per year</span>
                             </div>
-                            <div class="text-danger">
+                            <div class="text-danger property-upto">
                                 Property Upto {{plan.range}}
                             </div>
                         </div>
                         <div class="leads my-4 d-flex justify-content-center align-items-center">
-                            <span>{{plan.leads}}&nbsp;</span><span>Leads / Month</span>
+                            <span class="text-danger fw-bold">{{plan.leads}}&nbsp;</span><span>Leads / Month</span>
                         </div>
                         <button class="btn btn-dark">Get Started</button>
                     </div>
@@ -45,19 +45,20 @@
 
             <!-- Feature Matrix -->
             <!-- Feature Matrix -->
-            <div class="table-responsive mt-5">
-                <table class="table feature-table">
+            <div class="table-responsive table-border " #tableContainer>
+                <table class="table feature-table pricing-table">
                     <thead>
-                        <tr>
-                            <th>Feature Matrix</th>
+                        <tr class="table-header">
+                            <th style="background: #FAFAFA;">Feature Matrix</th>
 
-                            <th *ngFor="let plan of plans" [class.active-column]="isSelected(plan)">
+                            <th *ngFor="let plan of plans" [id]="'plan-column-' + plan.id"
+                                [class.active-column]="isSelected(plan)">
                                 {{ plan.name }}
                             </th>
                         </tr>
                     </thead>
 
-                    <tbody>
+                    <tbody class="table-body">
 
                         <tr>
                             <td>Property Value</td>
@@ -79,7 +80,7 @@
                             <td>CRM / Dashboard</td>
 
                             <td *ngFor="let plan of plans" [class.active-column]="isSelected(plan)">
-                                <span *ngIf="plan.features.crmDashboard">✔</span>
+                                <span class="text-danger" *ngIf="plan.features.crmDashboard">✔</span>
                                 <span *ngIf="!plan.features.crmDashboard">✖</span>
                             </td>
                         </tr>
@@ -96,12 +97,15 @@
                             <td>Dedicated Blogs</td>
 
                             <td *ngFor="let plan of plans" [class.active-column]="isSelected(plan)">
-                                {{ plan.features.dedicatedBlogs ? '✔' : '✖' }}
+                                <span class="fw-lighter" *ngIf="!plan.features.dedicatedBlogs">✖</span>
+                                <span *ngIf="plan.features.dedicatedBlogs" class="text-danger">✔</span>
                             </td>
                         </tr>
 
                         <tr>
-                            <td>Detailed Project Video<br>
+                            <td>
+                                Detailed Project Video
+                                <br>
                                 <small>(Shot / Podcast style)</small>
                             </td>
 
@@ -131,37 +135,42 @@
             </div>
 
             <!-- Notes -->
-            <div class="notes mt-4">
-                <h5>Important Package Notes</h5>
+            <div class="notes">
+                <h5 class="notes-header">Important Package Notes</h5>
 
                 <ul>
-                    <li>Package validity is 12 months.</li>
-                    <li>Leads are generated based on property category.</li>
-                    <li>GST extra as applicable.</li>
-                    <li>Unused leads cannot be carried forward.</li>
+                    <li>Region: These packages and prices are applicable exclusively for the Gujarat region.</li>
+                    <li>Validity: Packages are valid for a strict 12-month duration.</li>
+                    <li>Cap Limit: Agreements end after 12 months or when the total leads are exhausted, whichever
+                        occurs earlier.</li>
                 </ul>
             </div>
 
             <!-- FAQ -->
-            <div class="faq-section mt-5">
+            <div class="faq-section">
 
-                <h2 class="text-center mb-4">FAQ</h2>
+                <h2 class="text-center faq-heading">FAQ</h2>
 
                 <div class="accordion" id="faqAccordion">
 
                     <div class="accordion-item" *ngFor="let faq of faqs; let i = index">
 
                         <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                [attr.data-bs-target]="'#faq'+i">
-                                {{faq.question}}
+                            <button class="accordion-button fw-bold" [class.collapsed]="i !== 0" type="button"
+                                data-bs-toggle="collapse" [attr.data-bs-target]="'#faq' + i">
+
+                                {{ faq.question }}
+
                             </button>
                         </h2>
 
-                        <div [id]="'faq'+i" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div [id]="'faq' + i" class="accordion-collapse collapse" [class.show]="i === 0"
+                            data-bs-parent="#faqAccordion">
+
                             <div class="accordion-body">
-                                {{faq.answer}}
+                                {{ faq.answer }}
                             </div>
+
                         </div>
 
                     </div>
