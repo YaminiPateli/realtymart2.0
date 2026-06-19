@@ -139,7 +139,7 @@ export class ProjectPlanComponent implements OnInit, AfterViewInit {
       p => p.id === this.selectedPlan.id
     );
 
-    const firstColumnWidth = 20;
+    const firstColumnWidth = 27;
 ;
     const planColumnWidth = 183;
 

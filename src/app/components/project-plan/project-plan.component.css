@@ -128,6 +128,10 @@
   border-bottom: 1px solid #DDDDDD !important;
 }
 
+.feature-table td{
+  color:#040707;
+}
+
 
 
 @media(min-width:1440px){
@@ -147,6 +151,7 @@
   
 .table-header > th{
   background: #FAFAFA;
+  color: #333333;
 }
 
 .faq-section{
@@ -180,14 +185,31 @@
 
 .notes-header{
   font-size: 34px;
+  margin-bottom: 24px;
 }
+
+.notes-text li{
+  color :#666666;
+  line-height: 28px;
+  font-size: 18px;
+}
+
 @media(max-width:2560px){
     .plan-cards{
       justify-content: space-between;
     }
+
+    .plan-card{
+      width: 17rem;
+    }
 }
   
 @media(max-width:1920px){
+
+  .plan-card{
+      width: 19rem;
+    }
+
   .sub-title{
     font-size: 24px;
     line-height: 30px;
@@ -226,14 +248,124 @@
     margin-top: 58px;
   }
 }
+@media(max-width:1440px){
+.banner_title{
+  font-size: 41px;
+}
+.sub-title{
+  font-size: 21px;
+}
+.pricing-heading{
+  font-size: 40px;
+}
+.pricing-text{
+  font-size: 16px;
+}
+}
+@media(max-width:1368px){
+  .plan-card{
+    width:17rem !important;
+  }
+}
+@media(max-width:1198px){
+  .plan-cards{
+    justify-content: center;
+    gap: 19px;
+  }
+}
+@media(max-width:992px){
+  .plan-card{
+    width:21rem !important;
+  }
+
+  .pricing-heading{
+    font-size: 50px;
+  }
+
+  .feature-table th:first-child,
+.feature-table td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  text-align: left;
+}
+}
 @media(max-width:768px){
   .plan-cards{
     justify-content: center;
   }
+
+  .plan-card{
+    margin: 6px;
+  }
+
+  .faq-section{
+    margin-top: 50px;
+  }
+  .feature-table th,td{
+    padding: 20px 18px !important;
+  }
+
+  .notes-header{
+    font-size: 26px;
+  }
+
+  .whole-section{
+    margin-top: 40px;
+  }
+
+  .header-section{
+    margin-bottom: 0px;
+  }
+
+  .property-upto{
+    font-size: 16px;
+  }
+
+  .price{
+    font-size: 30px;
+  }
+
+  .per-year{
+    font-size: 15px;
+  }
+
+  .feature-table td,
+.feature-table th {
+  text-align: center;
+  vertical-align: middle;
+  font-size: 13px;
+}
+
+ .faq-heading{
+    margin-bottom: 20px;
+  }
+
+  .unit{
+    font-size: 24px;
+  }
+
+  .per-year{
+    font-size: 16px;
+  }
+}
+@media(max-width:576px){
+  .pricing-heading{
+    font-size: 38px;
+  }
+
+  .plan-card{
+    width: 23rem !important;
+  }
+}
+@media(max-width:481px){
+  .pricing-heading{
+    font-size: 33px;
+  }
 }
 @media (max-width:425px) {
   .pricing-heading {
-    font-size: 28px;
+    font-size: 25px;
   }
   .sub-title{
     font-size: 16px;
@@ -242,10 +374,6 @@
 @media(max-width:375px) {
   .pricing-heading {
     font-size: 21px;
-  }
-
-  .price{
-    font-size: 31px;
   }
   
   .header-card{
@@ -260,5 +388,8 @@
     }
     .plan-cards{
       justify-content: center;
+    }
+    .banner_title{
+      font-size: 29px;
     }
 }
