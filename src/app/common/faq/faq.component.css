@@ -1,0 +1,18 @@
+.faq-heading{
+    font-size: 34px;
+    margin-bottom: 40px;
+  }
+
+  .faq-section{
+  margin: 100px auto 80px auto;
+}
+
+@media(max-width:768px){
+    .faq-section{
+    margin-top: 50px;
+  }
+
+  .faq-heading{
+    margin-bottom: 20px;
+  }
+}

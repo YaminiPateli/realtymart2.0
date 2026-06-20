@@ -258,48 +258,48 @@
 
         <div class="row g-2 mt-1">
 
-          <div class="col-6">
+          <div class="col-6" *ngIf="singleproject?.project_minimum_price && singleproject?.project_maximum_price">
             <p class="label">Price</p>
             <h6 class="value">₹ {{ singleproject?.project_minimum_price }} - ₹ {{ singleproject?.project_maximum_price
               }}</h6>
           </div>
 
-          <div class="col-6">
+          <div class="col-6" *ngIf="singleproject?.project_type">
             <p class="label">Type</p>
             <h6 class="value">{{ singleproject?.project_type.join(', ') }}</h6>
           </div>
 
-          <div class="col-6">
+          <div class="col-6" *ngIf="singleproject?.land_size">
             <p class="label">Area</p>
             <h6 class="value">{{singleproject.land_size}}</h6>
           </div>
 
-          <div class="col-6">
+          <div class="col-6" *ngIf="singleproject?.project_size_in_sqft">
             <p class="label">Size</p>
             <h6 class="value">{{ singleproject?.project_size_in_sqft }} SqFt</h6>
           </div>
 
-          <div class="col-6">
+          <div class="col-6" *ngIf="singleproject?.project_status">
             <p class="label">Status</p>
             <h6 class="value">{{ singleproject?.project_status }}</h6>
           </div>
 
-          <div class="col-6">
+          <div class="col-6" *ngIf="singleproject?.project_total_tower">
             <p class="label">Towers</p>
             <h6 class="value">{{ singleproject?.project_total_tower }}</h6>
           </div>
 
-          <div class="col-6">
+          <div class="col-6" *ngIf="singleproject?.project_total_floor">
             <p class="label">No. of Floors</p>
             <h6 class="value">{{ singleproject?.project_total_floor }}</h6>
           </div>
 
-          <div class="col-6">
+          <div class="col-6" *ngIf="singleproject?.project_total_units">
             <p class="label">Total Units</p>
             <h6 class="value">{{ singleproject?.project_total_units }}</h6>
           </div>
 
-          <div class="col-6">
+          <div class="col-6" *ngIf="singleproject?.project_launch_date">
             <p class="label">Launch Date</p>
             <h6 class="value">{{ singleproject?.project_launch_date | date:'MMM, yyyy' }}</h6>
           </div>
@@ -350,7 +350,7 @@
 
       </section>
       <section id="reels" *ngIf="reels && reels.length > 0" class="reels-section">
-        <h3 class="section-title">Watch Our Reels</h3>
+        <h3 class="section-title section-title-for-reel">Watch Our Reels</h3>
 
         <!-- Desktop Carousel (768px and up) -->
         <div class="floor-plan-card ps-0 d-none d-md-block">
@@ -426,7 +426,10 @@
       <section id="address" class="address-card mb-5">
 
         <div class="address-header">
-          <h2 class="section-title">Address</h2>
+          <div class="d-flex flex-column">
+            <h2 class="section-title">Address</h2>
+            <p class="address-title"><img class="location-icon-image" src="../../../assets/images/location-icon.svg" alt="location"> {{this.singleproject.project_address}}</p>
+          </div>
 
           <a [href]="googleMapUrl" target="_blank" class="map-btn">
             <img src="../../../assets/images/map-icon.svg" alt="" srcset="">
@@ -446,16 +449,16 @@
 
         <h2 class="section-title">Amenities</h2>
 
-        <div class="row g-3 g-md-4">
+        <div class="all-amenities">
 
-          <div class="col-6 col-md-4 col-lg-3 col-xl-2" *ngFor="let amenity of this.singleproject.amenitiess">
+          <div class="each-amenitiy-card" *ngFor="let amenity of this.singleproject.amenitiess">
 
-            <div class="amenity-card d-flex flex-column align-items-center text-center">
+            <div class="amenity-card position-relative d-flex flex-column align-items-center text-center">
 
               <div class="amenity-icon mb-2">
                 <img [src]="amenity.image" [alt]="amenity.name" class="img-fluid">
               </div>
-              <h6 class="amenity-name">
+              <h6 class="amenity-name position-absolute bottom-0 top-100">
                 {{ amenity.name }}
               </h6>
 
@@ -675,25 +678,9 @@
 
   <!-- FAQ Section (Full width of container) -->
   <div class="container mb-5">
-    <section class="faq-section py-5">
-      <h2 class="faq-title text-center mb-4">
-        FAQ
-      </h2>
-      <div class="accordion custom-faq" id="faqAccordion">
-        <div class="accordion-item" *ngFor="let faq of faqs; let i = index">
-          <h2 class="accordion-header">
-            <button class="accordion-button" [class.collapsed]="i !== 0" type="button" data-bs-toggle="collapse"
-              [attr.data-bs-target]="'#faq'+i">
-              {{ faq.question }}
-            </button>
-          </h2>
-          <div [id]="'faq'+i" class="accordion-collapse collapse" [class.show]="i === 0" data-bs-parent="#faqAccordion">
-            <div class="accordion-body" [innerHTML]="faq.answer">
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+      <div class="container">
+    <app-faq [faqs]="faqs" [isInnerHtmlAnswer]="true"></app-faq>
+  </div>
   </div>
 
 </section>

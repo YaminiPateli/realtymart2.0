@@ -81,6 +81,7 @@ import { PropertyincityrentComponent } from './components/propertyincityrent/pro
 import { CookieConsentComponent } from './components/cookie-consent/cookie-consent.component';
 import { LocationPermissionComponent } from './components/location-permission/location-permission.component';
 import { ProjectPlanComponent } from './components/project-plan/project-plan.component';
+import { FaqComponent } from './common/faq/faq.component';
 
 // Page Routing
 const routes: Routes = [
@@ -209,6 +210,7 @@ register();
     CookieConsentComponent,
     LocationPermissionComponent,
     ProjectPlanComponent,
+    FaqComponent,
   ],
   imports: [
     LoginComponent,

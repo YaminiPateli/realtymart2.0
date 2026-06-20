@@ -140,22 +140,11 @@
   }
 }
 
-
-
-
- .faq-heading{
-    font-size: 34px;
-    margin-bottom: 40px;
-  }
   
   
 .table-header > th{
   background: #FAFAFA;
   color: #333333;
-}
-
-.faq-section{
-  margin: 100px auto 80px auto;
 }
 
 .table-border{
@@ -299,9 +288,6 @@
     margin: 6px;
   }
 
-  .faq-section{
-    margin-top: 50px;
-  }
   .feature-table th,td{
     padding: 20px 18px !important;
   }
@@ -337,10 +323,6 @@
   font-size: 13px;
 }
 
- .faq-heading{
-    margin-bottom: 20px;
-  }
-
   .unit{
     font-size: 24px;
   }
@@ -358,6 +340,7 @@
     width: 23rem !important;
   }
 }
+@media(ma){}
 @media(max-width:481px){
   .pricing-heading{
     font-size: 33px;

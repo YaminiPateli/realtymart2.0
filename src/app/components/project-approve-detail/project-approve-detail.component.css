@@ -22,6 +22,17 @@
   z-index: 2;
 }
 
+.all-amenities{
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.each-amenitiy-card{
+  margin-right: 20px;
+  margin-bottom: 40px;
+}
+
+
 .logo-card img {
   max-height: 33px;
   width: auto;
@@ -207,7 +218,8 @@
   text-align: center;
   padding: 18px;
   height: 100%;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 0px 3px 6px 0px rgba(0, 0, 0, 0.16);
+
 }
 
 .label {
@@ -261,6 +273,19 @@
   .info-card {
     padding: 15px;
   }
+
+  .each-amenitiy-card{
+    margin-bottom: 60px;
+  }
+}
+
+.section-title-for-reel{
+  margin-bottom: 0px !important;
+}
+
+.address-title{
+  padding: 10px;
+  background-color: rgb(255 255 255);
 }
 
 
@@ -1109,7 +1134,7 @@ google-map {
 }
 
 .specification-title {
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 700;
   color: #222;
   margin-bottom: 25px;
@@ -1810,6 +1835,7 @@ google-map {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   z-index: 0;
+  overflow-y: hidden;
 }
 
 /* â”€â”€ Back button â”€â”€ */
@@ -1818,7 +1844,7 @@ google-map {
   top: 24px;
   left: 28px;
   z-index: 10;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgb(139 139 139 / 73%);
   border: 1px solid rgba(255, 255, 255, 0.22);
   color: #fff;
   padding: 8px 18px;
@@ -1954,6 +1980,8 @@ google-map {
       rgba(0, 0, 0, 0.22) 55%,
       transparent 100%);
   z-index: 5;
+  backdrop-filter: blur(2px);
+  height: 25vh;
 }
 
 .reels-developer-info {
@@ -2304,6 +2332,7 @@ google-map {
 @media (max-width: 576px) {
   .reels-immersive-overlay {
     align-items: flex-start;
+    overflow-y: hidden;
   }
 
   .reels-container-wrapper {

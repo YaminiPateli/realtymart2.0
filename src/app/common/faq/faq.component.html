@@ -1,0 +1,40 @@
+<!-- FAQ -->
+<div class="faq-section">
+
+    <h2 class="text-center faq-heading">FAQ</h2>
+
+    <div class="accordion" id="faqAccordion">
+
+        <div class="accordion-item" *ngFor="let faq of faqs; let i = index">
+
+            <h2 class="accordion-header">
+                <button class="accordion-button fw-bold" [class.collapsed]="i !== 0" type="button"
+                    data-bs-toggle="collapse" [attr.data-bs-target]="'#faq' + i">
+
+                    {{ faq.question }}
+
+                </button>
+            </h2>
+
+            <div *ngIf="!isInnerHtmlAnswer" [id]="'faq' + i" class="accordion-collapse collapse" [class.show]="i === 0"
+                data-bs-parent="#faqAccordion">
+
+                <div class="accordion-body">
+                    {{ faq.answer }}
+                </div>
+
+            </div>
+
+            <div *ngIf="isInnerHtmlAnswer" [id]="'faq' + i" class="accordion-collapse collapse" [class.show]="i === 0"
+                data-bs-parent="#faqAccordion">
+
+                <div class="accordion-body" [innerHTML]="faq.answer">
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
