@@ -353,27 +353,35 @@ document.addEventListener('click', (event) => {
 
 function handleScroll() {
   const header = document.querySelector('header');
+
   if (header) {
-    const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+    const currentScroll =
+      window.pageYOffset || document.documentElement.scrollTop;
+
     header.classList.toggle('scrolled', currentScroll > 150);
-    
-    // Ignore scroll events for 1 second after clicking inside the header (e.g. menu items)
+
     if (Date.now() - lastHeaderClickTime < 1000) {
-      lastScrollTopGlobal = currentScroll <= 0 ? 0 : currentScroll;
+      lastScrollTopGlobal = currentScroll;
       return;
     }
 
+    const scrollDifference = currentScroll - lastScrollTopGlobal;
+    const threshold = 10; // Ignore tiny scroll movements
+
     if (currentScroll > 100) {
-      if (currentScroll > lastScrollTopGlobal) {
+      if (scrollDifference > threshold) {
+        // scrolling down
         header.classList.add('header-hidden');
-      } else {
+        lastScrollTopGlobal = currentScroll;
+      } else if (scrollDifference < -threshold) {
+        // scrolling up
         header.classList.remove('header-hidden');
+        lastScrollTopGlobal = currentScroll;
       }
     } else {
       header.classList.remove('header-hidden');
+      lastScrollTopGlobal = currentScroll;
     }
-    
-    lastScrollTopGlobal = currentScroll <= 0 ? 0 : currentScroll;
   }
 }
 

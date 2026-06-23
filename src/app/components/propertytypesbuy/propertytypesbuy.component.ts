@@ -78,6 +78,7 @@ export class PropertytypesbuyComponent {
   paginatedData: any[] = []; // Data for the current page
   currentPage: number = 1; // Current page number
   pageSize: number = 5; // Items per page
+  totalPages = 0;
   totalItems: number = 0; // Total number of items
   itemsPerPage = 5;
   visiblePageStart: number = 1;
@@ -209,48 +210,53 @@ export class PropertytypesbuyComponent {
     this.singleProp = property;
   }
 
+  onPageChange(page: number) {
+
+  this.currentPage = page;
+
+  this.fetchPropertyTypeBuysIn();
+
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+}
+
   fetchPropertyTypeBuysIn() {
     const type = this.route.snapshot.paramMap.get('type');
     const city = this.route.snapshot.paramMap.get('city');
-    if (this.isLoading || this.currentPage > this.lastPage) return;
-
-      this.isLoading = true;
-      this.loading = true;
-
-      const lastElement = document.querySelectorAll('.maching-myproperties');
-      const lastItem = lastElement[lastElement.length - 1];
-      const lastItemOffset = lastItem ? lastItem.getBoundingClientRect().top : 0;
 
     if (type && city) {
       this.http.get<any>(`${environment.apiUrl}propertytypesbuyin/${type}/${city}?page=${this.currentPage}`).subscribe(
         (response) => {
-          const oldScrollY = window.scrollY;
 
-          this.propertytype = this.propertytype || [];
-          this.propertytype = [...this.propertytype, ...(response.responseData?.propertytypesbuyin?.data || []),];
+          this.propertytype =
+          response.responseData?.propertytypesbuyin?.data  || [];
           this.original = [...this.propertytype, ...(response.responseData?.propertytypesbuyin?.data || []),];
-        this.setMetaTags(
+          
+          
+          console.log(this.propertytype, "proprty type")
+          this.totalItems =
+            response.propertytypesbuyincount;
+
+            this.itemsPerPage = response.responseData?.propertytypesbuyin.per_page;
+
+          // this.totalPages = Math.ceil(
+          //   this.propertytype /
+          //   this.itemsPerPage
+          // );
+       
+          this.setMetaTags(
           response.meta.title,
           response.meta.description,
             );
 
           this.lastPage = response.responseData?.propertytypesbuyin?.last_page;
 
-          this.currentPage++;
-          this.isLoading = false;
-          this.loading = false;
-
-          setTimeout(() => {
-            if (lastItem) {
-              const newOffset = lastItem.getBoundingClientRect().top;
-              window.scrollTo(0, oldScrollY + (newOffset - lastItemOffset));
-            }
-          }, 100);
+          
         },
         (error) => {
           console.error('Error fetching properties:', error);
-          this.isLoading = false;
-          this.loading = false;
         }
       );
     }

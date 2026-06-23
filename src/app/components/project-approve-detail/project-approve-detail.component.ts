@@ -937,7 +937,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     }
   }
 
-  getIPCountryCode(){
+  getIPCountryCode() {
     this.countrycodeService.getIPCountryCode().subscribe((res: any) => {
       this.countryCode = res.country_calling_code
     });
@@ -1491,6 +1491,11 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     const section = document.getElementById(sectionId);
     const navbar = document.getElementById('navbar');
 
+    let offset = navbar?.offsetHeight || 0;
+
+    if (sectionId === 'overview') {
+      offset += 120; // sticky header height
+    }
     if (section) {
       const navbarHeight = navbar ? navbar.offsetHeight : 0;
       const stickyTop = navbar ? parseFloat(window.getComputedStyle(navbar).top) || 0 : 125;
@@ -1499,7 +1504,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
       const scrollToPosition = sectionPosition - stickyTop - navbarHeight - 20;
 
       window.scrollTo({
-        top: scrollToPosition,
+        top: section.offsetTop - offset,
         behavior: 'smooth',
       });
       this.activeSection = sectionId;
@@ -1524,14 +1529,16 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     const header = document.querySelector('header');
     this.isHeaderHidden = header ? header.classList.contains('header-hidden') : false;
 
-    const headerElement = document.getElementById('project-detail-header');
     const navbar = document.getElementById('navbar');
-    if (headerElement && navbar) {
-      const rect = headerElement.getBoundingClientRect();
-      const stickyTop = parseFloat(window.getComputedStyle(navbar).top) || 125;
-      this.showStickyHeader = rect.bottom <= stickyTop;
-    } else {
-      this.showStickyHeader = currentScroll > 450;
+
+    if (navbar) {
+      const rect = navbar.getBoundingClientRect();
+
+      // Main website header height
+      const headerHeight = this.isHeaderHidden ? 0 : 125;
+
+      // Show sticky header when nav reaches header
+      this.showStickyHeader = rect.top <= headerHeight;
     }
   }
   detectActiveSectionOnScroll(): void {
@@ -1719,17 +1726,17 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
               proj_video_thumbnail: "../../../assets/images/reel-1-thumbnail.jpg",
               proj_builderName: "Binori Group",
               project_localities: "Gota",
-              project_about_developer:{
-                logo:null,
-                project_name:"Aquavista",
-                city:"Ahemdabad",
-                image:"../../../assets/images/",
-                minPrice:"7 lac",
-                maxPrice:"2 cr",
-                type:"3BHK",
-                minSize:"700 SqFt",
-                maxSize:"963 SqFt",
-                contact_no:""  
+              project_about_developer: {
+                logo: null,
+                project_name: "Aquavista",
+                city: "Ahemdabad",
+                image: "../../../assets/images/",
+                minPrice: "7 lac",
+                maxPrice: "2 cr",
+                type: "3BHK",
+                minSize: "700 SqFt",
+                maxSize: "963 SqFt",
+                contact_no: ""
               }
             },
               {
@@ -2371,6 +2378,47 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
       document.body.removeChild(textArea);
     }
   }
+
+  // Reel Share Modal Functions
+  openReelShareModal(index: number) {
+    this.activeReelIndex = index;
+    // Build the shareable URL for the reel
+    this.reelDynamicUrl = `${window.location.origin}${window.location.pathname}?reels=true&reel=${index}`;
+    const modalEl = document.getElementById('shareReelModal');
+    if (modalEl) {
+      const reelModal = new bootstrap.Modal(modalEl);
+      reelModal.show();
+    }
+  }
+
+  emailReelShare() {
+    const subject = encodeURIComponent('Check this reel');
+    const body = encodeURIComponent(`Here is something interesting: ${this.reelDynamicUrl}`);
+    const mailtoLink = `mailto:?subject=${subject}&body=${body}`;
+    window.open(mailtoLink, '_blank');
+  }
+
+  whatsappReelShare() {
+    const link = `https://wa.me/?text=${encodeURIComponent(this.reelDynamicUrl)}`;
+    window.open(link, '_blank');
+  }
+
+  facebookReelShare() {
+    const url = encodeURIComponent(this.reelDynamicUrl);
+    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+    window.open(facebookUrl, '_blank');
+  }
+
+  copyReelLink(event: MouseEvent) {
+    navigator.clipboard.writeText(this.reelDynamicUrl).then(() => {
+      this.toastr.success('Reel link copied to clipboard!');
+    }, () => {
+      this.toastr.error('Failed to copy reel link.');
+    });
+  }
+
+  // Property to hold the generated reel URL for the modal
+  reelDynamicUrl: string = '';
 
   getSanitizedVideoUrl(url: string): SafeResourceUrl {
     let embedUrl = url;

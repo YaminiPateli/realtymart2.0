@@ -22,12 +22,12 @@
   z-index: 2;
 }
 
-.all-amenities{
+.all-amenities {
   display: flex;
   flex-wrap: wrap;
 }
 
-.each-amenitiy-card{
+.each-amenitiy-card {
   margin-right: 20px;
   margin-bottom: 40px;
 }
@@ -274,16 +274,16 @@
     padding: 15px;
   }
 
-  .each-amenitiy-card{
+  .each-amenitiy-card {
     margin-bottom: 60px;
   }
 }
 
-.section-title-for-reel{
+.section-title-for-reel {
   margin-bottom: 0px !important;
 }
 
-.address-title{
+.address-title {
   padding: 10px;
   background-color: rgb(255 255 255);
 }
@@ -1243,7 +1243,7 @@ google-map {
 
 .builder-card {
   height: auto;
-  max-height: calc(100vh - 335px);
+  max-height: calc(100vh - 300px);
   overflow-y: auto;
 }
 
@@ -1875,8 +1875,8 @@ google-map {
 /* â”€â”€ Phone-style card â”€â”€ */
 .reels-player-card {
   position: relative;
-  width: 550px;
-  height: 1000px;
+  width: 294px;
+  height: 501px;
   aspect-ratio: 9 / 16;
   background: #111;
   border-radius: 32px;
@@ -1974,14 +1974,13 @@ google-map {
   bottom: 0px;
   left: 0;
   width: 100%;
-  padding: 50px 18px 20px;
+  padding: 50px 18px 0px;
   background: linear-gradient(to top,
       rgba(0, 0, 0, 0.92) 0%,
       rgba(0, 0, 0, 0.22) 55%,
       transparent 100%);
   z-index: 5;
-  backdrop-filter: blur(2px);
-  height: 25vh;
+  height: auto;
 }
 
 .reels-developer-info {
@@ -2228,9 +2227,6 @@ google-map {
 
 /* Tablet landscape */
 @media (max-width: 1024px) {
-  .reels-player-card {
-    width: 550px;
-  }
 
   .reels-container-wrapper {
     flex-wrap: wrap;
@@ -2344,7 +2340,7 @@ google-map {
   }
 
   .reels-player-card {
-    width: 100vw;
+    width: 66vw;
     height: 100dvh;
     height: 100vh;
     border-radius: 0;
@@ -2735,10 +2731,6 @@ google-map {
 
 /* Responsive Styles for Property Card and Watch Reels overlay */
 @media (max-width: 920px) {
-  .reels-player-card {
-    width: 455px;
-    height: min(1000px, 80vh);
-  }
 
   .reels-property-card {
     width: 270px;
@@ -2756,10 +2748,6 @@ google-map {
 }
 
 @media (max-width: 768px) {
-  .reels-player-card {
-    width: 500px;
-    border-radius: 20px;
-  }
 
   .reels-property-card {
     width: 240px;
@@ -2819,7 +2807,7 @@ google-map {
   }
 
   .reels-player-card {
-    width: 100vw;
+    width: 53vw;
     height: 100vh;
     border-radius: 0;
     border: none;
@@ -3514,6 +3502,13 @@ google-map {
     transform: none;
   }
 }
+
+@media(max-width:470px) {
+  .reels-player-card {
+    width: 100vw;
+  }
+}
+
 
 
 .floor-image {
@@ -4556,14 +4551,24 @@ google-map {
   transform: translate(-50%, -50%) scale(1.08);
 }
 
-@media(max-width:1920px){
-  .reels-card-bottom-details{
-    bottom: -10%;
+@media(max-width:1920px) {
+  .reels-card-bottom-details {
+    bottom: 0;
   }
 }
 
-@media(max-width:921px){
-  .reels-container-wrapper{
+@media(max-width:921px) {
+  .reels-container-wrapper {
     align-items: center;
+    justify-content: center;
   }
+}
+
+.developer-desc-container ::ng-deep p {
+  display: inline;
+  margin: 0;
+}
+
+.modal {
+  z-index: 99999;
 }

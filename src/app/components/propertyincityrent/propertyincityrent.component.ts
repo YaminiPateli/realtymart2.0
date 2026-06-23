@@ -76,6 +76,7 @@ export class PropertyincityrentComponent {
   pageSize: number = 5; // Items per page
   totalItems: number = 0; // Total number of items
   itemsPerPage = 5;
+  totalPages: any;
   visiblePageStart: number = 1;
   visiblePageCount: number = 5;
   // contact: any = {
@@ -147,29 +148,32 @@ export class PropertyincityrentComponent {
   }
 
   loadProperties() {
-    if (this.isLoading || this.currentPage > this.lastPage) return;
     this.cityget = this.route.snapshot.paramMap.get('city');
 
-    this.isLoading = true;
-    this.loading = true;
-
-    const lastElement = document.querySelectorAll('.maching-myproperties');
-    const lastItem = lastElement[lastElement.length - 1];
-    const lastItemOffset = lastItem ? lastItem.getBoundingClientRect().top : 0;
-
+   
     this.http
       .get<any>(
         `${environment.apiUrl}propertyrentincity/${this.cityget}?page=${this.currentPage}`
       )
       .subscribe(
         (response) => {
-          const oldScrollY = window.scrollY;
 
-          this.ownerlauchedproperty = this.ownerlauchedproperty || [];
-          this.ownerlauchedproperty = [
-            ...this.ownerlauchedproperty,
-            ...(response.data.data || []),
-          ];
+          this.ownerlauchedproperty =
+            response.data?.data || [];
+
+          this.ownerlauchedpropertycount =
+            response.data?.total;
+
+            this.itemsPerPage = response.data.per_page;
+
+          this.totalPages = Math.ceil(
+            this.ownerlauchedpropertycount /
+            this.itemsPerPage
+          );
+
+          this.itemsPerPage = response.data.per_page;
+
+
         this.setMetaTags(
           response.meta.title,
           response.meta.description,
@@ -177,16 +181,8 @@ export class PropertyincityrentComponent {
 
           this.lastPage = response.data.data?.last_page;
 
-          this.currentPage++;
-          this.isLoading = false;
-          this.loading = false;
 
-          setTimeout(() => {
-            if (lastItem) {
-              const newOffset = lastItem.getBoundingClientRect().top;
-              window.scrollTo(0, oldScrollY + (newOffset - lastItemOffset));
-            }
-          }, 100);
+
         },
         (error) => {
           console.error('Error fetching properties:', error);
@@ -196,24 +192,17 @@ export class PropertyincityrentComponent {
       );
   }
 
-  @HostListener('window:scroll', [])
-  onScroll(): void {
-    const items = document.querySelectorAll('.maching-myproperties');
-    if (items.length < 20) return;
+onPageChange(page: number) {
 
-    const lastVisibleItem = items[items.length - 2];
-    if (!lastVisibleItem) return;
+  this.currentPage = page;
 
-    const rect = lastVisibleItem.getBoundingClientRect();
-    const windowHeight = window.innerHeight;
+  this.loadProperties();
 
-    if (rect.top < windowHeight && !this.isLoading) {
-      clearTimeout(this.scrollTimeout);
-      this.scrollTimeout = setTimeout(() => {
-        this.loadProperties();
-      }, 200);
-    }
-  }
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+}
 
   openGallery(images: string[], event: Event) {
     event.preventDefault(); // Prevents default anchor behavior

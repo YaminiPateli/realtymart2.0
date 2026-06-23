@@ -1,5 +1,5 @@
 .matching-banner {
-  background-image: url(../../../assets/images/pricing_plan_bg_img.png);
+  background-image: url('/assets/images/pricing_plan_bg_img.png');
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;

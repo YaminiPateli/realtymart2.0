@@ -140,6 +140,8 @@ itemsPerPage = 20;
           this.projectincity =
             response.data?.data || [];
 
+            this.itemsPerPage = response.data.per_page;
+
           this.projectincitycount =
             response.data?.total;
              this.totalPages = Math.ceil(

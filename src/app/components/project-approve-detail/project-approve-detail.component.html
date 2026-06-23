@@ -203,51 +203,51 @@
     </div>
   </div>
 
-  <section class="top_flore">
-    <div class="container nav-container">
-      <ul class="flore_links">
-        <li>
-          <a style="cursor: pointer" (click)="scrollToSection('overview')"
-            [ngClass]="{ active: activeSection === 'overview' }">Overview</a>
-        </li>
-        <li class="{'active': activeSection === 'aboutProject'}"
-          *ngIf="this.hasKeysOrValues(this.singleproject?.project_about)">
-          <a style="cursor: pointer" (click)="scrollToSection('aboutProject')"
-            [ngClass]="{ active: activeSection === 'aboutProject' }">About Project</a>
-        </li>
-        <li *ngIf="this.reels && this.reels.length > 0" class="{'active': activeSection === 'reels'}">
-          <a style="cursor: pointer" (click)="scrollToSection('reels')"
-            [ngClass]="{ active: activeSection === 'reels' }">Reels</a>
-        </li>
-        <li *ngIf="floorPlanList.length > 0" class="{'active': activeSection === 'floorPlan'}">
-          <a style="cursor: pointer" (click)="scrollToSection('floorPlan')"
-            [ngClass]="{ active: activeSection === 'floorPlan' }">Floor plan</a>
-        </li>
-        <li class="{'active': activeSection === 'address'}"
-          *ngIf="this.hasKeysOrValues(this.singleproject.project_address)">
-          <a style="cursor: pointer" (click)="scrollToSection('address')"
-            [ngClass]="{ active: activeSection === 'address' }">Address</a>
-        </li>
-        <li class="{'active': activeSection === 'amenities'}" *ngIf="this.singleproject.amenitiess.length > 0">
-          <a style="cursor: pointer" (click)="scrollToSection('amenities')"
-            [ngClass]="{ active: activeSection === 'amenities' }">Amenities</a>
-        </li>
-        <li class="{'active': activeSection === 'brochure'}"
-          *ngIf="this.hasKeysOrValues(this.singleproject.project_brochure_images) && this.isPdf(singleproject.project_brochure)">
-          <a style="cursor: pointer" (click)="scrollToSection('brochure')"
-            [ngClass]="{ active: activeSection === 'brochure' }">Brochure</a>
-        </li>
-        <li class="{'active': activeSection === 'project-detail'}" *ngIf="this.singleproject.project_specification">
-          <a style="cursor: pointer" (click)="scrollToSection('project-detail')"
-            [ngClass]="{ active: activeSection === 'project-detail' }">Project Details</a>
-        </li>
-        <li class="{'active': activeSection === 'developer'}" *ngIf="hasKeysOrValues(singleproject.aboutdeveloper)">
-          <a style="cursor: pointer" (click)="scrollToSection('developer')"
-            [ngClass]="{ active: activeSection === 'developer' }">About Developer</a>
-        </li>
-      </ul>
-    </div>
-  </section>
+    <section class="top_flore">
+      <div class="container nav-container">
+        <ul class="flore_links">
+          <li>
+            <a style="cursor: pointer" (click)="scrollToSection('overview')"
+              [ngClass]="{ active: activeSection === 'overview' }">Overview</a>
+          </li>
+          <li class="{'active': activeSection === 'aboutProject'}"
+            *ngIf="this.hasKeysOrValues(this.singleproject?.project_about)">
+            <a style="cursor: pointer" (click)="scrollToSection('aboutProject')"
+              [ngClass]="{ active: activeSection === 'aboutProject' }">About Project</a>
+          </li>
+          <li *ngIf="this.reels && this.reels.length > 0" class="{'active': activeSection === 'reels'}">
+            <a style="cursor: pointer" (click)="scrollToSection('reels')"
+              [ngClass]="{ active: activeSection === 'reels' }">Reels</a>
+          </li>
+          <li *ngIf="floorPlanList.length > 0" class="{'active': activeSection === 'floorPlan'}">
+            <a style="cursor: pointer" (click)="scrollToSection('floorPlan')"
+              [ngClass]="{ active: activeSection === 'floorPlan' }">Floor plan</a>
+          </li>
+          <li class="{'active': activeSection === 'address'}"
+            *ngIf="this.hasKeysOrValues(this.singleproject.project_address)">
+            <a style="cursor: pointer" (click)="scrollToSection('address')"
+              [ngClass]="{ active: activeSection === 'address' }">Address</a>
+          </li>
+          <li class="{'active': activeSection === 'amenities'}" *ngIf="this.singleproject.amenitiess.length > 0">
+            <a style="cursor: pointer" (click)="scrollToSection('amenities')"
+              [ngClass]="{ active: activeSection === 'amenities' }">Amenities</a>
+          </li>
+          <li class="{'active': activeSection === 'brochure'}"
+            *ngIf="this.hasKeysOrValues(this.singleproject.project_brochure_images) && this.isPdf(singleproject.project_brochure)">
+            <a style="cursor: pointer" (click)="scrollToSection('brochure')"
+              [ngClass]="{ active: activeSection === 'brochure' }">Brochure</a>
+          </li>
+          <li class="{'active': activeSection === 'project-detail'}" *ngIf="this.singleproject.project_specification">
+            <a style="cursor: pointer" (click)="scrollToSection('project-detail')"
+              [ngClass]="{ active: activeSection === 'project-detail' }">Project Details</a>
+          </li>
+          <li class="{'active': activeSection === 'developer'}" *ngIf="hasKeysOrValues(singleproject.aboutdeveloper)">
+            <a style="cursor: pointer" (click)="scrollToSection('developer')"
+              [ngClass]="{ active: activeSection === 'developer' }">About Developer</a>
+          </li>
+        </ul>
+      </div>
+    </section>
 </div>
 <section class="project-main-section">
   <div class="container project-content-grid py-4">
@@ -320,9 +320,11 @@
             <a *ngIf="shouldTruncate(this.singleproject.project_about,50)" (click)="isAboutExpanded = true"
               class="read-more-link ms-1">Read More</a>
           </div>
-          <div *ngIf="isAboutExpanded" class="developer-desc-container">
-            <span [innerHTML]="getProcessedHtml(this.singleproject.project_about, true)"></span>
-            <a (click)="isAboutExpanded = false" class="read-more-link ms-1">Read Less</a>
+          <div *ngIf="isDeveloperExpanded" class="developer-desc-container mb-2 mt-1">
+            <span [innerHTML]="singleproject.aboutdeveloper.developerDescription"></span>
+            <a (click)="isDeveloperExpanded = false" class="read-more-link">
+              Read Less
+            </a>
           </div>
         </div>
 
@@ -1075,7 +1077,7 @@
         <button class="reels-icon-btn" title="Settings" (click)="toggleFilters()">
           <i class="fa-solid fa-sliders"></i>
         </button>
-        <button class="reels-icon-btn" title="Share" (click)="shareReel(activeReelIndex)">
+        <button class="reels-icon-btn" title="Share" (click)="openReelShareModal(activeReelIndex)">
           <i class="fa-solid fa-share-nodes"></i>
         </button>
       </div>
@@ -1326,3 +1328,40 @@
 
 </div>
 <!-- end .reels-immersive-overlay -->
+<!-- Reel Share Modal -->
+<div class="modal fade" id="shareReelModal" tabindex="-1" aria-labelledby="shareReelModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="m-0">Share Reel</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <div class="d-flex justify-content-around my-3">
+          <div>
+            <button class="btn" (click)="emailReelShare()">
+              <svg viewBox="0 0 64 64" width="56" height="56"><circle cx="32" cy="32" r="32" fill="#7f7f7f"></circle><path d="M17,22v20h30V22H17z M41.1,25L32,32.1L22.9,25H41.1z M20,39V26.6l12,9.3l12-9.3V39H20z" fill="white"></path></svg>
+              <div>Email</div>
+            </button>
+          </div>
+          <div>
+            <button class="btn" (click)="whatsappReelShare()">
+              <img width="56" height="56" src="../../../assets/images/whatsapp.svg" alt="" srcset="">
+              <div>WhatsApp</div>
+            </button>
+          </div>
+          <div>
+            <button class="btn" (click)="facebookReelShare()">
+              <img width="56" height="56" src="../../../assets/images/facebook.png" alt="" srcset="">
+              <div>Facebook</div>
+            </button>
+          </div>
+        </div>
+        <div class="input-group">
+          <input type="text" class="form-control" [value]="reelDynamicUrl" readonly>
+          <button class="btn btn-outline-secondary" type="button" (click)="copyReelLink($event)">Copy</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
