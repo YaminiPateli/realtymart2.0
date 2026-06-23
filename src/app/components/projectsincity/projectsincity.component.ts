@@ -33,10 +33,9 @@ export class ProjectsincityComponent {
     'Most Recent',
   ];
   paginatedData: any[] = []; // Data for the current page
-  currentPage: number = 1; // Current page number
-  pageSize: number = 5; // Items per page
-  totalItems: number = 0; // Total number of items
-  itemsPerPage = 5;
+  currentPage = 1;
+
+itemsPerPage = 20;
   visiblePageStart: number = 1;
   visiblePageCount: number = 5;
   contactData: any;
@@ -79,6 +78,7 @@ export class ProjectsincityComponent {
   remainingTime: number = 60;
   private timer: any;
   isSubmitting = false;
+  totalPages = 0;
 
   constructor(
     private titleService: Title,
@@ -129,14 +129,6 @@ export class ProjectsincityComponent {
   loadAllBuilders(): void {
     const cityName = this.route.snapshot.paramMap.get('city');
 
-    if (this.isLoading || this.currentPage > this.lastPage) return;
-
-    this.isLoading = true;
-    this.loading = true;
-
-    const lastElement = document.querySelectorAll('.citiys-planes');
-    const lastItem = lastElement[lastElement.length - 1];
-    const lastItemOffset = lastItem ? lastItem.getBoundingClientRect().top : 0;
 
     this.http
       .get<any>(
@@ -144,28 +136,19 @@ export class ProjectsincityComponent {
       )
       .subscribe(
         (response) => {
-          const oldScrollY = window.scrollY;
 
-          this.projectincity = this.projectincity || [];
-          this.projectincity = [
-            ...this.projectincity,
-            ...(response.data?.data || []),
-          ];
+          this.projectincity =
+            response.data?.data || [];
+
+          this.projectincitycount =
+            response.data?.total;
+             this.totalPages = Math.ceil(
+        this.projectincitycount /
+        this.itemsPerPage
+      );
+
           this.setMetaTags(response.meta.title, response.meta.description);
-
-          this.lastPage = response?.data?.last_page;
-          this.projectincitycount = response?.data?.total;
-
-          this.currentPage++;
-          this.isLoading = false;
-          this.loading = false;
-
-          setTimeout(() => {
-            if (lastItem) {
-              const newOffset = lastItem.getBoundingClientRect().top;
-              window.scrollTo(0, oldScrollY + (newOffset - lastItemOffset));
-            }
-          }, 100);
+      
         },
         (error) => {
           console.error('Error fetching properties:', error);
@@ -196,93 +179,6 @@ export class ProjectsincityComponent {
     // this.metaService.updateTag({ name: 'twitter:image', content: image });
   }
 
-  updatePaginatedData(): void {
-    const startIndex = (this.currentPage - 1) * this.pageSize;
-    const endIndex = startIndex + this.pageSize;
-    this.paginatedData = this.projectincity.slice(startIndex, endIndex);
-  }
-
-  updateTotalItems(): void {
-    this.totalItems = this.projectincity.length;
-  }
-
-  nextPage(): void {
-    if (this.currentPage < this.getTotalPages()) {
-      this.currentPage++;
-      this.updatePaginatedData();
-    }
-    this.updateTotalItems();
-  }
-
-  previousPage(): void {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      this.updatePaginatedData();
-    }
-    this.updateTotalItems();
-  }
-
-  getTotalPages(): number {
-    return Math.ceil(this.totalItems / this.pageSize);
-  }
-
-  goToPage(page: number): void {
-    if (page >= 1 && page <= this.getTotalPages()) {
-      this.currentPage = page;
-      this.updatePaginatedData();
-
-      // Adjust the visible range dynamically
-      if (page < this.visiblePageStart) {
-        this.visiblePageStart = Math.max(
-          1,
-          this.visiblePageStart - this.visiblePageCount
-        );
-      } else if (page >= this.visiblePageStart + this.visiblePageCount) {
-        this.visiblePageStart = Math.min(
-          page,
-          this.getTotalPages() - this.visiblePageCount + 1
-        );
-      }
-    }
-  }
-  nextPageGroup(): void {
-    const totalPages = this.getTotalPages();
-    if (this.visiblePageStart + this.visiblePageCount <= totalPages) {
-      this.visiblePageStart += this.visiblePageCount;
-    }
-  }
-  previousPageGroup(): void {
-    if (this.visiblePageStart > 1) {
-      this.visiblePageStart -= this.visiblePageCount;
-    }
-  }
-
-  setPageSize(size: number): void {
-    this.pageSize = size;
-    this.currentPage = 1; // Reset to the first page
-    this.updatePaginatedData();
-  }
-  getVisiblePages(): number[] {
-    const totalPages = this.getTotalPages();
-    const visiblePages: number[] = [];
-
-    const endPage = Math.min(
-      this.visiblePageStart + this.visiblePageCount - 1,
-      totalPages
-    );
-
-    for (let i = this.visiblePageStart; i <= endPage; i++) {
-      visiblePages.push(i);
-    }
-    return visiblePages;
-  }
-  showFirstPage(): boolean {
-    return this.currentPage > 3;
-  }
-
-  showLastPage(): boolean {
-    return this.currentPage < this.getTotalPages() - 2;
-  }
   getFormattedDate(dateString: string) {
     return this.datePipe.transform(dateString, 'MMMM, yyyy');
   }
@@ -303,6 +199,18 @@ export class ProjectsincityComponent {
 
     return numericValue;
   }
+
+  onPageChange(page: number) {
+
+  this.currentPage = page;
+
+  this.loadAllBuilders();
+
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+}
 
   changeSortOption(option: string): void {
     this.selectedSortOption = option;

@@ -1875,8 +1875,8 @@ google-map {
 /* â”€â”€ Phone-style card â”€â”€ */
 .reels-player-card {
   position: relative;
-  width: 360px;
-  height: min(640px, 88vh);
+  width: 550px;
+  height: 1000px;
   aspect-ratio: 9 / 16;
   background: #111;
   border-radius: 32px;
@@ -2229,8 +2229,7 @@ google-map {
 /* Tablet landscape */
 @media (max-width: 1024px) {
   .reels-player-card {
-    width: 320px;
-    height: min(568px, 86vh);
+    width: 550px;
   }
 
   .reels-container-wrapper {
@@ -2412,6 +2411,7 @@ google-map {
   /* Bottom overlay compact */
   .reels-card-bottom-details {
     padding: 40px 16px 18px;
+    bottom: 0 !important;
   }
 
   .reels-dev-name {
@@ -2736,8 +2736,8 @@ google-map {
 /* Responsive Styles for Property Card and Watch Reels overlay */
 @media (max-width: 920px) {
   .reels-player-card {
-    width: 300px;
-    height: min(540px, 80vh);
+    width: 455px;
+    height: min(1000px, 80vh);
   }
 
   .reels-property-card {
@@ -2751,14 +2751,13 @@ google-map {
 
   .reels-container-wrapper {
     gap: 12px;
-    height: 100%;
+    height: none;
   }
 }
 
 @media (max-width: 768px) {
   .reels-player-card {
-    width: 260px;
-    height: 100%;
+    width: 500px;
     border-radius: 20px;
   }
 
@@ -4555,4 +4554,16 @@ google-map {
 .reel-card-mobile:hover .play-btn {
   background: #ffffff;
   transform: translate(-50%, -50%) scale(1.08);
+}
+
+@media(max-width:1920px){
+  .reels-card-bottom-details{
+    bottom: -10%;
+  }
+}
+
+@media(max-width:921px){
+  .reels-container-wrapper{
+    align-items: center;
+  }
 }

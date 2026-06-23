@@ -20,6 +20,8 @@ export class BuilderListingComponent {
   allbuilderprojectData: any;
   allbuilderprojectcount: any;
   allbuilderproject: any = [];
+  itemsPerPage = 20;
+  totalPages = 0;
   isExpanded = false;
   // paginatedData: any[] = [];
   // currentPage: number = 1;
@@ -402,35 +404,12 @@ export class BuilderListingComponent {
     this.singleProp = property;
   }
 
-  @HostListener('window:scroll', [])
-  onScroll(): void {
-    const items = document.querySelectorAll('.topahmedabad');
-
-    if (items.length < 20) return;
-
-    const lastVisibleItem = items[items.length - 2];
-    if (!lastVisibleItem) return;
-
-    const rect = lastVisibleItem.getBoundingClientRect();
-    const windowHeight = window.innerHeight;
-
-    if (rect.top < windowHeight && !this.isLoading) {
-      clearTimeout(this.scrollTimeout);
-      this.scrollTimeout = setTimeout(() => {
-        this.loadAllBuilders();
-      }, 200);
-    }
-  }
-
-  toggleExpand() {
+  toggleExpand() {  
     this.isExpanded = !this.isExpanded;
   }
   loadAllBuilders(): void {
     const cityName = this.route.snapshot.paramMap.get('city');
-    if (this.isLoading || this.currentPage > this.lastPage) return;
-
-    this.isLoading = true;
-    this.loading = true;
+    // if (this.isLoading || this.currentPage > this.lastPage) return;
 
     const lastElement = document.querySelectorAll('.topahmedabad');
     const lastItem = lastElement[lastElement.length - 1];
@@ -443,28 +422,17 @@ export class BuilderListingComponent {
         )
         .subscribe(
           (response) => {
-            const oldScrollY = window.scrollY;
 
             this.allbuilderproject = this.allbuilderproject || [];
-            this.allbuilderproject = [
-              ...this.allbuilderproject,
-              ...(response.data?.data || []),
-            ];
+            this.allbuilderproject = response.data?.data || [];
             this.setMetaTags(response.meta.title, response.meta.description);
 
             this.allbuilderprojectcount = response?.data?.total;
-            this.lastPage = response?.data?.last_page;
+            this.totalPages = Math.ceil(
+              this.allbuilderprojectcount / this.itemsPerPage
+            );
 
-            this.currentPage++;
-            this.isLoading = false;
-            this.loading = false;
-
-            setTimeout(() => {
-              if (lastItem) {
-                const newOffset = lastItem.getBoundingClientRect().top;
-                window.scrollTo(0, oldScrollY + (newOffset - lastItemOffset));
-              }
-            }, 100);
+            this.lastPage = response.data?.last_page;
           },
           (error) => {
             console.error('Error fetching properties:', error);
@@ -474,6 +442,18 @@ export class BuilderListingComponent {
         );
     }
   }
+
+  onPageChange(page: number): void {
+
+    this.currentPage = page;
+    
+    this.loadAllBuilders();
+
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+}
 
   // meta title
   setMetaTags(title: string, description: string) {

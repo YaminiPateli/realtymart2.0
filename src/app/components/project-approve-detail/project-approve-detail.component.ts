@@ -16,6 +16,7 @@ import { IssponsoredService } from '../service/issponsored.service';
 import { IsverifiedService } from '../service/isverified.service';
 import { ActivityTrackerService } from '../service/activitytracker.service';
 import { FilteredCities } from 'src/app/filteredcities';
+import { CountrycodeService } from '../service/countrycode.service';
 declare var bootstrap: any;
 @Component({
   selector: 'app-project-approve-detail',
@@ -365,6 +366,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     private activityTrackerService: ActivityTrackerService,
     private sanitizer: DomSanitizer,
     private router: Router,
+    private countrycodeService: CountrycodeService
   ) {
     this._album.push({
       src: 'assets/images/advertisement.png',
@@ -899,6 +901,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     this.observeSections();
     this.detectActiveSectionOnScroll();
     this.fetchProjectApproveDetails();
+    this.getIPCountryCode();
     // this.loadissponsored();
     // this.loadisverified();
     if (this.latitude && this.longitude) {
@@ -932,6 +935,12 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     else {
       this.is_token = false;
     }
+  }
+
+  getIPCountryCode(){
+    this.countrycodeService.getIPCountryCode().subscribe((res: any) => {
+      this.countryCode = res.country_calling_code
+    });
   }
 
   updateMapCoordinates(latVal: any, lngVal: any) {
@@ -1037,7 +1046,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
       leads_type: 'Project',
       leads_for: this.singleproject.property_for,
       receiver_user_id: this.singleproject.user_id,
-      countrycode: '',
+      countrycode: this.countryCode,
       request_price: 0,
     };
     const token = localStorage.getItem('myrealtylogintoken');
@@ -1850,7 +1859,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
       leads_type: 'Project',
       leads_for: this.singleproject.property_for,
       receiver_user_id: this.singleproject.user_id,
-      countrycode: '',
+      countrycode: this.countryCode,
       request_price: 0,
     }
     const token = localStorage.getItem('myrealtylogintoken');
@@ -2107,7 +2116,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
             leads_type: 'Project',
             leads_for: this.singleproject?.property_for,
             receiver_user_id: this.singleproject?.user_id,
-            countrycode: '',
+            countrycode: this.countryCode,
             request_price: 0,
           };
           this.http.post(`${this.apiUrl}storeinquiry`, payload, { headers })
@@ -2735,7 +2744,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
       leads_type: 'Project',
       leads_for: this.singleproject.property_for,
       receiver_user_id: this.singleproject.user_id,
-      countrycode: '',
+      countrycode: this.countryCode,
       request_price: 0,
     };
 
@@ -2880,7 +2889,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
       leads_type: 'Project',
       leads_for: this.singleproject.property_for,
       receiver_user_id: this.singleproject.user_id,
-      countrycode: '',
+      countrycode: this.countryCode,
       request_price: 0,
       visit_date_time: this.scheduleVisitData.visitDateTime,
       remarks: this.scheduleVisitData.remarks || '',

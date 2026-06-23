@@ -73,7 +73,8 @@
       </div>
 
       <!-- Right Section -->
-      <div class="col-lg-6 mt-md-5 mt-4 col-md-4 d-flex justify-content-md-center justify-content-lg-end justify-content-center align-self-end">
+      <div
+        class="col-lg-6 mt-md-5 mt-4 col-md-4 d-flex justify-content-md-center justify-content-lg-end justify-content-center align-self-end">
         <div class="d-flex flex-wrap justify-content-lg-end gap-2">
           <div class="contact-container-relative">
             <button [attr.data-bs-toggle]="is_token ? null : 'modal'"
@@ -149,7 +150,8 @@
   </div>
 </section>
 <!-- navbar -->
-<div class="sticky-nav-wrapper" id="navbar" [class.sticky-active]="showStickyHeader" [class.scrolling-down]="!isScrollingUp">
+<div class="sticky-nav-wrapper" id="navbar" [class.sticky-active]="showStickyHeader"
+  [class.scrolling-down]="!isScrollingUp">
   <!-- Sticky Header Section (scroll state) -->
   <div class="project-sticky-header" *ngIf="showStickyHeader">
     <div class="container">
@@ -428,7 +430,8 @@
         <div class="address-header">
           <div class="d-flex flex-column">
             <h2 class="section-title">Address</h2>
-            <p class="address-title"><img class="location-icon-image" src="../../../assets/images/location-icon.svg" alt="location"> {{this.singleproject.project_address}}</p>
+            <p class="address-title"><img class="location-icon-image" src="../../../assets/images/location-icon.svg"
+                alt="location"> {{this.singleproject.project_address}}</p>
           </div>
 
           <a [href]="googleMapUrl" target="_blank" class="map-btn">
@@ -471,8 +474,8 @@
         <hr class="section-divider-2">
 
       </section>
-      <section *ngIf="singleproject.project_brochure_images.length > 0 && isPdf(this.singleproject.project_brochure)" id="brochure"
-        class="brochure-section">
+      <section *ngIf="singleproject.project_brochure_images.length > 0 && isPdf(this.singleproject.project_brochure)"
+        id="brochure" class="brochure-section">
 
         <h2 class="section-title">Brochure & Images</h2>
 
@@ -529,7 +532,7 @@
             About Developer
           </h5>
 
-          <div class="slider-nav"  *ngIf="showSliderNav">
+          <div class="slider-nav" *ngIf="showSliderNav">
             <button class="nav-btn" (click)="slideLeft()">
               <img src="../../../assets/images/arrow-left.png" alt="" srcset="">
             </button>
@@ -678,9 +681,9 @@
 
   <!-- FAQ Section (Full width of container) -->
   <div class="container mb-5">
-      <div class="container">
-    <app-faq [faqs]="faqs" [isInnerHtmlAnswer]="true"></app-faq>
-  </div>
+    <div class="container">
+      <app-faq [faqs]="faqs" [isInnerHtmlAnswer]="true"></app-faq>
+    </div>
   </div>
 
 </section>
@@ -883,7 +886,7 @@
               <div [hidden]="brochureOtpVisible">
                 <label for="mobile_no" class="input-label">Enter Phone Number</label>
                 <div class="form-field__wrap d-flex gap-2 justify-content-between">
-                  <input type="text" value="+91" class="gold-form-input text-center country_code" readonly />
+                  <input type="text" value="{{countryCode}}" class="gold-form-input text-center country_code" readonly />
                   <input type="tel" id="brochureMobile" name="brochureMobile" maxlength="10"
                     [(ngModel)]="brochureFormData.mobile" (keypress)="validateNumberInput($event)"
                     (blur)="validateBrochureMobile($event)" required class="gold-form-input placeholder-gray my-0" />
@@ -1152,10 +1155,10 @@
       <!-- Card Header: Developer/Project info -->
       <div class="reels-prop-header">
         <div class="reels-prop-avatar-wrap">
-          <img *ngIf="reels[activeReelIndex].project_about_developer.logo" [src]="reels[activeReelIndex].project_about_developer.logo" class="reels-prop-avatar"
-            alt="Logo">
-             <span *ngIf="!reels[activeReelIndex].project_about_developer.logo" class="reels-dev-letter">{{
-              reels[activeReelIndex]?.project_about_developer.project_name?.charAt(0)?.toUpperCase() }}</span>
+          <img *ngIf="reels[activeReelIndex].project_about_developer.logo"
+            [src]="reels[activeReelIndex].project_about_developer.logo" class="reels-prop-avatar" alt="Logo">
+          <span *ngIf="!reels[activeReelIndex].project_about_developer.logo" class="reels-dev-letter">{{
+            reels[activeReelIndex]?.project_about_developer.project_name?.charAt(0)?.toUpperCase() }}</span>
           <span *ngIf="!singleproject?.project_logo" class="reels-prop-letter">B</span>
         </div>
         <div class="reels-prop-header-text">
@@ -1180,7 +1183,8 @@
         <div class="reels-prop-name-price">
           <span class="reels-prop-name">{{ reels[activeReelIndex].project_about_developer.project_name }}</span>
           <span class="reels-prop-price">Price: <strong class="reels-prop-price-val">₹ {{
-              reels[activeReelIndex].project_about_developer.minPrice || '70 Lac' }} - {{ reels[activeReelIndex].project_about_developer.maxPrice || '2 Cr'
+              reels[activeReelIndex].project_about_developer.minPrice || '70 Lac' }} - {{
+              reels[activeReelIndex].project_about_developer.maxPrice || '2 Cr'
               }}</strong></span>
         </div>
 

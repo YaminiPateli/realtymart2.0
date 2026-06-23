@@ -1,0 +1,62 @@
+<div class="pagination-wrapper" *ngIf="totalPages > 1">
+
+  <!-- Previous -->
+  <button
+    class="btn btn-outline-danger"
+    [disabled]="currentPage === 1"
+    (click)="changePage(currentPage - 1)">
+    Previous
+  </button>
+
+  <!-- First Page -->
+  <button
+    *ngIf="getVisiblePages()[0] > 1"
+    class="btn btn-outline-danger"
+    (click)="changePage(1)">
+    1
+  </button>
+
+  <!-- Left Dots -->
+  <span *ngIf="getVisiblePages()[0] > 2">...</span>
+
+  <!-- Visible Pages -->
+  <button
+    *ngFor="let page of getVisiblePages()"
+    class="btn"
+    [ngClass]="{
+      'btn-danger': currentPage === page,
+      'btn-outline-danger': currentPage !== page
+    }"
+    (click)="changePage(page)">
+    {{ page }}
+  </button>
+
+  <!-- Right Dots -->
+  <span
+    *ngIf="
+      getVisiblePages()[getVisiblePages().length - 1] <
+      totalPages - 1
+    ">
+    ...
+  </span>
+
+  <!-- Last Page -->
+  <button
+    *ngIf="
+      getVisiblePages()[getVisiblePages().length - 1] <
+      totalPages
+    "
+    class="btn btn-outline-danger"
+    (click)="changePage(totalPages)">
+    {{ totalPages }}
+  </button>
+
+  <!-- Next -->
+  <button
+    class="btn btn-outline-danger"
+    [disabled]="currentPage === totalPages"
+    (click)="changePage(currentPage + 1)">
+    Next
+  </button>
+
+</div>
