@@ -1529,16 +1529,18 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     const header = document.querySelector('header');
     this.isHeaderHidden = header ? header.classList.contains('header-hidden') : false;
 
-    const navbar = document.getElementById('navbar');
+    const triggerElement = document.getElementById('project-detail-header');
 
-    if (navbar) {
-      const rect = navbar.getBoundingClientRect();
+    if (triggerElement) {
+      const rect = triggerElement.getBoundingClientRect();
 
       // Main website header height
       const headerHeight = this.isHeaderHidden ? 0 : 125;
 
-      // Show sticky header when nav reaches header
-      this.showStickyHeader = rect.top <= headerHeight;
+      // Show sticky header when the bottom of the section right ABOVE the navbar
+      // reaches the sticky offset. This guarantees a stable threshold that is 
+      // immune to sticky layout changes and image load timing.
+      this.showStickyHeader = rect.bottom <= headerHeight;
     }
   }
   detectActiveSectionOnScroll(): void {

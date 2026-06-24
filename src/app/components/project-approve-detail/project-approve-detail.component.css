@@ -295,7 +295,7 @@
   z-index: 97;
   background-color: #fff;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-  transition: all 0.3s ease;
+  transition: top 0.2s ease; /* only animate 'top', not all properties */
 }
 
 .sticky-nav-wrapper.scrolling-down {
@@ -307,7 +307,8 @@
   border-bottom: 1px solid #eaeaea;
   padding: 10px 0;
   display: block;
-  animation: slideDown 0.3s ease-out;
+  /* animation removed: *ngIf re-renders re-trigger keyframes on every scroll tick,
+     causing a strobe flicker. Appearance is instant since the parent transition handles it. */
 }
 
 @keyframes slideDown {
