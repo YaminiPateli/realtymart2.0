@@ -888,7 +888,7 @@
               <div [hidden]="brochureOtpVisible">
                 <label for="mobile_no" class="input-label">Enter Phone Number</label>
                 <div class="form-field__wrap d-flex gap-2 justify-content-between">
-                  <input type="text" [value]="countryCode" class="gold-form-input text-center country_code" readonly />
+                  <app-country-code-input class="country_code" [isInput]="true"></app-country-code-input>
                   <input type="tel" id="brochureMobile" name="brochureMobile" maxlength="10"
                     [(ngModel)]="brochureFormData.mobile" (keypress)="validateNumberInput($event)"
                     (blur)="validateBrochureMobile($event)" required class="gold-form-input placeholder-gray my-0" />

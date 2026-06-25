@@ -17,11 +17,12 @@ import { IsverifiedService } from '../service/isverified.service';
 import { ActivityTrackerService } from '../service/activitytracker.service';
 import { FilteredCities } from 'src/app/filteredcities';
 import { CountrycodeService } from '../service/countrycode.service';
+import { CountryCodeInputComponent } from 'src/app/common/country-code-input/country-code-input.component';
 declare var bootstrap: any;
 @Component({
   selector: 'app-project-approve-detail',
   templateUrl: './project-approve-detail.component.html',
-  styleUrls: ['./project-approve-detail.component.css']
+  styleUrls: ['./project-approve-detail.component.css'],
 })
 export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('otpModel') otpModel!: ElementRef;
@@ -901,7 +902,6 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     this.observeSections();
     this.detectActiveSectionOnScroll();
     this.fetchProjectApproveDetails();
-    this.getIPCountryCode();
     // this.loadissponsored();
     // this.loadisverified();
     if (this.latitude && this.longitude) {
@@ -935,12 +935,6 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     else {
       this.is_token = false;
     }
-  }
-
-  getIPCountryCode() {
-    this.countrycodeService.getIPCountryCode().subscribe((res: any) => {
-      this.countryCode = res.country_calling_code
-    });
   }
 
   updateMapCoordinates(latVal: any, lngVal: any) {

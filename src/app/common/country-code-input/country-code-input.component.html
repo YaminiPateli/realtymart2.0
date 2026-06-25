@@ -1,0 +1,7 @@
+<input *ngIf="isInput" type="text" [value]="'+333'" [ngClass]="inputClass" class="gold-form-input text-center" readonly />
+<span *ngIf="isText">{{countryCode}}</span>
+<select name="isd" id="ownerISD" *ngIf="">
+    <option [value]="countryCode" selected="selected">
+        {{countryCode}}
+    </option>
+</select>

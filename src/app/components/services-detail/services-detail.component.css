@@ -113,8 +113,13 @@ input.sub_phone {
   padding: 20px 0;
   position: sticky;
   top: 131px;
-  z-index: 10;
+  z-index: 97;
   background-color: #fff;
+  transition: top 0.2s ease;
+}
+
+.top_flore.scrolling-down {
+  top: 0 !important;
 }
 
 .nav_box {
@@ -405,4 +410,16 @@ input.sub_phone {
     align-items: center !important;
     justify-content: center !important;
   }
+}
+
+.country-code-wrapper{
+  border: none !important;
+}
+
+.mobile_no_border{
+  border-bottom: 1px solid #bbbbbb !important;
+}
+
+.country_code{
+  width: 22%;
 }

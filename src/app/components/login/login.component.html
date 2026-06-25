@@ -19,27 +19,30 @@
           <h1 class="login_sign_head">Login</h1>
           <div class="otp-process">
             <div>
-              <input
-                type="tel"
-                maxlength="10"
-                class="gold-form-input"
-                [(ngModel)]="contact_no"
-                [disabled]="isMobileNumberDisabled"
-                name="contact_no"
-                pattern="^\d{10}$"
-                placeholder="Enter Mobile Number"
-                (keypress)="validateNumberInput($event)"
-                (input)="validContactNumber($event)"
-                required
-              />
-              <button
-                class="form-action-btn mt-3"
-                *ngIf="!isOtpGenerated || showContactError"
-                (click)="generateOtp(contact_no)"
-                [disabled]="myForm.form.invalid"
-              >
-                Generate OTP
-              </button>
+              <div class="d-flex align-items-center gap-2">
+                <app-country-code-input class="country_code" [isInput]="true"></app-country-code-input>
+                <input
+                  type="tel"
+                  maxlength="10"
+                  class="gold-form-input"
+                  [(ngModel)]="contact_no"
+                  [disabled]="isMobileNumberDisabled"
+                  name="contact_no"
+                  pattern="^\d{10}$"
+                  placeholder="Enter Mobile Number"
+                  (keypress)="validateNumberInput($event)"
+                  (input)="validContactNumber($event)"
+                  required
+                />
+              </div>
+                <button
+                  class="form-action-btn w-100 mt-3"
+                  *ngIf="!isOtpGenerated || showContactError"
+                  (click)="generateOtp(contact_no)"
+                  [disabled]="myForm.form.invalid"
+                >
+                  Generate OTP
+                </button>
             </div>
             <div *ngIf="isOtpGenerated && !showContactError" class="mt-3">
               <input

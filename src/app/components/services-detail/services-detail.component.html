@@ -11,7 +11,7 @@
         </ngx-slick-carousel>
     </section>
 
-    <section class="top_flore" id="navbar">
+    <section class="top_flore" id="navbar" [class.scrolling-down]="isHeaderHidden">
         <div class="container">
             <ul class="nav_box">
                 <li><a  style="cursor: pointer" [ngClass]="{ active: activeSection === 'about' }" (click)="scrollToSection('about')">About</a></li>
@@ -532,19 +532,22 @@
             </div>
             <div *ngIf="emailTouched && emailError" class="mgs_error">Please enter a valid email address.</div>
 
-            <div class="form-field mt-3">
+            <div class="form-field country-code-wrapper mt-3">
               <label class="form-field__label" for="enqPhone">Mobile No.</label>
-              <div class="form-field__wrap">
-                <input
+              <div>
+                <div class="d-flex align-items-center gap-1">
+                  <app-country-code-input class="country_code" [isInput]="true"></app-country-code-input>
+                  <input
                   type="tel"
                   id="enqPhone"
                   name="enquiryPhone"
-                  class="gold-form-input my-0"
+                  class="gold-form-input my-0 mobile_no_border align-self-md-stretch"
                   [(ngModel)]="enquiryForm.contact_no"
                   (input)="validatePhoneNumber($event)"
                   (keypress)="validateNumberInput($event)"
                   maxlength="10"
                   required />
+                </div>
                 <span class="form-field__check" *ngIf="phoneTouched && enquiryForm.contact_no && !phoneError">&#10003;</span>
               </div>
             </div>

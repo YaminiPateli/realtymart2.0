@@ -6,6 +6,7 @@ import { Title, Meta } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { CountryCodeInputComponent } from "src/app/common/country-code-input/country-code-input.component";
 
 declare var $: any; // Declare jQuery
 @Component({
@@ -17,7 +18,8 @@ declare var $: any; // Declare jQuery
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-  ]
+    CountryCodeInputComponent
+]
 })
 export class SellingGuideComponent {
   apiUrl = environment.apiUrl;

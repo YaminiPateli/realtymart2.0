@@ -173,25 +173,6 @@ export class PropertytypesbuyComponent {
     this.fetchPropertyTypeBuysIn();
   }
 
-  @HostListener('window:scroll', [])
-  onScroll(): void {
-    const items = document.querySelectorAll('.maching-myproperties');
-    if (items.length < 20) return;
-
-    const lastVisibleItem = items[items.length - 2];
-    if (!lastVisibleItem) return;
-
-    const rect = lastVisibleItem.getBoundingClientRect();
-    const windowHeight = window.innerHeight;
-
-    if (rect.top < windowHeight && !this.isLoading) {
-      clearTimeout(this.scrollTimeout);
-      this.scrollTimeout = setTimeout(() => {
-        this.fetchPropertyTypeBuysIn();
-      }, 200);
-    }
-  }
-
   trackCustomActivity() {
     this.router.navigate(['property-details/:name/:id']);
     this.router.navigate(['project-details/:name/:id']);

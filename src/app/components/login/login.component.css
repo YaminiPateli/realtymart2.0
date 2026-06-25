@@ -63,8 +63,13 @@ span {
     background: #fff;
     margin: 0 auto;
     border-radius: 10px;
-    width: 70%;
+    width: 85%;
     position: relative;
     top: 140px;
   }
+}
+
+
+.country_code{
+  width: 17%;
 }

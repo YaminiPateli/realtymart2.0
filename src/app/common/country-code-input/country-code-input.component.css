@@ -1,0 +1,21 @@
+select[id="ownerISD"] {
+  border: 0;
+  border-bottom: 1px solid #e2e2e2;
+  height: 33px;
+  padding: 7px 20px 8px 0;
+  font-size: 14px;
+  line-height: 1.5;
+  background: #fff;
+}
+
+.gold-form-input-border{
+    border-bottom-color: black;
+}
+
+.text-gray{
+    color:gray;
+}
+
+.country_code{
+    width: 24%;
+}

@@ -14,6 +14,7 @@ import { GeolocationService } from '../service/geolocation.service';
 import { ToastrService } from 'ngx-toastr';
 import { NgxSpinnerService, NgxSpinnerModule } from 'ngx-spinner';
 import { FormsModule } from '@angular/forms';
+import { CountryCodeInputComponent } from 'src/app/common/country-code-input/country-code-input.component';
 declare var bootstrap: any;
 
 declare const google: any;
@@ -23,7 +24,7 @@ declare const google: any;
   templateUrl: './services-detail.component.html',
   styleUrls: ['./services-detail.component.css'],
   standalone: true,
-  imports: [NgbRatingModule, CommonModule, SlickCarouselModule, FormsModule, NgxSpinnerModule],
+  imports: [NgbRatingModule, CommonModule, SlickCarouselModule, FormsModule, NgxSpinnerModule, CountryCodeInputComponent],
 })
 export class ServicesDetailComponent implements OnInit {
   tooltipVisible = false;
@@ -35,6 +36,9 @@ export class ServicesDetailComponent implements OnInit {
   fullPath:any;
   activeSection: string | undefined ='about';
   private stickyOffset: number = 0;
+  lastScrollTop: number = 0;
+  isScrollingUp: boolean = false;
+  isHeaderHidden: boolean = false;
   // google reviews
   lat = '23.0225';
   lng = '72.5714';
@@ -508,6 +512,17 @@ export class ServicesDetailComponent implements OnInit {
 
   @HostListener('window:scroll')
   checkScroll() {
+    const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+    if (currentScroll < this.lastScrollTop) {
+      this.isScrollingUp = true;
+    } else {
+      this.isScrollingUp = false;
+    }
+    this.lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
+
+    const header = document.querySelector('header');
+    this.isHeaderHidden = header ? header.classList.contains('header-hidden') : false;
+
     const navbar = document.getElementById('navbar');
     if (!navbar) return;
 

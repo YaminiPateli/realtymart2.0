@@ -15,6 +15,7 @@ import { CommonModule } from '@angular/common';
 import { Title, Meta } from '@angular/platform-browser';
 import { GeolocationService } from '../service/geolocation.service';
 import { HeaderService } from '../service/header.service';
+import { CountryCodeInputComponent } from 'src/app/common/country-code-input/country-code-input.component';
 declare var google: any;
 interface ApiResponse {
   status: boolean;
@@ -26,7 +27,7 @@ interface ApiResponse {
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
   standalone: true,
-  imports: [NgIf, FormsModule, CommonModule],
+  imports: [NgIf, FormsModule, CommonModule, CountryCodeInputComponent],
 })
 export class LoginComponent {
   private apiUrl: string = environment.apiUrl;

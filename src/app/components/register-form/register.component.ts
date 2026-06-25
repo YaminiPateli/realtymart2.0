@@ -21,6 +21,7 @@ import {
   SlickCarouselModule,
 } from 'ngx-slick-carousel';
 import { environment } from '../../../environments/environment';
+import { CountryCodeInputComponent } from 'src/app/common/country-code-input/country-code-input.component';
 declare var bootstrap: any;
 
 @Component({
@@ -28,7 +29,7 @@ declare var bootstrap: any;
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css'],
   standalone: true,
-  imports: [FormsModule, SlickCarouselModule, CommonModule],
+  imports: [FormsModule, SlickCarouselModule, CommonModule, CountryCodeInputComponent],
 })
 export class RegisterComponent implements OnDestroy {
   @ViewChild('slickModal') slickModal!: SlickCarouselComponent;

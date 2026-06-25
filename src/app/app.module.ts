@@ -83,6 +83,7 @@ import { LocationPermissionComponent } from './components/location-permission/lo
 import { ProjectPlanComponent } from './components/project-plan/project-plan.component';
 import { FaqComponent } from './common/faq/faq.component';
 import { PaginationComponent } from './common/pagination/pagination.component';
+import { CountryCodeInputComponent } from './common/country-code-input/country-code-input.component';
 
 // Page Routing
 const routes: Routes = [
@@ -233,6 +234,7 @@ register();
     ToastrModule.forRoot(),
     LightboxModule,
     GoogleMapsModule,
+    CountryCodeInputComponent
   ],
   providers: [CookieService],
   bootstrap: [AppComponent],

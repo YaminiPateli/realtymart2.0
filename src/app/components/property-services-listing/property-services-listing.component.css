@@ -23,3 +23,7 @@
   .mgs_error {
     color: red;
   }
+
+  .country_code{
+    max-width:12%;
+  }
