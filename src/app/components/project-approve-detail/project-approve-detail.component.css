@@ -122,6 +122,12 @@
   }
 }
 
+@media(max-width:375px){
+  .photo-count-container{
+     flex-direction: column;
+  }
+}
+
 .project-title {
   font-size: 40px;
   font-weight: 700;

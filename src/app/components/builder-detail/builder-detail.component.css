@@ -107,3 +107,13 @@ line-height: normal;
 @media only screen and (min-width: 1200px) and (max-width: 1281px) {
   .provider_flow .slick-slide img{height:68vh;}
 }
+
+.top_flore {
+  z-index: 97;
+  background-color: #fff;
+  transition: top 0.2s ease;
+}
+
+.top_flore.scrolling-down {
+  top: 0 !important;
+}

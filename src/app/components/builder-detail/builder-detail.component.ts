@@ -26,7 +26,7 @@ interface City {
   templateUrl: './builder-detail.component.html',
   styleUrls: ['./builder-detail.component.css']
 })
-export class BuilderDetailComponent implements OnInit {
+export class BuilderDetailComponent implements OnInit, AfterViewInit {
   @ViewChild('otpContactModel') otpContactModel!: ElementRef;
   activeTab: string = 'ongoing';
   private apiUrl: string = environment.apiUrl;
@@ -105,6 +105,8 @@ export class BuilderDetailComponent implements OnInit {
   tooltipPosition: { top: string; left: string } = { top: '0px', left: '0px' };
 
   activeSection: string | undefined ='overview';
+  stickyOffset: number = 0;
+  isHeaderHidden: boolean = false;
   constructor(
     public http: HttpClient,
     private titleService: Title,
@@ -724,6 +726,10 @@ export class BuilderDetailComponent implements OnInit {
     ],
   };
   ngAfterViewInit() {
+    const navbar = document.getElementById('navbar');
+    if (navbar) {
+      this.stickyOffset = navbar.offsetTop;
+    }
     Fancybox.bind('[data-fancybox="gallery"]', {
       // Custom options if needed
     });
@@ -747,13 +753,20 @@ export class BuilderDetailComponent implements OnInit {
   }
   @HostListener('window:scroll', ['$event'])
   checkScroll() {
-    const navbar = document.getElementById("navbar");
-    const sticky = navbar?.offsetTop;
+    const header = document.querySelector('header');
+    this.isHeaderHidden = header ? header.classList.contains('header-hidden') : false;
 
-    if (window.pageYOffset > sticky!) {
-      navbar?.classList.add("sticky");
+    const navbar = document.getElementById("navbar");
+    if (!navbar) return;
+
+    if (!navbar.classList.contains("sticky") && navbar.offsetTop > 0) {
+      this.stickyOffset = navbar.offsetTop;
+    }
+
+    if (window.pageYOffset > this.stickyOffset) {
+      navbar.classList.add("sticky");
     } else {
-      navbar?.classList.remove("sticky");
+      navbar.classList.remove("sticky");
     }
   }
 }
