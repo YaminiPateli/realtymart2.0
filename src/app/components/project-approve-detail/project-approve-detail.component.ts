@@ -18,7 +18,9 @@ import { ActivityTrackerService } from '../service/activitytracker.service';
 import { FilteredCities } from 'src/app/filteredcities';
 import { CountrycodeService } from '../service/countrycode.service';
 import { CountryCodeInputComponent } from 'src/app/common/country-code-input/country-code-input.component';
+import flatpickr from 'flatpickr';
 declare var bootstrap: any;
+
 @Component({
   selector: 'app-project-approve-detail',
   templateUrl: './project-approve-detail.component.html',
@@ -27,6 +29,8 @@ declare var bootstrap: any;
 export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('otpModel') otpModel!: ElementRef;
   @ViewChild('otpContactModel') otpContactModel!: ElementRef;
+  /** Reference to the flatpickr date-time input element */
+  @ViewChild('visitDateTimeInput') visitDateTimeInput!: ElementRef<HTMLInputElement>;
   private apiUrl: string = environment.apiUrl;
   @ViewChild('descriptionElem') descriptionElem!: ElementRef;
   @ViewChild('slider') slider!: ElementRef;
@@ -139,6 +143,10 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     remarks: ''
   };
   scheduleVisitDateTimeError: boolean = false;
+  /** Holds the flatpickr instance so we can destroy or open it */
+  public visitFlatpickr: any = null;
+
+
   // Floor plans – populated from API `floor_plans` array
   floorPlanList: { bhk_type: string; carpet_area: string; image: string[] }[] = [];
   selectedFloorPlanIndex: number = 0;
@@ -411,6 +419,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
         },
       },
     });
+
   }
 
   moveNext(event: Event, index: number) {
@@ -670,7 +679,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     return url;
   }
 
-  downloadCurrentImage(): void {
+  async downloadCurrentImage(): Promise<void> {
     const rawUrl = this.galleryImages[this.currentIndex];
     if (!rawUrl) return;
 
@@ -680,13 +689,83 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     }
 
     const currentUrl = this.cleanUrl(rawUrl);
+    const fileName = currentUrl.split('/').pop()?.split('?')[0] || 'project-image.jpg';
 
-    const link = document.createElement('a');
-    link.href = currentUrl;
-    link.download = currentUrl.split('/').pop() || 'image';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    this.toastr.info('Downloading image...');
+
+    const triggerDownload = (url: string) => {
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
+
+    const downloadFromBlob = (blob: Blob) => {
+      const blobUrl = window.URL.createObjectURL(blob);
+      triggerDownload(blobUrl);
+      setTimeout(() => window.URL.revokeObjectURL(blobUrl), 1000);
+    };
+
+    // Check if the URL is same-origin (relative path or matches current browser hostname)
+    const isSameOrigin = currentUrl.startsWith('/') || currentUrl.includes(window.location.hostname);
+
+    if (isSameOrigin) {
+      try {
+        const res = await fetch(currentUrl);
+        if (res.ok) {
+          const blob = await res.blob();
+          if (blob && blob.size > 0) {
+            downloadFromBlob(blob);
+            return;
+          }
+        }
+      } catch (e) {}
+    }
+
+    // For cross-origin URLs (e.g. testing localhost against realtymart.com), route through wsrv.nl
+    // global image CDN proxy. This prevents red browser console CORS errors and guarantees instant direct download.
+    try {
+      const proxyUrl = `https://wsrv.nl/?url=${encodeURIComponent(currentUrl)}`;
+      const res = await fetch(proxyUrl);
+      if (res.ok) {
+        const blob = await res.blob();
+        if (blob && blob.size > 0) {
+          downloadFromBlob(blob);
+          return;
+        }
+      }
+    } catch (e) {}
+
+    // Fallback proxy 2: corsproxy.io
+    try {
+      const proxyUrl2 = `https://corsproxy.io/?${encodeURIComponent(currentUrl)}`;
+      const res2 = await fetch(proxyUrl2);
+      if (res2.ok) {
+        const blob2 = await res2.blob();
+        if (blob2 && blob2.size > 0) {
+          downloadFromBlob(blob2);
+          return;
+        }
+      }
+    } catch (e) {}
+
+    // Fallback proxy 3: codetabs
+    try {
+      const proxyUrl3 = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(currentUrl)}`;
+      const res3 = await fetch(proxyUrl3);
+      if (res3.ok) {
+        const blob3 = await res3.blob();
+        if (blob3 && blob3.size > 0) {
+          downloadFromBlob(blob3);
+          return;
+        }
+      }
+    } catch (e) {}
+
+    // Ultimate fallback if offline
+    triggerDownload(currentUrl);
   }
 
   activeButton: string = 'buy';
@@ -1489,7 +1568,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     const headerEl = document.querySelector('header');
     if (!section || !navbar) return;
 
-    const stickyTop = headerEl ? headerEl.offsetHeight : (window.innerWidth <= 991 ? 115 : 75);
+    const stickyTop = this.showStickyHeader ? (window.innerWidth <= 991 ? 115 : 75) : (headerEl ? headerEl.offsetHeight : (window.innerWidth <= 991 ? 115 : 75));
     const totalHeaderOffset = stickyTop + navbar.offsetHeight + 15;
     const sectionAbsoluteTop = section.getBoundingClientRect().top + window.scrollY;
 
@@ -1503,7 +1582,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     // After smooth scroll settles (~900ms), verify position and correct if needed
     setTimeout(() => {
       const hEl = document.querySelector('header');
-      const currentStickyTop = hEl ? hEl.offsetHeight : (window.innerWidth <= 991 ? 115 : 75);
+      const currentStickyTop = this.showStickyHeader ? (window.innerWidth <= 991 ? 115 : 75) : (hEl ? hEl.offsetHeight : (window.innerWidth <= 991 ? 115 : 75));
       const finalNavbarHeight = navbar ? navbar.offsetHeight : 55;
       const currentSectionTop = section.getBoundingClientRect().top;
       const idealTop = currentStickyTop + finalNavbarHeight + 15;
@@ -1548,9 +1627,10 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
       const headerBottom = header.getBoundingClientRect().bottom;
       const navbarTop = navbar.getBoundingClientRect().top;
       const stickyThreshold = window.innerWidth <= 991 ? 115 : 75;
+      const isMenuOpen = document.getElementById('navbarSupportedContent')?.classList.contains('show');
 
-      // Trigger when navbar reaches either the sticky threshold or bottom edge of website header
-      if (navbarTop <= stickyThreshold + 5 || navbarTop <= headerBottom + 5) {
+      // Beyond navbar, keep main header hidden until scrolling back to top of navbar
+      if (!isMenuOpen && navbarTop <= stickyThreshold + 5) {
         header.classList.add('header-hidden');
         this.isHeaderHidden = true;
         this.showStickyHeader = true;
@@ -2790,8 +2870,10 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     // Open brochure PDF
     const pdfUrl = this.singleproject?.project_brochure;
     if (pdfUrl) {
-      window.open(pdfUrl, '_blank');
       this.toastr.success('Opening brochure...');
+      setTimeout(() => {
+        window.open(pdfUrl, '_blank');
+      }, 500);
     } else {
       this.toastr.warning('Brochure is not available.');
     }
@@ -2920,24 +3002,54 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   }
 
   openScheduleVisitModal() {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    this.scheduleVisitData.visitDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
     this.scheduleVisitData.remarks = '';
     this.scheduleVisitDateTimeError = false;
+    this.scheduleVisitData.visitDateTime = '';
 
     const modalEl = document.getElementById('schedule-visit-modal');
     if (modalEl) {
       const bootstrapModal = new bootstrap.Modal(modalEl);
       bootstrapModal.show();
+
+      if (this.visitFlatpickr) {
+        this.visitFlatpickr.destroy();
+        this.visitFlatpickr = null;
+      }
+
+      const inputEl = document.getElementById('visitDateTimeInput') as HTMLInputElement;
+      if (inputEl) {
+        const now = new Date();
+        this.visitFlatpickr = flatpickr(inputEl, {
+          enableTime: true,
+          dateFormat: 'F j, Y h:i K', // "June 29, 2026 02:25 PM"
+          defaultDate: now,
+          minDate: 'today',
+          time_24hr: false,
+          disableMobile: true,
+          clickOpens: true,
+          static: true, // CRITICAL: positions picker cleanly inside relative parent container via CSS
+          appendTo: inputEl.parentElement || modalEl,
+
+          onChange: (selectedDates: Date[]) => {
+            if (selectedDates.length > 0) {
+              const d = selectedDates[0];
+              const iso = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}T${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+              this.scheduleVisitData.visitDateTime = iso;
+              this.scheduleVisitDateTimeError = false;
+            }
+          }
+        });
+        (this.visitFlatpickr as any).setDate(now, true);
+      }
     }
   }
 
   closeScheduleVisitModal() {
+    // Destroy the flatpickr instance when modal closes
+    if (this.visitFlatpickr) {
+      this.visitFlatpickr.destroy();
+      this.visitFlatpickr = null;
+    }
     const modalEl = document.getElementById('schedule-visit-modal');
     if (modalEl) {
       const bootstrapModal = bootstrap.Modal.getInstance(modalEl);
@@ -2948,6 +3060,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   }
 
   submitScheduleVisit() {
+    // visitDateTime is set by the flatpickr onChange callback
     this.scheduleVisitDateTimeError = !this.scheduleVisitData.visitDateTime;
     if (this.scheduleVisitDateTimeError) {
       return;

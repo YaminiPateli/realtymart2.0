@@ -1,4 +1,5 @@
 @import "~@ng-select/ng-select/themes/default.theme.css";
+@import "~flatpickr/dist/flatpickr.min.css";
 
 /* @import "~@ng-select/ng-select/themes/material.theme.css"; */
 html {
@@ -7901,4 +7902,11 @@ body.gallery-open .modal-backdrop {
 .reels-mobile-scroll-container::-webkit-scrollbar-thumb {
   background: #ef3f23 !important;
   border-radius: 3px !important;
+}
+
+/* Ensure flatpickr datepicker always appears above Bootstrap modals */
+.flatpickr-calendar,
+.flatpickr-calendar.open,
+.flatpickr-calendar.static.open {
+  z-index: 1000000 !important;
 }

@@ -298,7 +298,7 @@
 .sticky-nav-wrapper {
   position: sticky;
   top: 75px !important;
-  z-index: 9999 !important;
+  z-index: 1 !important;
   background-color: #fff !important;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
   transition: box-shadow 0.3s ease;
@@ -4643,4 +4643,46 @@ google-map {
 
 .hidden {
   visibility: hidden;
+}
+
+.schedule-visit-label {
+  font-size: 14px;
+}
+
+/* ── Flatpickr single datetime input ─────────────────────────────────────── */
+
+.visit-datetime-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.visit-flatpickr-input {
+  width: 100%;
+  cursor: pointer;
+  padding-right: 40px !important;  /* leave room for the calendar icon */
+  font-size: 15px !important;
+  font-weight: 500;
+  color: #1d1d1d;
+  border: none !important;
+}
+
+.visit-flatpickr-input::placeholder {
+  color: #aaa;
+  font-weight: 400;
+}
+
+.visit-calendar-icon {
+  position: absolute;
+  right: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #888;
+  font-size: 16px;
+  pointer-events: none;   /* clicks fall through to the input */
+}
+
+/* Ensure the flatpickr calendar dropdown renders above the Bootstrap modal */
+.flatpickr-calendar {
+  z-index: 100010 !important;
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit , AfterViewInit, ElementRef, Renderer2 } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ElementRef, Renderer2 } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { PropertyservicesService } from '../../components/service/propertyservices.service';
@@ -22,7 +22,7 @@ interface ApiResponse {
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css'],
 })
-export class HeaderComponent implements AfterViewInit{
+export class HeaderComponent implements AfterViewInit {
   private apiUrl: string = environment.apiUrl;
   [x: string]: any;
   propertyget: any;
@@ -35,11 +35,11 @@ export class HeaderComponent implements AfterViewInit{
   isOtpValid: boolean = false;
   generatedOtp: string = '';
   loading: boolean = false;
-  locationCookie:any;
-  latitude:any;
+  locationCookie: any;
+  latitude: any;
   cookie_location: any;
-  longitude:any;
-  checkToken:any;
+  longitude: any;
+  checkToken: any;
   city: any;
   locationFooter: any;
   validCities: string[] = ['Ahmedabad', 'Rajkot', 'Surat', 'Vadodara', 'Mumbai', 'Navi Mumbai', 'Pune', 'Bangalore', 'NCR', 'Delhi', 'Gurgaon', 'Hyderabad'];
@@ -56,7 +56,7 @@ export class HeaderComponent implements AfterViewInit{
     private headerService: HeaderService,
     private renderer: Renderer2
   ) {
-    if(this.checkToken == null || this.checkToken == undefined){
+    if (this.checkToken == null || this.checkToken == undefined) {
       this.checkToken = localStorage.getItem('myrealtylogintoken');
     }
 
@@ -74,17 +74,17 @@ export class HeaderComponent implements AfterViewInit{
   ngOnInit(): void {
     this.headerService.refresh$.subscribe((refresh) => {
       if (refresh) {
-      this.getLocation();
-      this.getLocations();
-      if(this.checkToken == null || this.checkToken == undefined){
-        this.checkToken = localStorage.getItem('myrealtylogintoken');
-      }
+        this.getLocation();
+        this.getLocations();
+        if (this.checkToken == null || this.checkToken == undefined) {
+          this.checkToken = localStorage.getItem('myrealtylogintoken');
+        }
         this.headerService.resetRefresh();
       }
     });
     this.getLocation();
     this.getLocations();
-    if(this.checkToken == null || this.checkToken == undefined){
+    if (this.checkToken == null || this.checkToken == undefined) {
       this.checkToken = localStorage.getItem('myrealtylogintoken');
     }
   }
@@ -250,7 +250,7 @@ export class HeaderComponent implements AfterViewInit{
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
   }
-  
+
   logout() {
     const token = localStorage.getItem('myrealtylogintoken');
 
@@ -282,7 +282,7 @@ export class HeaderComponent implements AfterViewInit{
     const url = `${this.apiUrl}logout`;
     const data = { location: this.locationFooter };
 
-    this.http.post<ApiResponse>(url, data, {headers}).subscribe(
+    this.http.post<ApiResponse>(url, data, { headers }).subscribe(
       (response: any) => {
         clearLocalSession();
       },
@@ -337,8 +337,8 @@ export class HeaderComponent implements AfterViewInit{
           console.error('Error sending data', error);
         }
       );
-      }
-    }
+  }
+}
 
 let lastScrollTopGlobal = 0;
 let lastHeaderClickTime = 0;

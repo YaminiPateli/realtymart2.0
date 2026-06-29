@@ -342,7 +342,7 @@
                 class="read-more-link ms-1">Read More</a>
             </div>
             <div *ngIf="isWhyBuyExpanded" class="developer-desc-container">
-              <span [innerHTML]="getProcessedHtml(this.singleproject.project_why_buy_sell, false)"></span>
+              <span [innerHTML]="singleproject.project_why_buy_sell"></span>
               <a (click)="isWhyBuyExpanded = false" class="read-more-link ms-1">Read Less</a>
             </div>
           </div>
@@ -1011,18 +1011,36 @@
         <form (submit)="submitScheduleVisit()">
           <!-- Select Date and Time -->
           <div class="form-field mt-3">
-            <label class="input-label font-weight-bold" for="visitDateTime">Select Date and Time<span
+            <label class="schedule-visit-label font-weight-bold" for="visitDateTimeInput">Select Date and Time<span
                 class="text-danger">*</span></label>
-            <input type="datetime-local" id="visitDateTime" name="visitDateTime"
-              [(ngModel)]="scheduleVisitData.visitDateTime" required class="gold-form-input placeholder-gray my-0" />
+
+            <!-- Single flatpickr input — shows "June 29, 2026 2:25 PM" -->
+            <div class="visit-datetime-wrapper gold-form-input" (click)="visitFlatpickr?.open()">
+              <input
+                #visitDateTimeInput
+                id="visitDateTimeInput"
+                name="visitDateTimeInput"
+                type="text"
+                readonly
+                (click)="visitFlatpickr?.open()"
+                placeholder="Select date and time..."
+                class="schedule-visit-label placeholder-gray my-0 visit-flatpickr-input"
+              />
+              <span class="visit-calendar-icon" (click)="visitFlatpickr?.open()">
+                <i class="fa-regular fa-calendar"></i>
+              </span>
+            </div>
+
             <div *ngIf="scheduleVisitDateTimeError" class="mgs_error">Please select date and time.</div>
           </div>
 
+
           <!-- Remarks -->
           <div class="form-field mt-3">
-            <label class="input-label font-weight-bold" for="visitRemarks">Remarks</label>
+            <label class="schedule-visit-label font-weight-bold" for="visitRemarks">Remarks</label>
             <textarea id="visitRemarks" name="visitRemarks" [(ngModel)]="scheduleVisitData.remarks" rows="3"
-              placeholder="Enter remarks" class="gold-form-textarea placeholder-gray my-0"></textarea>
+              placeholder="Enter remarks"
+              class="gold-form-textarea schedule-visit-label placeholder-gray my-0"></textarea>
           </div>
 
           <!-- Action Buttons -->
