@@ -244,22 +244,20 @@ export class HomeComponent implements AfterViewInit, OnInit {
       const matchedCity = this.citySearch?.find((city: any) => city.id == selectedCityId);
       if (matchedCity) {
         const cityName = matchedCity.name;
-        if (this.city !== cityName) {
-          this.updateCity(cityName);
-          this.headerService.triggerRefresh();
-          // reload home page data
-          this.loadHotDeals();
-          this.loadFeaturedResidentalProjects();
-          this.loadFeaturedCommercialProjects();
-          this.loadFeaturedBunglowsProjects();
-          this.loadFarmHouseProjects();
-          this.loadFeaturedPlotsProjects();
-          this.loadTopBuilders();
-          this.loadHomeBanner();
-          this.loadAhmedabadProjects();
-          // Call search API
-          this.onSubmit(false);
-        }
+        this.updateCity(cityName);
+        this.headerService.triggerRefresh();
+        // reload home page data
+        this.loadHotDeals();
+        this.loadFeaturedResidentalProjects();
+        this.loadFeaturedCommercialProjects();
+        this.loadFeaturedBunglowsProjects();
+        this.loadFarmHouseProjects();
+        this.loadFeaturedPlotsProjects();
+        this.loadTopBuilders();
+        this.loadHomeBanner();
+        this.loadAhmedabadProjects();
+        // Call search API
+        this.onSubmit(false);
       }
     });
   }
@@ -306,7 +304,10 @@ export class HomeComponent implements AfterViewInit, OnInit {
 
   getLocation() {
     const locationCookie = localStorage.getItem('location');
-    this.city = locationCookie;
+    this.city = locationCookie || 'Ahmedabad';
+    if (!locationCookie) {
+      localStorage.setItem('location', 'Ahmedabad');
+    }
 
     if (!locationCookie) {
       if (navigator.geolocation) {
@@ -383,6 +384,12 @@ export class HomeComponent implements AfterViewInit, OnInit {
   updateCity(city: string) {
     this.city = city;
     localStorage.setItem('location', city);
+    if (this.city1 && this.myForm) {
+      const defaultCity = this.city1.find((c: any) => c.cname === city);
+      if (defaultCity && this.myForm.get('selectcitysearch')?.value !== defaultCity.cid) {
+        this.myForm.get('selectcitysearch')?.setValue(defaultCity.cid, { emitEvent: false });
+      }
+    }
   }
 
   loadHomeBanner(): void {
@@ -904,7 +911,7 @@ export class HomeComponent implements AfterViewInit, OnInit {
 
         const defaultCity = this.city1.find(city => city.cname === this.city);
         if (defaultCity) {
-          this.myForm.get('selectcitysearch')?.setValue(defaultCity.cid);
+          this.myForm.get('selectcitysearch')?.setValue(defaultCity.cid, { emitEvent: false });
         }
       },
       (error: any) => {

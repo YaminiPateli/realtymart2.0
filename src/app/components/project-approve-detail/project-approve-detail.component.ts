@@ -334,6 +334,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   city1: { cid: number, cname: string }[] = [];
   priceTooltipVisible: boolean = false;
   showStickyHeader = false;
+  isManualScroll: boolean = false;
   countryCode: any;
   otpArray = [0, 1, 2, 3];
   brochureSlideConfig = {
@@ -396,6 +397,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   isDeveloperExpanded: boolean = false;
 
   ngAfterViewInit(): void {
+    (window as any).__projectDetailActive = true;
     setTimeout(() => this.checkScrollPosition());
     Fancybox.bind('[data-fancybox="gallery"]', {
 
@@ -1484,25 +1486,42 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
 
     const section = document.getElementById(sectionId);
     const navbar = document.getElementById('navbar');
+    const headerEl = document.querySelector('header');
+    if (!section || !navbar) return;
 
-    let offset = navbar?.offsetHeight || 0;
+    const stickyTop = headerEl ? headerEl.offsetHeight : (window.innerWidth <= 991 ? 115 : 75);
+    const totalHeaderOffset = stickyTop + navbar.offsetHeight + 15;
+    const sectionAbsoluteTop = section.getBoundingClientRect().top + window.scrollY;
 
-    if (sectionId === 'overview') {
-      offset += 120; // sticky header height
-    }
-    if (section) {
-      const navbarHeight = navbar ? navbar.offsetHeight : 0;
-      const stickyTop = navbar ? parseFloat(window.getComputedStyle(navbar).top) || 0 : 125;
-      const sectionPosition = section.getBoundingClientRect().top + window.scrollY;
-      // Account for navbar's sticky top position + navbar height + extra padding
-      const scrollToPosition = sectionPosition - stickyTop - navbarHeight - 20;
+    const scrollToPosition = sectionAbsoluteTop - totalHeaderOffset;
 
-      window.scrollTo({
-        top: section.offsetTop - offset,
-        behavior: 'smooth',
-      });
+    this.activeSection = sectionId;
+    this.isManualScroll = true;
+
+    window.scrollTo({ top: scrollToPosition, behavior: 'smooth' });
+
+    // After smooth scroll settles (~900ms), verify position and correct if needed
+    setTimeout(() => {
+      const hEl = document.querySelector('header');
+      const currentStickyTop = hEl ? hEl.offsetHeight : (window.innerWidth <= 991 ? 115 : 75);
+      const finalNavbarHeight = navbar ? navbar.offsetHeight : 55;
+      const currentSectionTop = section.getBoundingClientRect().top;
+      const idealTop = currentStickyTop + finalNavbarHeight + 15;
+
+      if (Math.abs(currentSectionTop - idealTop) > 8) {
+        window.scrollTo({
+          top: window.scrollY + currentSectionTop - idealTop,
+          behavior: 'smooth',
+        });
+      }
+
       this.activeSection = sectionId;
-    }
+
+      setTimeout(() => {
+        this.isManualScroll = false;
+        this.activeSection = sectionId;
+      }, 500);
+    }, 900);
   }
 
 
@@ -1511,7 +1530,9 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     this.showContactDetails = false;
     this.activeContactPopover = null;
     this.detectActiveSectionOnScroll();
-
+    // console.log(window.pageYOffset, '====window.pageYOffset')
+    // console.log(document.documentElement.scrollTop, '====document.documentElement.scrollTop')
+    // console.log(this.lastScrollTop, '====this.lastScrollTop')
     const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
     if (currentScroll < this.lastScrollTop) {
       this.isScrollingUp = true;
@@ -1521,23 +1542,31 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     this.lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
 
     const header = document.querySelector('header');
-    this.isHeaderHidden = header ? header.classList.contains('header-hidden') : false;
+    const navbar = document.getElementById('navbar');
 
-    const triggerElement = document.getElementById('project-detail-header');
+    if (navbar && header) {
+      const headerBottom = header.getBoundingClientRect().bottom;
+      const navbarTop = navbar.getBoundingClientRect().top;
+      const stickyThreshold = window.innerWidth <= 991 ? 115 : 75;
 
-    if (triggerElement) {
-      const rect = triggerElement.getBoundingClientRect();
-
-      // Main website header height
-      const headerHeight = this.isHeaderHidden ? 0 : 125;
-
-      // Show sticky header when the bottom of the section right ABOVE the navbar
-      // reaches the sticky offset. This guarantees a stable threshold that is 
-      // immune to sticky layout changes and image load timing.
-      this.showStickyHeader = rect.bottom <= headerHeight;
+      // Trigger when navbar reaches either the sticky threshold or bottom edge of website header
+      if (navbarTop <= stickyThreshold + 5 || navbarTop <= headerBottom + 5) {
+        header.classList.add('header-hidden');
+        this.isHeaderHidden = true;
+        this.showStickyHeader = true;
+      } else {
+        header.classList.remove('header-hidden');
+        this.isHeaderHidden = false;
+        this.showStickyHeader = false;
+      }
+    } else {
+      this.showStickyHeader = false;
     }
   }
   detectActiveSectionOnScroll(): void {
+    // Block scroll spy during programmatic scrollToSection() calls
+    if (this.isManualScroll) return;
+
     const sections = [
       { id: 'overview', element: document.getElementById('overview') },
       { id: 'aboutProject', element: document.getElementById('aboutProject') },
@@ -1550,20 +1579,17 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
       { id: 'developer', element: document.getElementById('developer') },
     ];
 
+    const hEl = document.querySelector('header');
+    const stickyTop = hEl ? hEl.offsetHeight : (window.innerWidth <= 991 ? 115 : 75);
     const navbar = document.getElementById('navbar');
-    const navbarHeight = navbar ? navbar.offsetHeight : 0;
-    const stickyTop = navbar ? parseFloat(window.getComputedStyle(navbar).top) || 0 : 125;
-    const scrollPosition = window.scrollY + navbarHeight + stickyTop + 25;
+    const navbarHeight = navbar ? navbar.offsetHeight : 60;
+    const triggerOffset = stickyTop + navbarHeight + 40;
 
-    // Find the section that is currently in view
     let activeSection = 'overview';
     for (const section of sections) {
       if (section.element) {
-        const sectionTop = section.element.offsetTop;
-        if (scrollPosition >= sectionTop) {
+        if (section.element.getBoundingClientRect().top <= triggerOffset) {
           activeSection = section.id;
-        } else {
-          break;
         }
       }
     }
@@ -1715,67 +1741,67 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
             } else {
               this.projectBrochureImages = [];
             }
-            this.singleproject.project_video.push({
-              video_source: "video",
-              proj_video_link: "",
-              proj_video_file: "../../../assets/reels/reel-1.mp4",
-              proj_video_thumbnail: "../../../assets/images/reel-1-thumbnail.jpg",
-              proj_builderName: "Binori Group",
-              project_localities: "Gota",
-              project_about_developer: {
-                logo: null,
-                project_name: "Aquavista",
-                city: "Ahemdabad",
-                image: "../../../assets/images/",
-                minPrice: "7 lac",
-                maxPrice: "2 cr",
-                type: "3BHK",
-                minSize: "700 SqFt",
-                maxSize: "963 SqFt",
-                contact_no: ""
-              }
-            },
-              {
-                video_source: "video",
-                proj_video_link: "",
-                proj_video_file: "../../../assets/reels/reel-2.mp4",
-                proj_video_thumbnail: "../../../assets/images/reel-2-thumbnail.jpg",
-                proj_builderName: "Aarsh Group",
-                project_localities: "Jagatpur",
-                project_about_developer: {
-                  logo: null,
-                  project_name: "Stark Torre",
-                  city: "Ahemdabad",
-                  image: "../../../assets/images/",
-                  minPrice: "23 lac",
-                  maxPrice: "5 cr",
-                  type: "2,3 BHK",
-                  minSize: "800 SqFt",
-                  maxSize: "1290 SqFt",
-                  contact_no: ""
-                }
-              },
-              {
-                video_source: "video",
-                proj_video_link: "",
-                proj_video_file: "../../../assets/reels/reel-3.mp4",
-                proj_video_thumbnail: "../../../assets/images/reel-3-thumbnail.jpg",
-                proj_builderName: "Shivalik Group",
-                project_localities: "south bopal",
-                project_about_developer: {
-                  logo: null,
-                  project_name: "shivalik shilp",
-                  city: "Ahemdabad",
-                  image: "../../../assets/images/",
-                  minPrice: "50 lac",
-                  maxPrice: "78 lac",
-                  type: "2,3,4 BHK",
-                  minSize: "1000 SqFt",
-                  maxSize: "1500 SqFt",
-                  contact_no: ""
-                }
-              }
-            )
+            // this.singleproject.project_video.push({
+            //   video_source: "video",
+            //   proj_video_link: "",
+            //   proj_video_file: "../../../assets/reels/reel-1.mp4",
+            //   proj_video_thumbnail: "../../../assets/images/reel-1-thumbnail.jpg",
+            //   proj_builderName: "Binori Group",
+            //   project_localities: "Gota",
+            //   project_about_developer: {
+            //     logo: null,
+            //     project_name: "Aquavista",
+            //     city: "Ahemdabad",
+            //     image: "../../../assets/images/",
+            //     minPrice: "7 lac",
+            //     maxPrice: "2 cr",
+            //     type: "3BHK",
+            //     minSize: "700 SqFt",
+            //     maxSize: "963 SqFt",
+            //     contact_no: ""
+            //   }
+            // },
+            //   {
+            //     video_source: "video",
+            //     proj_video_link: "",
+            //     proj_video_file: "../../../assets/reels/reel-2.mp4",
+            //     proj_video_thumbnail: "../../../assets/images/reel-2-thumbnail.jpg",
+            //     proj_builderName: "Aarsh Group",
+            //     project_localities: "Jagatpur",
+            //     project_about_developer: {
+            //       logo: null,
+            //       project_name: "Stark Torre",
+            //       city: "Ahemdabad",
+            //       image: "../../../assets/images/",
+            //       minPrice: "23 lac",
+            //       maxPrice: "5 cr",
+            //       type: "2,3 BHK",
+            //       minSize: "800 SqFt",
+            //       maxSize: "1290 SqFt",
+            //       contact_no: ""
+            //     }
+            //   },
+            //   {
+            //     video_source: "video",
+            //     proj_video_link: "",
+            //     proj_video_file: "../../../assets/reels/reel-3.mp4",
+            //     proj_video_thumbnail: "../../../assets/images/reel-3-thumbnail.jpg",
+            //     proj_builderName: "Shivalik Group",
+            //     project_localities: "south bopal",
+            //     project_about_developer: {
+            //       logo: null,
+            //       project_name: "shivalik shilp",
+            //       city: "Ahemdabad",
+            //       image: "../../../assets/images/",
+            //       minPrice: "50 lac",
+            //       maxPrice: "78 lac",
+            //       type: "2,3,4 BHK",
+            //       minSize: "1000 SqFt",
+            //       maxSize: "1500 SqFt",
+            //       contact_no: ""
+            //     }
+            //   }
+            // )
             if (this.singleproject.project_video.length > 0) {
               this.singleproject.project_video.forEach((element: {
                 video_source: string,
@@ -2140,6 +2166,11 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   }
 
   ngOnDestroy(): void {
+    (window as any).__projectDetailActive = false;
+    const header = document.querySelector('header');
+    if (header) {
+      header.classList.remove('header-hidden');
+    }
     document.body.style.overflow = '';
     document.body.style.paddingRight = '';
     document.body.classList.remove('modal-open');

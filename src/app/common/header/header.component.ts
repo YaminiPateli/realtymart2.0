@@ -91,7 +91,10 @@ export class HeaderComponent implements AfterViewInit{
 
   getLocation() {
     const locationCookie = localStorage.getItem('location');
-    this.city = locationCookie;
+    this.city = locationCookie || 'Ahmedabad';
+    if (!locationCookie) {
+      localStorage.setItem('location', 'Ahmedabad');
+    }
 
     if (!locationCookie) {
       if (navigator.geolocation) {
@@ -133,11 +136,7 @@ export class HeaderComponent implements AfterViewInit{
 
   updateCity(city: string) {
     this.city = city;
-    const locationCookie = localStorage.getItem('location');
-    if (this.city == locationCookie) {
-      localStorage.removeItem('location');
     localStorage.setItem('location', city);
-    }
   }
 
 
@@ -352,6 +351,10 @@ document.addEventListener('click', (event) => {
 });
 
 function handleScroll() {
+  if ((window as any).__projectDetailActive) {
+    return;
+  }
+
   const header = document.querySelector('header');
 
   if (header) {

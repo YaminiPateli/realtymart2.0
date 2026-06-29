@@ -122,9 +122,9 @@
   }
 }
 
-@media(max-width:375px){
-  .photo-count-container{
-     flex-direction: column;
+@media(max-width:375px) {
+  .photo-count-container {
+    flex-direction: column;
   }
 }
 
@@ -297,24 +297,51 @@
 
 .sticky-nav-wrapper {
   position: sticky;
-  top: 125px;
-  z-index: 97;
-  background-color: #fff;
+  top: 75px !important;
+  z-index: 9999 !important;
+  background-color: #fff !important;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-  transition: top 0.2s ease; /* only animate 'top', not all properties */
+  transition: box-shadow 0.3s ease;
 }
 
-.sticky-nav-wrapper.scrolling-down {
-  top: 0 !important;
+.sticky-nav-wrapper.sticky-active {
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1),
+    0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .project-sticky-header {
-  background-color: #fff;
-  border-bottom: 1px solid #eaeaea;
-  padding: 10px 0;
-  display: block;
-  /* animation removed: *ngIf re-renders re-trigger keyframes on every scroll tick,
-     causing a strobe flicker. Appearance is instant since the parent transition handles it. */
+  position: fixed !important;
+  top: 0 !important;
+  left: 0;
+  width: 100%;
+  height: 75px !important;
+  z-index: 10000 !important;
+  background-color: #fff !important;
+  /* border-bottom: 1px solid #eaeaea; */
+  /* box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06); */
+  padding: 0 !important;
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.35s ease-in-out, visibility 0.35s ease-in-out;
+  margin-top: 0 !important;
+}
+
+.sticky-nav-wrapper.sticky-active .project-sticky-header {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.project-sticky-header .row {
+  transform: translateY(-10px);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sticky-nav-wrapper.sticky-active .project-sticky-header .row {
+  transform: translateY(0);
 }
 
 @keyframes slideDown {
@@ -367,14 +394,19 @@
 
 @media (max-width: 991px) {
   .sticky-nav-wrapper {
-    top: 116px;
-    /* Sticks right below the global mobile header */
+    top: 115px !important;
+    /* Sit smoothly below mobile header space */
   }
 
   .project-sticky-header {
-    padding: 15px;
-    background-color: #fff;
-    border-bottom: 1px solid #eaeaea;
+    height: 115px !important;
+    margin-top: 0 !important;
+  }
+
+  .sticky-nav-wrapper.sticky-active .project-sticky-header {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
   }
 
   .project-sticky-header .container {
@@ -1488,6 +1520,10 @@ google-map {
 
   .card-img-wrapper {
     height: 160px;
+  }
+
+  .project-sticky-header {
+    padding: 30px 13px !important;
   }
 }
 
@@ -4578,4 +4614,33 @@ google-map {
 
 .modal {
   z-index: 99999;
+}
+
+/* Custom Header Cross-fade Overrides */
+::ng-deep .header_wrapper {
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out, z-index 0.3s ease !important;
+}
+
+::ng-deep .header_wrapper.header-hidden {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: none !important;
+  /* Prevent sliding out, keep at same place (top: 0) */
+  z-index: 90 !important;
+}
+
+@media(max-width:1920px) {
+  .project-sticky-header {
+    padding: 0px !important;
+  }
+}
+
+@media(max-width:1180px) {
+  .project-sticky-header {
+    padding: 10px 14px !important;
+  }
+}
+
+.hidden {
+  visibility: hidden;
 }
