@@ -721,7 +721,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
             return;
           }
         }
-      } catch (e) {}
+      } catch (e) { }
     }
 
     // For cross-origin URLs (e.g. testing localhost against realtymart.com), route through wsrv.nl
@@ -736,7 +736,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
           return;
         }
       }
-    } catch (e) {}
+    } catch (e) { }
 
     // Fallback proxy 2: corsproxy.io
     try {
@@ -749,7 +749,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
           return;
         }
       }
-    } catch (e) {}
+    } catch (e) { }
 
     // Fallback proxy 3: codetabs
     try {
@@ -762,10 +762,20 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
           return;
         }
       }
-    } catch (e) {}
+    } catch (e) { }
 
-    // Ultimate fallback if offline
-    triggerDownload(currentUrl);
+    // Final fallback: only safe for same-origin URLs where browser respects the `download` attribute.
+    // For cross-origin URLs, browsers IGNORE the `download` attribute and navigate the tab instead.
+    // So we intentionally do nothing and show a hint toast.
+    if (isSameOrigin) {
+      triggerDownload(currentUrl);
+    } else {
+      this.toastr.warning(
+        'Could not download. Right-click the image and choose "Save image as".',
+        '',
+        { timeOut: 5000 }
+      );
+    }
   }
 
   activeButton: string = 'buy';
@@ -1259,9 +1269,9 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
             } else if (this.selectedAction === 'view-contact') {
               this.showContactDetails = true;
               this.activeContactPopover = this.pendingContactPopover;
-              setTimeout(() => {
-                window.location.reload();
-              }, 100);
+              // setTimeout(() => {
+              //   window.location.reload();
+              // }, 100);
             } else if (this.selectedAction === 'whatsapp') {
               this.redirectToWhatsApp();
               setTimeout(() => {
@@ -1624,13 +1634,13 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     const navbar = document.getElementById('navbar');
 
     if (navbar && header) {
-      const headerBottom = header.getBoundingClientRect().bottom;
       const navbarTop = navbar.getBoundingClientRect().top;
-      const stickyThreshold = window.innerWidth <= 991 ? 115 : 75;
       const isMenuOpen = document.getElementById('navbarSupportedContent')?.classList.contains('show');
+      const isMobileOrTablet = window.innerWidth <= 991;
+      const stickyThreshold = isMobileOrTablet ? 115 : (header.getBoundingClientRect().bottom > 0 ? header.getBoundingClientRect().bottom : 75);
 
-      // Beyond navbar, keep main header hidden until scrolling back to top of navbar
-      if (!isMenuOpen && navbarTop <= stickyThreshold + 5) {
+      // Trigger sticky header when navbar reaches its sticky threshold (touching header bottom on desktop / 115px on mobile & tablet)
+      if (!isMenuOpen && navbarTop <= stickyThreshold + 2) {
         header.classList.add('header-hidden');
         this.isHeaderHidden = true;
         this.showStickyHeader = true;
@@ -1821,67 +1831,70 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
             } else {
               this.projectBrochureImages = [];
             }
-            // this.singleproject.project_video.push({
-            //   video_source: "video",
-            //   proj_video_link: "",
-            //   proj_video_file: "../../../assets/reels/reel-1.mp4",
-            //   proj_video_thumbnail: "../../../assets/images/reel-1-thumbnail.jpg",
-            //   proj_builderName: "Binori Group",
-            //   project_localities: "Gota",
-            //   project_about_developer: {
-            //     logo: null,
-            //     project_name: "Aquavista",
-            //     city: "Ahemdabad",
-            //     image: "../../../assets/images/",
-            //     minPrice: "7 lac",
-            //     maxPrice: "2 cr",
-            //     type: "3BHK",
-            //     minSize: "700 SqFt",
-            //     maxSize: "963 SqFt",
-            //     contact_no: ""
-            //   }
-            // },
-            //   {
-            //     video_source: "video",
-            //     proj_video_link: "",
-            //     proj_video_file: "../../../assets/reels/reel-2.mp4",
-            //     proj_video_thumbnail: "../../../assets/images/reel-2-thumbnail.jpg",
-            //     proj_builderName: "Aarsh Group",
-            //     project_localities: "Jagatpur",
-            //     project_about_developer: {
-            //       logo: null,
-            //       project_name: "Stark Torre",
-            //       city: "Ahemdabad",
-            //       image: "../../../assets/images/",
-            //       minPrice: "23 lac",
-            //       maxPrice: "5 cr",
-            //       type: "2,3 BHK",
-            //       minSize: "800 SqFt",
-            //       maxSize: "1290 SqFt",
-            //       contact_no: ""
-            //     }
-            //   },
-            //   {
-            //     video_source: "video",
-            //     proj_video_link: "",
-            //     proj_video_file: "../../../assets/reels/reel-3.mp4",
-            //     proj_video_thumbnail: "../../../assets/images/reel-3-thumbnail.jpg",
-            //     proj_builderName: "Shivalik Group",
-            //     project_localities: "south bopal",
-            //     project_about_developer: {
-            //       logo: null,
-            //       project_name: "shivalik shilp",
-            //       city: "Ahemdabad",
-            //       image: "../../../assets/images/",
-            //       minPrice: "50 lac",
-            //       maxPrice: "78 lac",
-            //       type: "2,3,4 BHK",
-            //       minSize: "1000 SqFt",
-            //       maxSize: "1500 SqFt",
-            //       contact_no: ""
-            //     }
-            //   }
-            // )
+            if(this.singleproject.id === 1){
+              
+              this.singleproject.project_video.push({
+                video_source: "video",
+                proj_video_link: "",
+                proj_video_file: "../../../assets/reels/reel-1.mp4",
+                proj_video_thumbnail: "../../../assets/images/reel-1-thumbnail.jpg",
+                proj_builderName: "Aarsh Group",
+                project_localities: "Gota",
+                project_about_developer: {
+                  logo: null,
+                  project_name: "Aquavista",
+                  city: "Ahemdabad",
+                  image: "../../../assets/images/",
+                  minPrice: this.singleproject.project_minimum_price,
+                  maxPrice: this.singleproject.project_maximum_price,
+                  type: "3BHK - 4BHK",
+                  minSize: "1168 SqFt",
+                  maxSize: "1566 SqFt",
+                  contact_no: ""
+                }
+              },
+                {
+                  video_source: "video",
+                  proj_video_link: "",
+                  proj_video_file: "../../../assets/reels/reel-2.mp4",
+                  proj_video_thumbnail: "../../../assets/images/reel-2-thumbnail.jpg",
+                  proj_builderName: "Aarsh Group",
+                   project_localities: "Gota",
+                  project_about_developer: {
+                  logo: null,
+                  project_name: "Aquavista",
+                  city: "Ahemdabad",
+                  image: "../../../assets/images/",
+                  minPrice: this.singleproject.project_minimum_price,
+                  maxPrice: this.singleproject.project_maximum_price,
+                  type: "3BHK - 4BHK",
+                  minSize: "1168 SqFt",
+                  maxSize: "1566 SqFt",
+                  contact_no: ""
+                }
+                },
+                {
+                  video_source: "video",
+                  proj_video_link: "",
+                  proj_video_file: "../../../assets/reels/reel-3.mp4",
+                  proj_video_thumbnail: "../../../assets/images/reel-3-thumbnail.jpg",
+                  proj_builderName: "Aarsh Group",
+                   project_localities: "Gota",
+                   project_about_developer: {
+                  logo: null,
+                  project_name: "Aquavista",
+                  city: "Ahemdabad",
+                  image: "../../../assets/images/",
+                  minPrice: this.singleproject.project_minimum_price,
+                  maxPrice: this.singleproject.project_maximum_price,
+                  type: "3BHK - 4BHK",
+                  minSize: "1168 SqFt",
+                  maxSize: "1566 SqFt",
+                  contact_no: ""
+                }
+                }
+              )
+            }
             if (this.singleproject.project_video.length > 0) {
               this.singleproject.project_video.forEach((element: {
                 video_source: string,
@@ -3033,7 +3046,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
           onChange: (selectedDates: Date[]) => {
             if (selectedDates.length > 0) {
               const d = selectedDates[0];
-              const iso = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}T${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+              const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}T${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
               this.scheduleVisitData.visitDateTime = iso;
               this.scheduleVisitDateTimeError = false;
             }

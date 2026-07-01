@@ -426,7 +426,7 @@ export class BuilderListingComponent {
             this.allbuilderproject = this.allbuilderproject || [];
             this.allbuilderproject = response.data?.data || [];
             this.setMetaTags(response.meta.title, response.meta.description);
-
+            this.itemsPerPage = response.data?.per_page || 20; // Get from backend
             this.allbuilderprojectcount = response?.data?.total;
             this.totalPages = Math.ceil(
               this.allbuilderprojectcount / this.itemsPerPage

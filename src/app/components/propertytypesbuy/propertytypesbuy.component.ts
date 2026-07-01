@@ -222,10 +222,10 @@ export class PropertytypesbuyComponent {
 
             this.itemsPerPage = response.responseData?.propertytypesbuyin.per_page;
 
-          // this.totalPages = Math.ceil(
-          //   this.propertytype /
-          //   this.itemsPerPage
-          // );
+          this.totalPages = Math.ceil(
+            this.propertytype /
+            this.itemsPerPage
+          );
        
           this.setMetaTags(
           response.meta.title,

@@ -45,6 +45,7 @@ export class ExploreLocalitiesComponent {
   pageSize: number = 5; // Items per page
   totalItems: number = 0; // Total number of items
   itemsPerPage = 5;
+  totalPages = 0;
   visiblePageStart: number = 1;
   visiblePageCount: number = 5;
   formData: any = {countrycode: 'IN +91'};
@@ -95,32 +96,40 @@ export class ExploreLocalitiesComponent {
     }
   }
 
-    @HostListener('window:scroll', [])
-    onScroll(): void {
-      const items = document.querySelectorAll('.localiti-box');
-      if (items.length < 20) return;
+    // @HostListener('window:scroll', [])
+    // onScroll(): void {
+    //   const items = document.querySelectorAll('.localiti-box');
+    //   if (items.length < 20) return;
+ 
+    //   const lastVisibleItem = items[items.length - 2];
+    //   if (!lastVisibleItem) return;
 
-      const lastVisibleItem = items[items.length - 2];
-      if (!lastVisibleItem) return;
+    //   const rect = lastVisibleItem.getBoundingClientRect();
+    //   const windowHeight = window.innerHeight;
 
-      const rect = lastVisibleItem.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
+    //   if (rect.top < windowHeight && !this.isLoading) {
+    //     clearTimeout(this.scrollTimeout);
+    //     this.scrollTimeout = setTimeout(() => {
+    //       this.loadExploreLocalities();
+    //     }, 200);
+    //   }
+    // }
 
-      if (rect.top < windowHeight && !this.isLoading) {
-        clearTimeout(this.scrollTimeout);
-        this.scrollTimeout = setTimeout(() => {
-          this.loadExploreLocalities();
-        }, 200);
-      }
-    }
+  onPageChange(page: number) {
+
+    this.currentPage = page;
+
+    this.loadExploreLocalities();
+
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  }
+
 
     loadExploreLocalities() {
       const city = localStorage.getItem('location');
-      // const city = locationCookie || 'Ahmedabad';
-      if (this.isLoading || this.currentPage > this.lastPage) return;
-
-      this.isLoading = true;
-      this.loading = true;
 
       const lastElement = document.querySelectorAll('.localiti-box');
       const lastItem = lastElement[lastElement.length - 1];
@@ -133,31 +142,24 @@ export class ExploreLocalitiesComponent {
         .subscribe(
           (response) => {
             const oldScrollY = window.scrollY;
+            this.explorelocalities =
+              response.data?.data || [];
 
-            this.explorelocalities = this.explorelocalities || [];
-            this.explorelocalities = [
-              ...this.explorelocalities,
-              ...(response.data?.data || []),
-            ];
+            this.explorelocalitiesCount =
+              response.data?.total;
 
             this.setMetaTags(
               response.meta.title,
               response.meta.description,
             );
+            this.itemsPerPage = Number(response.data?.per_page);
 
-            this.lastPage = response?.data?.last_page;          
-            this.explorelocalitiesCount = response?.data?.total;          
+            this.lastPage = response?.data?.last_page;
 
-            this.currentPage++;
-            this.isLoading = false;
-            this.loading = false;
+            this.totalPages = Math.ceil(
+              this.explorelocalitiesCount / this.itemsPerPage
+            );
 
-            setTimeout(() => {
-              if (lastItem) {
-                const newOffset = lastItem.getBoundingClientRect().top;
-                window.scrollTo(0, oldScrollY + (newOffset - lastItemOffset));
-              }
-            }, 100);
           },
           (error) => {
             console.error('Error fetching properties:', error);

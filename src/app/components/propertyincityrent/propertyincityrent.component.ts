@@ -171,8 +171,6 @@ export class PropertyincityrentComponent {
             this.itemsPerPage
           );
 
-          this.itemsPerPage = response.data.per_page;
-
 
         this.setMetaTags(
           response.meta.title,

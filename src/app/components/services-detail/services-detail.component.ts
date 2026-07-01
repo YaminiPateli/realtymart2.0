@@ -3,7 +3,7 @@ import { CompanyPropertyServiceService } from '../../components/service/company-
 import { ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { NgbRatingModule } from '@ng-bootstrap/ng-bootstrap';
-import {NgFor, NgForOf , CommonModule} from "@angular/common";
+import { NgFor, NgForOf, CommonModule } from "@angular/common";
 import { Fancybox } from "@fancyapps/ui";
 import { SlickCarouselModule } from 'ngx-slick-carousel';
 import { Title, Meta } from '@angular/platform-browser';
@@ -30,11 +30,12 @@ export class ServicesDetailComponent implements OnInit {
   tooltipVisible = false;
   tooltipPosition = { top: '0px', left: '0px' };
   [x: string]: any;
-  currentRate:any;
+  currentRate: any;
   singlecompany: any = {};
-  urlSegments:any;
-  fullPath:any;
-  activeSection: string | undefined ='about';
+  urlSegments: any;
+  fullPath: any;
+  activeSection: string | undefined = 'about';
+  isManualScroll: boolean = false;
   private stickyOffset: number = 0;
   lastScrollTop: number = 0;
   isScrollingUp: boolean = false;
@@ -53,8 +54,8 @@ export class ServicesDetailComponent implements OnInit {
   city: any;
   placesName: any;
   dynamicUrl: any;
-   serviceName = this.route.snapshot.paramMap.get('name');
-   serviceId = this.route.snapshot.paramMap.get('id');
+  serviceName = this.route.snapshot.paramMap.get('name');
+  serviceId = this.route.snapshot.paramMap.get('id');
 
   constructor(
     private titleService: Title,
@@ -67,7 +68,7 @@ export class ServicesDetailComponent implements OnInit {
     private geolocationService: GeolocationService,
     private toastr: ToastrService,
     private spinner: NgxSpinnerService
-  ) {}
+  ) { }
 
   enquiryForm = {
     username: '',
@@ -219,7 +220,7 @@ export class ServicesDetailComponent implements OnInit {
   //   }
   // }
 
-  getUrl(urlPart1:any, urlPart2:any){
+  getUrl(urlPart1: any, urlPart2: any) {
     this.url = window.location.origin;
     const staticpart = '/company-detail/';
     this.dynamicUrl = this.url + staticpart + this.serviceName + '/' + this.serviceId;
@@ -289,98 +290,98 @@ export class ServicesDetailComponent implements OnInit {
   //   }
   // }
   fetchCompanyServiceListing() {
-  const serviceName = this.route.snapshot.paramMap.get('name');
-  const serviceId = this.route.snapshot.paramMap.get('id');
+    const serviceName = this.route.snapshot.paramMap.get('name');
+    const serviceId = this.route.snapshot.paramMap.get('id');
 
-  if (!serviceName || !serviceId) return;
+    if (!serviceName || !serviceId) return;
 
-  const city = localStorage.getItem('location');
+    const city = localStorage.getItem('location');
 
-  // Safari + iPhone Fix → Add geolocation options
-  const geoOptions = {
-    enableHighAccuracy: true,
-    timeout: 10000,       // 10 seconds
-    maximumAge: 0
-  };
+    // Safari + iPhone Fix → Add geolocation options
+    const geoOptions = {
+      enableHighAccuracy: true,
+      timeout: 10000,       // 10 seconds
+      maximumAge: 0
+    };
 
 
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-        const lat = latitude;
-        const lng = longitude;
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          const lat = latitude;
+          const lng = longitude;
 
-        this.singleCompanyService
-          .getCompanyServiceListing(serviceName, serviceId, lat, lng, city)
-          .subscribe(
-            (response: any) => {
-              this.singlecompany = response.data;
-              this.setMetaTags(
-                this.singlecompany.meta_title,
-                this.singlecompany.meta_description,
-                this.singlecompany.company_logo
-              );
-              console.log('response', response.data);
-            },
-            (error: any) => {
-              console.error('Error fetching company service listing:', error);
-            }
-          );
-      },
+          this.singleCompanyService
+            .getCompanyServiceListing(serviceName, serviceId, lat, lng, city)
+            .subscribe(
+              (response: any) => {
+                this.singlecompany = response.data;
+                this.setMetaTags(
+                  this.singlecompany.meta_title,
+                  this.singlecompany.meta_description,
+                  this.singlecompany.company_logo
+                );
+                console.log('response', response.data);
+              },
+              (error: any) => {
+                console.error('Error fetching company service listing:', error);
+              }
+            );
+        },
 
-      // ------------- ERROR HANDLER FIXED FOR SAFARI --------------
-      (error: GeolocationPositionError) => {
-        console.error('Geolocation error:', error);
+        // ------------- ERROR HANDLER FIXED FOR SAFARI --------------
+        (error: GeolocationPositionError) => {
+          console.error('Geolocation error:', error);
 
-        // Custom readable error logs
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            console.warn("User denied location request.");
-            break;
+          // Custom readable error logs
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              console.warn("User denied location request.");
+              break;
 
-          case error.POSITION_UNAVAILABLE:
-            console.warn("Location unavailable. Safari often causes this.");
-            break;
+            case error.POSITION_UNAVAILABLE:
+              console.warn("Location unavailable. Safari often causes this.");
+              break;
 
-          case error.TIMEOUT:
-            console.warn("Location timed out.");
-            break;
-        }
+            case error.TIMEOUT:
+              console.warn("Location timed out.");
+              break;
+          }
 
-        // fallback without location
-        this.singleCompanyService
-          .getCompanyServiceListing(serviceName, serviceId, this.lat, this.lng, city)
-          .subscribe(
-            (response: any) => {
-              this.singlecompany = response.data;
-              this.setMetaTags(
-                this.singlecompany.meta_title,
-                this.singlecompany.meta_description,
-                this.singlecompany.company_logo
-              );
-              console.log('response (fallback)', response.data);
-            }
-          );
-      },
-      geoOptions
-    );
-  } else {
-    // If geolocation not supported
-    this.singleCompanyService
-      .getCompanyServiceListing(serviceName, serviceId, this.lat, this.lng, city)
-      .subscribe(
-        (response: any) => {
-          this.singlecompany = response.data;
-          this.setMetaTags(
-            this.singlecompany.meta_title,
-            this.singlecompany.meta_description,
-            this.singlecompany.company_logo
-          );
-        }
+          // fallback without location
+          this.singleCompanyService
+            .getCompanyServiceListing(serviceName, serviceId, this.lat, this.lng, city)
+            .subscribe(
+              (response: any) => {
+                this.singlecompany = response.data;
+                this.setMetaTags(
+                  this.singlecompany.meta_title,
+                  this.singlecompany.meta_description,
+                  this.singlecompany.company_logo
+                );
+                console.log('response (fallback)', response.data);
+              }
+            );
+        },
+        geoOptions
       );
+    } else {
+      // If geolocation not supported
+      this.singleCompanyService
+        .getCompanyServiceListing(serviceName, serviceId, this.lat, this.lng, city)
+        .subscribe(
+          (response: any) => {
+            this.singlecompany = response.data;
+            this.setMetaTags(
+              this.singlecompany.meta_title,
+              this.singlecompany.meta_description,
+              this.singlecompany.company_logo
+            );
+          }
+        );
+    }
   }
-}
 
 
   // Set the title and meta description
@@ -498,6 +499,8 @@ export class ServicesDetailComponent implements OnInit {
     const navbar = document.getElementById('navbar');
 
     if (section && navbar) {
+      this.isManualScroll = true;
+      this.activeSection = sectionId;
       const navbarHeight = navbar.offsetHeight;
       const sectionPosition = section.getBoundingClientRect().top + window.scrollY;
       const scrollMargin = 130;
@@ -506,13 +509,65 @@ export class ServicesDetailComponent implements OnInit {
         top: scrollToPosition,
         behavior: 'smooth'
       });
-      this.activeSection = sectionId;
+      setTimeout(() => {
+        this.isManualScroll = false;
+      }, 1000);
     }
   }
 
-  @HostListener('window:scroll')
+  observeSections() {
+    const sections = document.querySelectorAll('#about, #gallery, #services, #products, #catalogues, #testimonials, #reviews');
+    const observerOptions = {
+      root: null,
+      rootMargin: '-120px 0px -60% 0px',
+      threshold: 0.1,
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && !this.isManualScroll) {
+          this.activeSection = entry.target.id;
+        }
+      });
+    }, observerOptions);
+    sections.forEach((section) => {
+      observer.observe(section);
+    });
+  }
+
+  detectActiveSectionOnScroll(): void {
+    if (this.isManualScroll) return;
+
+    const sections = [
+      { id: 'about', element: document.getElementById('about') },
+      { id: 'gallery', element: document.getElementById('gallery') },
+      { id: 'services', element: document.getElementById('services') },
+      { id: 'products', element: document.getElementById('products') },
+      { id: 'catalogues', element: document.getElementById('catalogues') },
+      { id: 'testimonials', element: document.getElementById('testimonials') },
+      { id: 'reviews', element: document.getElementById('reviews') },
+    ];
+
+    const hEl = document.querySelector('header');
+    const stickyTop = hEl ? hEl.offsetHeight : (window.innerWidth <= 991 ? 115 : 75);
+    const navbar = document.getElementById('navbar');
+    const navbarHeight = navbar ? navbar.offsetHeight : 60;
+    const triggerOffset = stickyTop + navbarHeight + 150;
+
+    let activeSection = 'about';
+    for (const section of sections) {
+      if (section.element) {
+        if (section.element.getBoundingClientRect().top <= triggerOffset) {
+          activeSection = section.id;
+        }
+      }
+    }
+    this.activeSection = activeSection;
+  }
+
+  @HostListener('window:scroll', ['$event'])
   checkScroll() {
-    const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+    const currentScroll = window.pageYOffset || document.documentElement.scrollTop || 0;
     if (currentScroll < this.lastScrollTop) {
       this.isScrollingUp = true;
     } else {
@@ -521,76 +576,93 @@ export class ServicesDetailComponent implements OnInit {
     this.lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
 
     const header = document.querySelector('header');
-    this.isHeaderHidden = header ? header.classList.contains('header-hidden') : false;
-
     const navbar = document.getElementById('navbar');
     if (!navbar) return;
 
-    if (window.scrollY > this.stickyOffset) {
+    if (!navbar.classList.contains('sticky') && navbar.offsetTop > 0) {
+      this.stickyOffset = navbar.offsetTop;
+    }
+
+    if (currentScroll > this.stickyOffset) {
       navbar.classList.add('sticky');
     } else {
       navbar.classList.remove('sticky');
     }
+
+    if (header) {
+      const headerHeight = header.offsetHeight || 75;
+      const hideThreshold = Math.max(0, this.stickyOffset - headerHeight);
+
+      if (currentScroll >= hideThreshold) {
+        header.classList.add('header-hidden');
+        this.isHeaderHidden = true;
+      } else {
+        header.classList.remove('header-hidden');
+        this.isHeaderHidden = false;
+      }
+    }
+
+    this.detectActiveSectionOnScroll();
   }
 
-  shareonWhatsapp(){
+  shareonWhatsapp() {
     // const whatsappMessage = `https://api.whatsapp.com/send?text=${encodeURIComponent('Check out my amazing concept: My Amazing Website! '+this.fullPath)}`;
     // window.open(whatsappMessage, '_blank');
     const message = `Thank you for your inquiry. Our team will get back to you shortly.`;
 
-const whatsappMessage =
-  `https://api.whatsapp.com/send?phone=7378373783&text=${encodeURIComponent(message)}`;
+    const whatsappMessage =
+      `https://api.whatsapp.com/send?phone=7378373783&text=${encodeURIComponent(message)}`;
 
-window.open(whatsappMessage, '_blank');
+    window.open(whatsappMessage, '_blank');
   }
 
 
- // google reviews
-//  queryPlaceByName(placeName: string): void {
-//   const service = new google.maps.places.PlacesService(document.createElement('div'));
+  // google reviews
+  //  queryPlaceByName(placeName: string): void {
+  //   const service = new google.maps.places.PlacesService(document.createElement('div'));
 
-//   const request = {
-//     query: placeName,
-//     fields: ['place_id', 'name'],
-//   };
+  //   const request = {
+  //     query: placeName,
+  //     fields: ['place_id', 'name'],
+  //   };
 
-//   service.textSearch(request, (results: any, status: any) => {
-//     if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
-//       const placeId = results[0].place_id;
-//       this.fetchPlaceDetails(placeId);
-//     } else {
-//       this.errorMessage = 'Error: Place not found.';
-//     }
-//   });
-// }
+  //   service.textSearch(request, (results: any, status: any) => {
+  //     if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
+  //       const placeId = results[0].place_id;
+  //       this.fetchPlaceDetails(placeId);
+  //     } else {
+  //       this.errorMessage = 'Error: Place not found.';
+  //     }
+  //   });
+  // }
 
-getToday(): string {
-  const today = new Date().getDay(); // Sunday = 0, Saturday = 6
-  return today === 0 ? '7' : today.toString(); // Convert Sunday (0) to '7'
-}
+  getToday(): string {
+    const today = new Date().getDay(); // Sunday = 0, Saturday = 6
+    return today === 0 ? '7' : today.toString(); // Convert Sunday (0) to '7'
+  }
 
-// Check if the day matches today
-isToday(day: string): boolean {
-  return day === this.getToday();
-}
+  // Check if the day matches today
+  isToday(day: string): boolean {
+    return day === this.getToday();
+  }
 
-// Convert day number to day name
-getDayName(day: string): string {
-  return this.dayNames[parseInt(day, 10) - 1] || 'UNKNOWN';
-}
+  // Convert day number to day name
+  getDayName(day: string): string {
+    return this.dayNames[parseInt(day, 10) - 1] || 'UNKNOWN';
+  }
 
-// Reorder business hours to start with today
-reorderBusinessHours() {
-  const today = this.getToday();
-  const todayIndex = parseInt(today, 10) - 1;
+  // Reorder business hours to start with today
+  reorderBusinessHours() {
+    const today = this.getToday();
+    const todayIndex = parseInt(today, 10) - 1;
 
-  const sortedHours = [
-    ...this.singlecompany?.bussiness_hours?.slice(todayIndex),
-    ...this.singlecompany?.bussiness_hours?.slice(0, todayIndex),
-  ];
+    const sortedHours = [
+      ...this.singlecompany?.bussiness_hours?.slice(todayIndex),
+      ...this.singlecompany?.bussiness_hours?.slice(0, todayIndex),
+    ];
 
-  return sortedHours;
-}
+    return sortedHours;
+  }
 
   fetchPlaceDetails(placeId: string): void {
     const service = new google.maps.places.PlacesService(document.createElement('div'));

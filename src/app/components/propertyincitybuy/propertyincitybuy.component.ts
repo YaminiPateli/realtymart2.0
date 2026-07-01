@@ -185,12 +185,12 @@ export class PropertyincitybuyComponent {
           this.ownerlauchedpropertycount =
             response.data?.total;
 
+            this.itemsPerPage = response.data.per_page;
           this.totalPages = Math.ceil(
             this.ownerlauchedpropertycount /
             this.itemsPerPage
           );
 
-          this.itemsPerPage = response.data.per_page;
 
         this.setMetaTags(
           response.meta.title,

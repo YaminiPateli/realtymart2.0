@@ -12,7 +12,7 @@ import { Fancybox } from "@fancyapps/ui";
 import { TopbuildersService } from '../service/topbuilders.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
-import { Title,Meta } from '@angular/platform-browser';
+import { Title, Meta } from '@angular/platform-browser';
 import { ActivityTrackerService } from '../service/activitytracker.service';
 import { GeolocationService } from '../service/geolocation.service';
 declare var bootstrap: any;
@@ -30,7 +30,7 @@ export class BuilderDetailComponent implements OnInit, AfterViewInit {
   @ViewChild('otpContactModel') otpContactModel!: ElementRef;
   activeTab: string = 'ongoing';
   private apiUrl: string = environment.apiUrl;
-  running_projectsData:any;
+  running_projectsData: any;
   allbuildersData: any;
   allbuilders: any;
   listbuilder: any = {};
@@ -40,27 +40,27 @@ export class BuilderDetailComponent implements OnInit, AfterViewInit {
   allpropertytype: any;
   completedproject: any;
   completedprojectData: any;
-  builderprojectData:any;
+  builderprojectData: any;
   builderproject: any;
   searchpricetrendsdata: any;
-  builderDetail:any;
+  builderDetail: any;
   locationCookie: any;
   topbuilderData: any;
   topbuilders: any;
   dates: any;
   prices: any;
-  nameContactError:boolean=false;
-  emailContactError:boolean=false;
-  phoneContactError:boolean=false;
-  termsContactError:boolean=false;
+  nameContactError: boolean = false;
+  emailContactError: boolean = false;
+  phoneContactError: boolean = false;
+  termsContactError: boolean = false;
   otpError: boolean = false;
   isResendEnabled = false;
-  isMobileNumberDisabled: boolean = false; 
+  isMobileNumberDisabled: boolean = false;
   isSubmitting = false;
   remainingTime: number = 60;
   private timer: any;
   public chart: any;
-  completed_project:any;
+  completed_project: any;
   filteredRunningProjects: any[] = [];
   filteredCompletedProjects: any[] = [];
   myForm!: FormGroup;
@@ -74,14 +74,14 @@ export class BuilderDetailComponent implements OnInit, AfterViewInit {
     contactusername: '',
     contactuseremail: '',
     contactcountrycode: 'IN +91',
-    contactcontact_no: null, 
+    contactcontact_no: null,
     contactproperty_for: '', // Initialize with an empty string,
     contactotp: '',
     termsContactAccepted: false
   };
   city: any;
-  city1:City[]=[];
-  validcityforselected:any;
+  city1: City[] = [];
+  validcityforselected: any;
 
   cmprj = {
     city: 'All Cities',
@@ -95,8 +95,8 @@ export class BuilderDetailComponent implements OnInit, AfterViewInit {
     builderid: this.route.snapshot.paramMap.get('id'),
   };
 
-  is_token:boolean=false;
-  checkToken:any;
+  is_token: boolean = false;
+  checkToken: any;
 
   // share URL data
   url: string = '';
@@ -104,7 +104,8 @@ export class BuilderDetailComponent implements OnInit, AfterViewInit {
   tooltipVisible: boolean = false;
   tooltipPosition: { top: string; left: string } = { top: '0px', left: '0px' };
 
-  activeSection: string | undefined ='overview';
+  activeSection: string | undefined = 'overview';
+  isManualScroll: boolean = false;
   stickyOffset: number = 0;
   isHeaderHidden: boolean = false;
   constructor(
@@ -119,7 +120,7 @@ export class BuilderDetailComponent implements OnInit, AfterViewInit {
     private spinner: NgxSpinnerService,
     private toastr: ToastrService,
     private activityTrackerService: ActivityTrackerService,
-     private geolocationService: GeolocationService,
+    private geolocationService: GeolocationService,
     // private modalElement: HTMLElement | null = null;
   ) {
     const builderId = this.route.snapshot.paramMap.get('id');
@@ -132,34 +133,34 @@ export class BuilderDetailComponent implements OnInit, AfterViewInit {
     this.loadAllPropertyType();
     this.loadTopBuilders();
     const modalElement = document.getElementById('get-builder');
-  if (modalElement) {
-    modalElement.addEventListener('hide.bs.modal', () => {
-      this.resetContactForm();
-    });
-  }
-  const token = localStorage.getItem('myrealtylogintoken');
-  if (token) {
-    this.is_token = true;
-    this.formDataphone.contactusername = localStorage.getItem('name') || '';
-    this.formDataphone.contactuseremail = localStorage.getItem('email') || '';
-    this.formDataphone.contactcontact_no = localStorage.getItem('contact_no') || '';
-    this.formDataphone.termsContactAccepted = true;
-  }
+    if (modalElement) {
+      modalElement.addEventListener('hide.bs.modal', () => {
+        this.resetContactForm();
+      });
+    }
+    const token = localStorage.getItem('myrealtylogintoken');
+    if (token) {
+      this.is_token = true;
+      this.formDataphone.contactusername = localStorage.getItem('name') || '';
+      this.formDataphone.contactuseremail = localStorage.getItem('email') || '';
+      this.formDataphone.contactcontact_no = localStorage.getItem('contact_no') || '';
+      this.formDataphone.termsContactAccepted = true;
+    }
   }
 
   checkLoggedIn() {
     this.checkToken = localStorage.getItem('myrealtylogintoken');
-    if(this.checkToken){
-      this.is_token= true;
+    if (this.checkToken) {
+      this.is_token = true;
     }
     else {
-      this.is_token= false;
+      this.is_token = false;
     }
   }
   // meta title 
   setMetaTags(title: string, description: string, image: string) {
     this.titleService.setTitle(title);
-  
+
     this.metaService.updateTag({ name: 'description', content: description });
     this.metaService.updateTag({ property: 'og:title', content: title });
     this.metaService.updateTag({ property: 'og:description', content: description });
@@ -244,18 +245,21 @@ export class BuilderDetailComponent implements OnInit, AfterViewInit {
     const builderDetailsId = this.route.snapshot.paramMap.get('id');
     // const builderDetailName = this.route.snapshot.paramMap.get('name');
     if (builderDetailsId) {
-    this.builderDetailService.getsinglebuilderdetail(builderDetailsId).subscribe(
-      (res:any) => {
-        this.builderDetail = res.data;
-        this.setMetaTags(this.builderDetail.meta_title, this.builderDetail.meta_description , this.builderDetail.builder_logo);
-        this.filteredRunningProjects = [...this.builderDetail.runningproject];
-        this.filteredCompletedProjects = [...this.builderDetail.completedproject];
-      },
-      (error: any) => {
-        console.error('Error fetching all builders:', error);
-      }
-    );
-  }
+      this.builderDetailService.getsinglebuilderdetail(builderDetailsId).subscribe(
+        (res: any) => {
+          this.builderDetail = res.data;
+          this.setMetaTags(this.builderDetail.meta_title, this.builderDetail.meta_description, this.builderDetail.builder_logo);
+          this.filteredRunningProjects = [...this.builderDetail.runningproject];
+          this.filteredCompletedProjects = [...this.builderDetail.completedproject];
+          setTimeout(() => {
+            this.observeSections();
+          }, 500);
+        },
+        (error: any) => {
+          console.error('Error fetching all builders:', error);
+        }
+      );
+    }
   }
 
   onSearch(): void {
@@ -268,29 +272,29 @@ export class BuilderDetailComponent implements OnInit, AfterViewInit {
 
     if (this.builderDetail) {
       this.filteredRunningProjects = this.builderDetail.runningproject.filter(
-        (project:any) =>
+        (project: any) =>
           (city === 'All Cities' || project.project_city === city) &&
           (projecttype === 'Project Type' || project.project_type.includes(projecttype))
       );
 
       this.filteredCompletedProjects = this.builderDetail.completedproject.filter(
-        (project:any) => 
-           (city === 'All Cities' || project.project_city === city) &&
-        (projecttype === 'Project Type' || project.project_type.includes(projecttype))
-        
-        );
+        (project: any) =>
+          (city === 'All Cities' || project.project_city === city) &&
+          (projecttype === 'Project Type' || project.project_type.includes(projecttype))
+
+      );
     }
   }
 
-  loadAllCities() : void{
-    this.allcityService.getallcities()?.subscribe((data:any) => {
+  loadAllCities(): void {
+    this.allcityService.getallcities()?.subscribe((data: any) => {
       this.allcitiesData = data;
       this.allcities = this.allcitiesData?.responseData?.allcities;
     });
   }
 
-  loadAllPropertyType() : void{
-    this.allpropertytypeService.getallpropertytype()?.subscribe((data:any) => {
+  loadAllPropertyType(): void {
+    this.allpropertytypeService.getallpropertytype()?.subscribe((data: any) => {
       this.allpropertytypeData = data;
       this.allpropertytype = this.allpropertytypeData?.responseData?.allPropertytype;
     });
@@ -322,35 +326,35 @@ export class BuilderDetailComponent implements OnInit, AfterViewInit {
     // }
     this.spinner.show();
     const payload = {
-    contact_no:this.formDataphone.contactcontact_no,
-    builder_id:this.builderDetail.id,
-    username:this.formDataphone.contactusername,
-    useremail:this.formDataphone.contactuseremail,
-    leads_type:'builder',
-    // leads_for:'',
-    receiver_user_id:this.builderDetail.user_id,
-    location:this.city,
+      contact_no: this.formDataphone.contactcontact_no,
+      builder_id: this.builderDetail.id,
+      username: this.formDataphone.contactusername,
+      useremail: this.formDataphone.contactuseremail,
+      leads_type: 'builder',
+      // leads_for:'',
+      receiver_user_id: this.builderDetail.user_id,
+      location: this.city,
       // contact_no :this.formDataphone.contactcontact_no,
       // useremail:this.formDataphone.contactuseremail,
       // username:this.formDataphone.contactusername
     }
-   const token = localStorage.getItem('myrealtylogintoken');
-      
-         const headers = new HttpHeaders()
-           .set('Authorization', `Bearer ${token}`)
-           .set('Accept', 'application/json');
-    this.http.post(`${this.apiUrl}storeinquiry`,payload,{headers})
+    const token = localStorage.getItem('myrealtylogintoken');
+
+    const headers = new HttpHeaders()
+      .set('Authorization', `Bearer ${token}`)
+      .set('Accept', 'application/json');
+    this.http.post(`${this.apiUrl}storeinquiry`, payload, { headers })
       .subscribe((response: any) => {
         if (response.status === true) {
-          this.activityTrackerService.logActivity('Inquiry stored for Builder','');
-        this.toastr.success('Inquiry Addeded successfully!');
-        const modalElement = document.getElementById('get-builder');
-        if (modalElement) {
-          const modalInstance = bootstrap.Modal.getInstance(modalElement);
-          modalInstance?.hide();
+          this.activityTrackerService.logActivity('Inquiry stored for Builder', '');
+          this.toastr.success('Inquiry Addeded successfully!');
+          const modalElement = document.getElementById('get-builder');
+          if (modalElement) {
+            const modalInstance = bootstrap.Modal.getInstance(modalElement);
+            modalInstance?.hide();
+          }
+          this.resetContactForm();
         }
-        this.resetContactForm();
-      } 
       }, (error) => {
         console.error('Error sending data', error);
       });
@@ -392,8 +396,7 @@ export class BuilderDetailComponent implements OnInit, AfterViewInit {
     }
   }
 
-  validateContactName(event:any)
-  {
+  validateContactName(event: any) {
     const inputValue = event.target.value;
     const companyPattern = /^[a-zA-Z\s]+$/;
     this.nameContactError = !companyPattern.test(inputValue);
@@ -418,9 +421,9 @@ export class BuilderDetailComponent implements OnInit, AfterViewInit {
       sequentialPattern.test(inputValue) ||          // Reject if sequential
       mirroredPattern.test(inputValue)               // Reject if mirrored/palindromic
     ) {
-      this.phoneContactError =true;
+      this.phoneContactError = true;
     } else {
-      this.phoneContactError= false;
+      this.phoneContactError = false;
       // this.sendOTPToMobile();
     }
   }
@@ -431,28 +434,25 @@ export class BuilderDetailComponent implements OnInit, AfterViewInit {
     this.emailContactError = false;
     this.termsContactError = false;
 
-    if(!this.formDataphone.contactusername) {
-      this.nameContactError=true;
+    if (!this.formDataphone.contactusername) {
+      this.nameContactError = true;
     }
-    if(!this.formDataphone.contactuseremail)
-    {
-      this.emailContactError=true;
+    if (!this.formDataphone.contactuseremail) {
+      this.emailContactError = true;
     }
-    if(!this.formDataphone.contactcontact_no)
-    {
-      this.phoneContactError=true;
+    if (!this.formDataphone.contactcontact_no) {
+      this.phoneContactError = true;
     }
     if (!this.formDataphone.termsContactAccepted) {
       this.termsContactError = true;
     }
-    if(this.nameContactError || this.phoneContactError || this.emailContactError || this.termsContactError)
-    {
+    if (this.nameContactError || this.phoneContactError || this.emailContactError || this.termsContactError) {
       return;
     }
     if (this.phoneContactError) {
-      return; 
+      return;
     }
-    this.sendOTPContactToMobile(); 
+    this.sendOTPContactToMobile();
 
     let contactModal = document.getElementById('get-builder');
     let otpModal = document.getElementById('#otpContactModel');
@@ -482,22 +482,22 @@ export class BuilderDetailComponent implements OnInit, AfterViewInit {
       })
       .subscribe(
         (response: any) => {
-          if(response.data =='ok') {
-          this.startTimer();
-          if (response.status === true) {
-            // this.sendOTPToMobile();
-            const modalElement = this.otpContactModel.nativeElement;
-            const modal = new bootstrap.Modal(modalElement);
-            modal.show();
-            this.toastr.success('OTP Sent Successfully.');
+          if (response.data == 'ok') {
+            this.startTimer();
+            if (response.status === true) {
+              // this.sendOTPToMobile();
+              const modalElement = this.otpContactModel.nativeElement;
+              const modal = new bootstrap.Modal(modalElement);
+              modal.show();
+              this.toastr.success('OTP Sent Successfully.');
+            }
+            if (response.code === 101) {
+              this.toastr.warning(response.message);
+            }
           }
-          if (response.code === 101) {
-            this.toastr.warning(response.message);
+          else {
+            this.phoneContactError = true;
           }
-        }
-        else {
-          this.phoneContactError= true;
-        }
           this.spinner.hide();
         },
         (error) => {
@@ -509,13 +509,13 @@ export class BuilderDetailComponent implements OnInit, AfterViewInit {
   }
 
   verifyContactOTP() {
-    if(this.formDataphone.contactotp == ''){
+    if (this.formDataphone.contactotp == '') {
       this.toastr.error('Please Enter OTP');
       return
     }
-    let payload  = {
-      contact_no:this.formDataphone.contactcontact_no,
-      otp:this.formDataphone.contactotp,
+    let payload = {
+      contact_no: this.formDataphone.contactcontact_no,
+      otp: this.formDataphone.contactotp,
     }
     this.http
       .post(
@@ -564,22 +564,22 @@ export class BuilderDetailComponent implements OnInit, AfterViewInit {
         }
       );
   }
-  
-    fetchCities() {
-      this.http.get<{ data: { id: number; name: string }[] }>(`${environment.apiUrl}cities`).subscribe(
-        (response: any) => {
-          this.city1 = response.responseData.map((city: any) => ({
-            cid: city.id,
-            cname: city.name
-          }));
-          this.validcityforselected = response.validCities;
-          const defaultCity = this.city1.find(city => city.cname === this.city);
-        },
-        (error: any) => {
-          console.error('API Error:', error);
-        }
-      );
-    }
+
+  fetchCities() {
+    this.http.get<{ data: { id: number; name: string }[] }>(`${environment.apiUrl}cities`).subscribe(
+      (response: any) => {
+        this.city1 = response.responseData.map((city: any) => ({
+          cid: city.id,
+          cname: city.name
+        }));
+        this.validcityforselected = response.validCities;
+        const defaultCity = this.city1.find(city => city.cname === this.city);
+      },
+      (error: any) => {
+        console.error('API Error:', error);
+      }
+    );
+  }
 
   isValidCity(city: string): boolean {
     return this.validcityforselected.includes(city);
@@ -589,15 +589,15 @@ export class BuilderDetailComponent implements OnInit, AfterViewInit {
     this.city = city;
     localStorage.setItem('location', city);
   }
-  
+
   startTimer() {
     this.isResendEnabled = false;
-    this.remainingTime = 60; 
+    this.remainingTime = 60;
     clearInterval(this.timer);
-  
+
     this.timer = setInterval(() => {
       this.remainingTime--;
-  
+
       if (this.remainingTime <= 0) {
         clearInterval(this.timer);
         this.isResendEnabled = true;
@@ -672,7 +672,7 @@ export class BuilderDetailComponent implements OnInit, AfterViewInit {
       },
     ],
   };
-// project slider
+  // project slider
   slideConfig3 = {
     slidesToShow: 2,
     slidesToScroll: 2,
@@ -681,7 +681,7 @@ export class BuilderDetailComponent implements OnInit, AfterViewInit {
     infinite: true,
     autoplay: true,
 
-   
+
     responsive: [
       {
         breakpoint: 520,  // Max width 1024px
@@ -740,6 +740,8 @@ export class BuilderDetailComponent implements OnInit, AfterViewInit {
     const navbar = document.getElementById('navbar');
 
     if (section && navbar) {
+      this.isManualScroll = true;
+      this.activeSection = sectionId;
       const navbarHeight = navbar.offsetHeight;
       const sectionPosition = section.getBoundingClientRect().top + window.scrollY;
       const scrollMargin = 130;
@@ -748,25 +750,90 @@ export class BuilderDetailComponent implements OnInit, AfterViewInit {
         top: scrollToPosition,
         behavior: 'smooth'
       });
-      this.activeSection = sectionId;
+      setTimeout(() => {
+        this.isManualScroll = false;
+      }, 1000);
     }
   }
+
+  observeSections() {
+    const sections = document.querySelectorAll('#overview, #projects, #award, #faqs');
+    const observerOptions = {
+      root: null,
+      rootMargin: '-120px 0px -60% 0px',
+      threshold: 0.1,
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && !this.isManualScroll) {
+          this.activeSection = entry.target.id;
+        }
+      });
+    }, observerOptions);
+    sections.forEach((section) => {
+      observer.observe(section);
+    });
+  }
+
+  detectActiveSectionOnScroll(): void {
+    if (this.isManualScroll) return;
+
+    const sections = [
+      { id: 'overview', element: document.getElementById('overview') },
+      { id: 'projects', element: document.getElementById('projects') },
+      { id: 'award', element: document.getElementById('award') },
+      { id: 'faqs', element: document.getElementById('faqs') },
+    ];
+
+    const hEl = document.querySelector('header');
+    const stickyTop = hEl ? hEl.offsetHeight : (window.innerWidth <= 991 ? 115 : 75);
+    const navbar = document.getElementById('navbar');
+    const navbarHeight = navbar ? navbar.offsetHeight : 60;
+    const triggerOffset = stickyTop + navbarHeight + 150;
+
+    let activeSection = 'overview';
+    for (const section of sections) {
+      if (section.element) {
+        if (section.element.getBoundingClientRect().top <= triggerOffset) {
+          activeSection = section.id;
+        }
+      }
+    }
+    this.activeSection = activeSection;
+  }
+
   @HostListener('window:scroll', ['$event'])
   checkScroll() {
     const header = document.querySelector('header');
-    this.isHeaderHidden = header ? header.classList.contains('header-hidden') : false;
-
-    const navbar = document.getElementById("navbar");
+    const navbar = document.getElementById('navbar');
     if (!navbar) return;
 
-    if (!navbar.classList.contains("sticky") && navbar.offsetTop > 0) {
+    if (!navbar.classList.contains('sticky') && navbar.offsetTop > 0) {
       this.stickyOffset = navbar.offsetTop;
     }
 
-    if (window.pageYOffset > this.stickyOffset) {
-      navbar.classList.add("sticky");
+    const currentScroll = window.pageYOffset || document.documentElement.scrollTop || 0;
+
+    if (currentScroll > this.stickyOffset) {
+      navbar.classList.add('sticky');
     } else {
-      navbar.classList.remove("sticky");
+      navbar.classList.remove('sticky');
     }
+
+    if (header) {
+      const headerHeight = header.offsetHeight || 75;
+      const hideThreshold = Math.max(0, this.stickyOffset - headerHeight);
+
+      if (currentScroll >= hideThreshold) {
+        header.classList.add('header-hidden');
+        this.isHeaderHidden = true;
+      } else {
+        header.classList.remove('header-hidden');
+        this.isHeaderHidden = false;
+      }
+    }
+
+    this.detectActiveSectionOnScroll();
   }
 }

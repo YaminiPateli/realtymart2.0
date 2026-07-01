@@ -54,6 +54,7 @@ export class NewlylaunchedComponent {
   };
   paginatedData: any[] = []; // Data for the current page
   currentPage: number = 1; // Current page number
+  totalPages = 0;
   pageSize: number = 5; // Items per page
   totalItems: number = 0; // Total number of items
   itemsPerPage = 5;
@@ -147,15 +148,7 @@ export class NewlylaunchedComponent {
 
   fetchNewLaunchProject(): void {
     this.city = localStorage.getItem('location');
-    if (this.isLoading || this.currentPage > this.lastPage) return;
-
-    this.isLoading = true;
-    this.loading = true;
-
-    const lastElement = document.querySelectorAll('.maching-myproperties');
-    const lastItem = lastElement[lastElement.length - 1];
-    const lastItemOffset = lastItem ? lastItem.getBoundingClientRect().top : 0;
-
+  
     this.http
       .get<any>(
         `${environment.apiUrl}newlylaunched/${this.city}?page=${this.currentPage}`
@@ -163,6 +156,11 @@ export class NewlylaunchedComponent {
       .subscribe(
         (response) => {
           const oldScrollY = window.scrollY;
+            this.newlauchedproperty =
+        response.data?.data || [];
+
+      this.newlauchedpropertycount =
+        response.data?.total;
 
           this.newlauchedproperty = this.newlauchedproperty || [];
           this.newlauchedproperty = [
@@ -170,19 +168,13 @@ export class NewlylaunchedComponent {
             ...(response.data?.data || []),
           ];
           this.setMetaTags(response.meta.title, response.meta.description);
+          this.itemsPerPage = Number(response.data?.per_page);
+          this.totalPages = Math.ceil(
+            this.newlauchedpropertycount /
+            this.itemsPerPage
+          );
 
           this.lastPage = response?.data?.last_page;
-
-          this.currentPage++;
-          this.isLoading = false;
-          this.loading = false;
-
-          setTimeout(() => {
-            if (lastItem) {
-              const newOffset = lastItem.getBoundingClientRect().top;
-              window.scrollTo(0, oldScrollY + (newOffset - lastItemOffset));
-            }
-          }, 100);
         },
         (error) => {
           console.error('Error fetching properties:', error);
@@ -192,23 +184,35 @@ export class NewlylaunchedComponent {
       );
   }
 
-  @HostListener('window:scroll', [])
-  onScroll(): void {
-    const items = document.querySelectorAll('.maching-myproperties');
-    if (items.length < 20) return;
+  // @HostListener('window:scroll', [])
+  // onScroll(): void {
+  //   const items = document.querySelectorAll('.maching-myproperties');
+  //   if (items.length < 20) return;
 
-    const lastVisibleItem = items[items.length - 2];
-    if (!lastVisibleItem) return;
+  //   const lastVisibleItem = items[items.length - 2];
+  //   if (!lastVisibleItem) return;
 
-    const rect = lastVisibleItem.getBoundingClientRect();
-    const windowHeight = window.innerHeight;
+  //   const rect = lastVisibleItem.getBoundingClientRect();
+  //   const windowHeight = window.innerHeight;
 
-    if (rect.top < windowHeight && !this.isLoading) {
-      clearTimeout(this.scrollTimeout);
-      this.scrollTimeout = setTimeout(() => {
-        this.fetchNewLaunchProject();
-      }, 200);
-    }
+  //   if (rect.top < windowHeight && !this.isLoading) {
+  //     clearTimeout(this.scrollTimeout);
+  //     this.scrollTimeout = setTimeout(() => {
+  //       this.fetchNewLaunchProject();
+  //     }, 200);
+  //   }
+  // }
+
+  onPageChange(page: number) {
+
+    this.currentPage = page;
+
+    this.fetchNewLaunchProject();
+
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
   }
 
   // meta title

@@ -1,4 +1,4 @@
-import { Component, HostListener, ViewChild, ElementRef, OnInit  } from '@angular/core';
+import { Component, HostListener, ViewChild, ElementRef, OnInit, OnDestroy } from '@angular/core';
 import { FormControl, Validators, FormsModule, ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
@@ -21,7 +21,7 @@ declare var $: any; // Declare jQuery
     CountryCodeInputComponent
 ]
 })
-export class SellingGuideComponent {
+export class SellingGuideComponent implements OnInit, OnDestroy {
   apiUrl = environment.apiUrl;
   contactStore!: FormGroup;
   bootstrap:any;
@@ -101,6 +101,7 @@ export class SellingGuideComponent {
   }
 
   @ViewChild('exampleModal') modal!: ElementRef;
+  private modalTimer: any;
 
 
   isFixed: boolean = true; // Initial state is fixed
@@ -115,11 +116,25 @@ export class SellingGuideComponent {
   }
 
   autoOpenModal() {
-    setTimeout(() => {
-      if (this.modal && this.modal.nativeElement) {
+    this.modalTimer = setTimeout(() => {
+      // Only show the modal if this element is still in the document and we are still on the selling-guide page
+      if (this.modal && this.modal.nativeElement && document.body.contains(this.modal.nativeElement) && this.route.url.includes('/selling-guide')) {
         $(this.modal.nativeElement).modal('show');
       }
     }, 15000); // 15 seconds delay
+  }
+
+  ngOnDestroy() {
+    if (this.modalTimer) {
+      clearTimeout(this.modalTimer);
+      this.modalTimer = null;
+    }
+    // Only hide this specific component modal
+    if (this.modal && this.modal.nativeElement) {
+      try {
+        $(this.modal.nativeElement).modal('hide');
+      } catch (e) {}
+    }
   }
 
   // addContact(clearaddform: any) {
