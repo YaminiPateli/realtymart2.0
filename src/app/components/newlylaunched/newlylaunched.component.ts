@@ -809,8 +809,8 @@ export class NewlylaunchedComponent {
     const body = encodeURIComponent(
       `Here is something interesting: ${this.propertyLink}`
     );
-    const mailtoLink = `mailto:?subject=${subject}&body=${body}`;
-    window.open(mailtoLink, '_blank');
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&su=${subject}&body=${body}`;
+    window.open(gmailUrl, '_blank');
   }
 
   showTooltip(event: MouseEvent): void {

@@ -2514,8 +2514,9 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   emailReelShare() {
     const subject = encodeURIComponent('Check this reel');
     const body = encodeURIComponent(`Here is something interesting: ${this.reelDynamicUrl}`);
-    const mailtoLink = `mailto:?subject=${subject}&body=${body}`;
-    window.open(mailtoLink, '_blank');
+    // Open Gmail web composer directly in a new tab so it works in browsers without requiring desktop mail apps
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&su=${subject}&body=${body}`;
+    window.open(gmailUrl, '_blank');
   }
 
   whatsappReelShare() {
