@@ -127,6 +127,9 @@ export class BuilderDetailComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }, 0);
     this.locationCookie = localStorage.getItem('location');
     this.fetchBuilderDetail();
     this.loadAllCities();
@@ -822,10 +825,13 @@ export class BuilderDetailComponent implements OnInit, AfterViewInit {
     }
 
     if (header) {
-      const headerHeight = header.offsetHeight || 75;
-      const hideThreshold = Math.max(0, this.stickyOffset - headerHeight);
+      const isMenuOpen = document.getElementById('navbarSupportedContent')?.classList.contains('show') ||
+                         document.getElementById('navbarSupportedContent')?.classList.contains('collapsing');
+      const isMobileOrTablet = window.innerWidth <= 991;
+      const headerHeight = isMobileOrTablet ? 115 : (header.offsetHeight || 75);
+      const hideThreshold = this.stickyOffset - headerHeight;
 
-      if (currentScroll >= hideThreshold) {
+      if (!isMenuOpen && this.stickyOffset > 0 && currentScroll > 0 && currentScroll >= hideThreshold) {
         header.classList.add('header-hidden');
         this.isHeaderHidden = true;
       } else {

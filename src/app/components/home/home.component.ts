@@ -521,10 +521,10 @@ export class HomeComponent implements AfterViewInit, OnInit {
           console.log('Active Tab:', this.activeTab);
 
           const defaultSelections = ['Office Space', 'Commercial Land'];
-          this.selectedPlotItems = this.propertyplot
+          this.selectedCommercialItems = this.propertycommercial
             ?.filter((item: any) => defaultSelections.includes(item.name))
             .map((item: any) => item.id);
-          this.selectedItemsOrder = this.propertyplot?.filter(
+          this.selectedItemsOrder = this.propertycommercial?.filter(
             (item: any) => defaultSelections.includes(item.name)
           );
 
