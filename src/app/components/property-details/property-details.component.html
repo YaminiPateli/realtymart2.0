@@ -364,7 +364,7 @@
               <div class="row">
                 <div class="col-md-2" *ngFor="let amenities of this.singleproperty?.amenitiess">
                   <div class="amenit_box">
-                    <img src="{{ amenities.image }}" alt class="img-fluid" />
+                    <img src="{{ amenities.image }}" alt="amenities-image" class="img-fluid" />
                   </div>
                   <p class="amenit_title">{{ amenities.name }}</p>
                 </div>
@@ -446,7 +446,7 @@
               <ngx-slick-carousel class="carousel" #slickModal="slick-carousel" [config]="slideConfig1">
                 <div ngxSlickItem class="slide" *ngFor="let item of nearByProperty">
                   <a href="#" class="prj_box">
-                    <img src="{{ item.property_main_img }}" alt="" />
+                    <img src="{{ item.property_main_img }}" alt="property-main-img" />
                     <div class="projdesc">
                       <a routerLink="/property-details/{{
                   item.propertyfirstUrlPart
@@ -479,7 +479,7 @@
                 <div class="row align-items-center">
                   <div class="col-md-6 mb-2">
                     <div class="company_llg">
-                      <img src="{{ singleproperty?.project_logo }}" alt="" class="img-fluid" />
+                      <img src="{{ singleproperty?.project_logo }}" alt="project_logo" class="img-fluid" />
                     </div>
                   </div>
                   <div class="col-md-6">
@@ -668,7 +668,7 @@
               <div class="row">
                 <div class="col-md-2" *ngFor="let amenities of this.singleproperty?.amenitiess">
                   <div class="amenit_box">
-                    <img src="{{ amenities.image }}" alt class="img-fluid" />
+                    <img src="{{ amenities.image }}" alt="amenities-image" class="img-fluid" />
                   </div>
                   <p class="amenit_title">{{ amenities.name }}</p>
                 </div>
@@ -755,7 +755,7 @@
               <ngx-slick-carousel class="carousel" #slickModal="slick-carousel" [config]="slideConfig1">
                 <div ngxSlickItem class="slide" *ngFor="let item of nearByProperty">
                   <a href="#" class="prj_box">
-                    <img src="{{ item.property_main_img }}" alt="" />
+                    <img src="{{ item.property_main_img }}" alt="property-main-img" />
                     <div class="projdesc">
                       <a routerLink="/property-details/{{
                       item.propertyfirstUrlPart
@@ -789,7 +789,7 @@
                 <div class="row align-items-center">
                   <div class="col-md-6 mb-2">
                     <div class="company_llg">
-                      <img src="{{ singleproperty?.project_logo }}" alt="" class="img-fluid" />
+                      <img src="{{ singleproperty?.project_logo }}" alt="project_logo" class="img-fluid" />
                     </div>
                   </div>
 
@@ -1217,7 +1217,7 @@
         <ngx-slick-carousel class="carousel" #slickModal="slick-carousel" [config]="slideConfig1">
           <div ngxSlickItem class="slide" *ngFor="let verify of verifyProperty">
             <div class="prj_box">
-              <img src="{{ verify.property_main_img }}" alt="" class="img-fluid" />
+              <img src="{{ verify.property_main_img }}" alt="property-main-img" class="img-fluid" />
               <div class="projdesc">
                 <a routerLink="/property-details/{{
                     verify.propertyfirstUrlPart

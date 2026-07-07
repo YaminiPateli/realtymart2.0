@@ -14,7 +14,7 @@
             <div class="buy-image">
               <img
                 src="{{ singleproject.project_images }}"
-                alt=""
+                alt="project_images"
                 class="img-fluid"
               />
             </div>
@@ -296,7 +296,7 @@
           <h4>Verified on RealtyMart</h4>
           <div class="buy-proj">
               <div class="ongoing-img" *ngFor="let verifys of verify">
-                <img src="{{ verifys.project_images }}" alt="" class="img-fluid">
+                <img src="{{ verifys.project_images }}" alt="project_images" class="img-fluid">
                 <div class="ongoing-deatils">
                   <a routerLink="/project-details/{{ verifys.project_name }}/{{ verifys.project_id }}/{{verifys.property_type}}" class="detail-head">{{ verifys.project_name }}</a>
                   <p class="ongoing-location">

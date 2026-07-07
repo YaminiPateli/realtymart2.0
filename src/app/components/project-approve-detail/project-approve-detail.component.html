@@ -1,12 +1,12 @@
 <section class="project-banner position-relative">
   <div class="p-0 col-12">
-    <img *ngIf="singleproject?.project_banner_image" [src]="singleproject?.project_banner_image"
+    <img *ngIf="singleproject?.project_banner_image" alt="project-banner-image" [src]="singleproject?.project_banner_image"
       class="img-fluid w-100 banner-image" />
   </div>
 
   <!-- Logo Card -->
   <div class="logo-card shadow-sm">
-    <img *ngIf="singleproject?.project_logo" src="{{ singleproject.project_logo }}" class="img-fluid" />
+    <img *ngIf="singleproject?.project_logo" alt="project-logo" src="{{ singleproject.project_logo }}" class="img-fluid" />
   </div>
 
   <!-- Photos/Videos Counts -->
@@ -14,7 +14,7 @@
     <!-- Photos Count -->
     <div class="photo-count cursor-pointer" *ngIf="photoAlbum.length > 0 || layoutAlbum.length > 0"
       (click)="openPhotoViewer(0)">
-      <img src="../../../assets/images/photo.png" alt="" srcset="">
+      <img src="../../../assets/images/photo.png" alt="photo" srcset="">
       <span>{{ photoAlbum.length + layoutAlbum.length }} Photos</span>
     </div>
 
@@ -39,7 +39,7 @@
 
           <div>
             <div class="d-flex flex-wrap align-items-center">
-              <h2 class="project-title mb-0">{{ singleproject?.project_name }}</h2>
+              <h1 class="project-title mb-0">{{ singleproject?.project_name }}</h1>
               <div class="mb-search__property__data">
                 <span class="ms-2 builder-name-by text-muted small">
                   by
@@ -52,16 +52,16 @@
             </div>
 
             <p class="location mb-2 m-0 d-flex justify-content-start align-items-center gap-1">
-              <span><img src="../../../assets/images/location-icon-2.svg" alt="" srcset=""></span> {{
+              <span><img src="../../../assets/images/location-icon-2.svg" alt="location" srcset=""></span> {{
               singleproject?.project_localities }}
             </p>
 
             <div *ngIf="singleproject?.project_minimum_price && singleproject?.project_maximum_price" class="price-info d-flex align-items-center justify-content-start gap-2">
-              <span class="price-icon"><img src="../../../assets//images/Tag.svg" alt="" srcset=""></span>
+              <span class="price-icon"><img src="../../../assets//images/Tag.svg" alt="tag" srcset=""></span>
               ₹ {{singleproject?.project_minimum_price}} - ₹{{ singleproject?.project_maximum_price }}
               <span class="d-flex price-tooltip-container position-relative cursor-pointer"
                 (click)="togglePriceTooltip($event)">
-                <img src="../../../assets/images/tooltip.svg" alt="" srcset="">
+                <img src="../../../assets/images/tooltip.svg" alt="tooltip" srcset="">
                 <div class="custom-price-tooltip" [class.show]="priceTooltipVisible">
                   Price may vary based on applicable taxes and other charges
                 </div>
@@ -81,7 +81,7 @@
               [attr.data-bs-target]="is_token ? null : '#get-builder'"
               (click)="is_token ? handleContactClick('header') : openOtpModal('view-contact', 'header')"
               class="btn d-flex align-items-center gap-2 action-btn contact-btn text-light">
-              <span><img src="../../../assets/images/phone.svg" alt="" srcset=""></span>
+              <span><img src="../../../assets/images/phone.svg" alt="phone" srcset=""></span>
               View Contact
             </button>
             <div class="contact-popover-card" *ngIf="activeContactPopover === 'header' && !showStickyHeader">
@@ -96,7 +96,7 @@
             [attr.data-bs-target]="is_token ? null : '#get-builder'"
             (click)="is_token ? redirectToWhatsApp() : openOtpModal('whatsapp')"
             class="btn btn-success d-flex align-items-center gap-2 action-btn whatsapp-btn">
-            <span><img src="../../../assets/images/whatsapp.svg" alt="" srcset=""></span>
+            <span><img src="../../../assets/images/whatsapp.svg" alt="whatsapp" srcset=""></span>
             WhatsApp
           </button>
 
@@ -105,7 +105,7 @@
             (click)="is_token ? downloadBrochureDirectly() : openOtpModal('brochure')"
             *ngIf="isPdf(singleproject?.project_brochure)"
             class="btn btn-dark d-flex align-items-center gap-2 action-btn download-btn">
-            <span><img src="../../../assets/images/download.svg" alt="" srcset=""></span>
+            <span><img src="../../../assets/images/download.svg" alt="download" srcset=""></span>
             Download Brochure
           </button>
 
@@ -160,7 +160,7 @@
         <div class="col-lg-6 col-md-5 d-flex flex-column justify-content-center">
           <h3 class="sticky-project-name mb-1">{{ singleproject?.project_name }}</h3>
           <div class="sticky-project-price">
-            <span class="price-icon-sticky"><img src="../../../assets/images/Tag.svg" alt="Price Tag"></span>
+            <span class="price-icon-sticky"><img  alt="tag" src="../../../assets/images/Tag.svg"></span>
             ₹ {{singleproject?.project_minimum_price}} - ₹{{ singleproject?.project_maximum_price }}
           </div>
         </div>
@@ -171,7 +171,7 @@
               [attr.data-bs-target]="is_token ? null : '#get-builder'"
               (click)="is_token ? handleContactClick('sticky') : openOtpModal('view-contact', 'sticky')"
               class="btn d-flex align-items-center gap-2 action-btn contact-btn text-light">
-              <span><img src="../../../assets/images/phone.svg" alt="" srcset=""></span>
+              <span><img src="../../../assets/images/phone.svg" alt="phone" srcset=""></span>
               View Contact
             </button>
             <div class="contact-popover-card" *ngIf="activeContactPopover === 'sticky' && showStickyHeader">
@@ -186,7 +186,7 @@
             [attr.data-bs-target]="is_token ? null : '#get-builder'"
             (click)="is_token ? redirectToWhatsApp() : openOtpModal('whatsapp')"
             class="btn btn-success d-flex align-items-center gap-2 action-btn whatsapp-btn">
-            <span><img src="../../../assets/images/whatsapp.svg" alt="" srcset=""></span>
+            <span><img src="../../../assets/images/whatsapp.svg" alt="whatsapp" srcset=""></span>
             WhatsApp
           </button>
 
@@ -195,7 +195,7 @@
             (click)="is_token ? downloadBrochureDirectly() : openOtpModal('brochure')"
             *ngIf="isPdf(singleproject?.project_brochure)"
             class="btn btn-dark d-flex align-items-center gap-2 action-btn download-btn">
-            <span><img src="../../../assets/images/download.svg" alt="" srcset=""></span>
+            <span><img src="../../../assets/images/download.svg" alt="download" srcset=""></span>
             Download Brochure
           </button>
         </div>
@@ -244,6 +244,10 @@
         <li class="{'active': activeSection === 'developer'}" *ngIf="hasKeysOrValues(singleproject.aboutdeveloper)">
           <a style="cursor: pointer" (click)="scrollToSection('developer')"
             [ngClass]="{ active: activeSection === 'developer' }">About Developer</a>
+        </li>
+        <li class="{'active': activeSection === 'faq'}" *ngIf="faqs && faqs.length > 0">
+          <a style="cursor: pointer" (click)="scrollToSection('faq')"
+            [ngClass]="{ active: activeSection === 'faq' }">FAQs</a>
         </li>
       </ul>
     </div>
@@ -312,7 +316,7 @@
       </section>
       <section id="aboutProject">
 
-        <h3 class="section-title">About Project</h3>
+        <h2 class="section-title">About Project</h2>
 
         <div *ngIf="this.singleproject.project_about !== null" class="investing-desc">
           <div *ngIf="!isAboutExpanded" class="developer-desc-container">
@@ -330,10 +334,10 @@
 
         <div class="investing-card" *ngIf="this.singleproject.project_why_buy_sell !== null">
 
-          <h4 class="investing-title" *ngIf="this.singleproject.project_why_buy_sell !== null">
+          <h3 class="investing-title" *ngIf="this.singleproject.project_why_buy_sell !== null">
             What makes investing in The
             {{ this.singleproject.project_name }} a compelling choice?
-          </h4>
+          </h3>
 
           <div *ngIf="this.singleproject.project_why_buy_sell !== null" class="investing-desc">
             <div *ngIf="!isWhyBuyExpanded" class="developer-desc-container">
@@ -363,7 +367,7 @@
             <div ngxSlickItem *ngFor="let reel of reels; let i = index" class="slide px-2">
               <div class="d-flex justify-content-center">
                 <div class="reel-card" (click)="openReelsView(i)">
-                  <img [src]="reel.proj_video_thumbnail" [alt]="reel.title" class="reel-thumbnail" />
+                  <img [src]="reel.proj_video_thumbnail" [alt]="reel.title" alt="reel-thumbnail" class="reel-thumbnail" />
                   <div class="play-btn">
                     <span>
                       <img src="../../../assets/images/play.svg" alt="Play">
@@ -437,7 +441,7 @@
           </div>
 
           <a [href]="googleMapUrl" target="_blank" class="map-btn">
-            <img src="../../../assets/images/map-icon.svg" alt="" srcset="">
+            <img src="../../../assets/images/map-icon.svg" alt="map-icon" srcset="">
             View on Google Map
           </a>
         </div>
@@ -502,7 +506,7 @@
             <button class="download-btn" [attr.data-bs-toggle]="is_token ? null : 'modal'"
               [attr.data-bs-target]="is_token ? null : '#get-builder'"
               (click)="is_token ? downloadBrochureDirectly() : openOtpModal('brochure')">
-              <img src="../../../assets/images/download.svg" alt="" srcset="">
+              <img src="../../../assets/images/download.svg" alt="download" srcset="">
               Download Brochure
             </button>
 
@@ -530,17 +534,17 @@
 
         <div class="d-flex justify-content-between align-items-center mb-3">
 
-          <h5 class="section-title mb-0">
+          <h2 class="section-title mb-0">
             About Developer
-          </h5>
+          </h2>
 
           <div class="slider-nav" *ngIf="showSliderNav">
             <button class="nav-btn" (click)="slideLeft()">
-              <img src="../../../assets/images/arrow-left.png" alt="" srcset="">
+              <img src="../../../assets/images/arrow-left.png" alt="arrow-left" srcset="">
             </button>
 
             <button class="nav-btn" (click)="slideRight()">
-              <img src="../../../assets/images/arrow-right.png" alt="" srcset="">
+              <img src="../../../assets/images/arrow-right.png" alt="arrow-right" srcset="">
             </button>
           </div>
         </div>
@@ -553,7 +557,7 @@
               <div class="card h-100">
 
                 <div class="card-img-wrapper">
-                  <img [src]="item.image" alt="" class="img-fluid w-100">
+                  <img [src]="item.image" alt="developer-Projects" class="img-fluid w-100">
                 </div>
 
                 <div class="card-body">
@@ -562,12 +566,12 @@
                     {{ item.developer_name }}
                   </h6>
 
-                  <p class="builder-name mb-1">
+                  <h3 class="builder-name mb-1">
                     {{ item.builder_group_name }}
-                  </p>
+                  </h3>
 
                   <p class="location-developer mb-3 d-flex align-items-end">
-                    <span class="pe-1"><img src="../../../assets/images/location-icon-2.svg" alt="" srcset=""></span>
+                    <span class="pe-1"><img src="../../../assets/images/location-icon-2.svg" alt="location-icon" srcset=""></span>
                     {{ item.developer_address }}
                   </p>
 
@@ -668,7 +672,7 @@
           <button [attr.data-bs-toggle]="is_token ? null : 'modal'"
             [attr.data-bs-target]="is_token ? null : '#get-builder'"
             (click)="is_token ? openScheduleVisitModal() : openOtpModal('schedule-visit')" class="btn visit-btn w-100">
-            <span><img src="../../../assets/images/calander.svg" alt="" srcset=""></span>
+            <span><img src="../../../assets/images/calander.svg" alt="calander" srcset=""></span>
             Schedule Visit
           </button>
         </div>
@@ -682,7 +686,7 @@
   <!-- End project-content-grid -->
 
   <!-- FAQ Section (Full width of container) -->
-  <div class="container mb-5">
+  <div class="container mb-5" id="faq">
     <div class="container">
       <app-faq [faqs]="faqs" [isInnerHtmlAnswer]="true"></app-faq>
     </div>
@@ -697,7 +701,7 @@
       <button [attr.data-bs-toggle]="is_token ? null : 'modal'" [attr.data-bs-target]="is_token ? null : '#get-builder'"
         (click)="is_token ? handleContactClick('mobile') : openOtpModal('view-contact', 'mobile')"
         class="btn w-100 contact-btn flex-grow-1 d-flex align-items-center justify-content-center gap-2">
-        <span><img src="../../../assets/images/phone.svg" alt="" srcset=""></span>
+        <span><img src="../../../assets/images/phone.svg" alt="phone" srcset=""></span>
         View Contact
       </button>
       <div class="contact-popover-card" *ngIf="activeContactPopover === 'mobile'">
@@ -710,7 +714,7 @@
     <button [attr.data-bs-toggle]="is_token ? null : 'modal'" [attr.data-bs-target]="is_token ? null : '#get-builder'"
       (click)="is_token ? redirectToWhatsApp() : openOtpModal('whatsapp')"
       class="btn whatsapp-btn flex-grow-1 d-flex align-items-center justify-content-center gap-2">
-      <span><img src="../../../assets/images/whatsapp.svg" alt="" srcset=""></span>
+      <span><img src="../../../assets/images/whatsapp.svg" alt="whatsapp" srcset=""></span>
       WhatsApp
     </button>
   </div>
@@ -772,14 +776,14 @@
       (click)="selectImage(i)">
       <ng-container *ngIf="isVideo(item)">
         <div class="video-thumbnail-container">
-          <img [src]="getThumbnailUrl(item)" />
+          <img [src]="getThumbnailUrl(item)" alt="video-thumbnail" />
           <div class="play-overlay">
             <i class="fa-solid fa-play"></i>
           </div>
         </div>
       </ng-container>
       <ng-container *ngIf="!isVideo(item)">
-        <img [src]="item" />
+        <img [src]="item" alt="image"/>
       </ng-container>
     </div>
   </div>
@@ -858,7 +862,7 @@
           <button type="button"
             class="btn-close position-absolute bg-white opacity-100 scale-1 rounded-5 p-2 top-0 end-0"
             data-bs-dismiss="modal" aria-label="Close" (click)="resetBrochureForm()"></button>
-          <img class="img-fluid" src="../../../assets/images/login_modal_image.png" alt="" srcset="">
+          <img class="img-fluid" src="../../../assets/images/login_modal_image.png" alt="login-modal" srcset="">
         </div>
         <div class="p-3">
           <h2 class="py-2">Explore Unlimited Properties</h2>

@@ -15,6 +15,7 @@ import { ToastrService } from 'ngx-toastr';
 import { Title, Meta } from '@angular/platform-browser';
 import { ActivityTrackerService } from '../service/activitytracker.service';
 import { GeolocationService } from '../service/geolocation.service';
+import { SeoService } from 'src/app/seo.service';
 declare var bootstrap: any;
 
 interface City {
@@ -121,6 +122,7 @@ export class BuilderDetailComponent implements OnInit, AfterViewInit {
     private toastr: ToastrService,
     private activityTrackerService: ActivityTrackerService,
     private geolocationService: GeolocationService,
+    private seoService:SeoService
     // private modalElement: HTMLElement | null = null;
   ) {
     const builderId = this.route.snapshot.paramMap.get('id');
@@ -251,6 +253,7 @@ export class BuilderDetailComponent implements OnInit, AfterViewInit {
       this.builderDetailService.getsinglebuilderdetail(builderDetailsId).subscribe(
         (res: any) => {
           this.builderDetail = res.data;
+          this.setBuilderSchema();
           this.setMetaTags(this.builderDetail.meta_title, this.builderDetail.meta_description, this.builderDetail.builder_logo);
           this.filteredRunningProjects = [...this.builderDetail.runningproject];
           this.filteredCompletedProjects = [...this.builderDetail.completedproject];
@@ -842,4 +845,123 @@ export class BuilderDetailComponent implements OnInit, AfterViewInit {
 
     this.detectActiveSectionOnScroll();
   }
+
+  setBuilderSchema() {
+
+  const runningProjects = (this.builderDetail.runningproject || []).map(
+    (project: any, index: number) => ({
+
+      "@type": "ListItem",
+
+      "position": index + 1,
+
+      "item": {
+
+        "@type": "ApartmentComplex",
+
+        "name": project.project_name,
+
+        "url": `https://www.realtymart.com/${project.firstUrlPart}/${project.secondUrlPart}`,
+
+        "image": project.project_banner_image,
+
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": project.project_address,
+          "addressLocality": project.project_localities,
+          "postalCode": project.project_pincode,
+          "addressCountry": "IN"
+        },
+
+        "offers": {
+          "@type": "Offer",
+          "price": project.project_minimum_price,
+          "priceCurrency": "INR"
+        }
+
+      }
+
+    })
+  );
+
+  const schema = {
+
+    "@context": "https://schema.org",
+
+    "@graph": [
+
+      {
+        "@type": "RealEstateAgent",
+
+        "@id": window.location.href + "#builder",
+
+        "name": this.builderDetail.name,
+
+        "url": window.location.href,
+
+        "logo": this.builderDetail.builder_logo,
+
+        "image": this.builderDetail.builder_logo,
+
+        "description": this.builderDetail.long_description
+          ? this.builderDetail.long_description.replace(/<[^>]*>/g, "")
+          : "",
+
+        "email": this.builderDetail.builder_email,
+
+        "telephone": this.builderDetail.builder_number,
+
+        "address": {
+
+          "@type": "PostalAddress",
+
+          "streetAddress": this.builderDetail.office_address,
+
+          "addressLocality": this.builderDetail.working_in_cities[0],
+
+          "addressRegion": this.builderDetail.working_in_states,
+
+          "addressCountry": "IN"
+
+        },
+
+        "sameAs": this.builderDetail.builder_website
+          ? [this.builderDetail.builder_website]
+          : []
+
+      },
+
+      {
+
+        "@type": "CollectionPage",
+
+        "@id": window.location.href,
+
+        "name": `${this.builderDetail.name} Projects`,
+
+        "url": window.location.href,
+
+        "description": `Explore all ongoing and completed projects developed by ${this.builderDetail.name}.`,
+
+        "mainEntity": {
+
+          "@type": "ItemList",
+
+          "numberOfItems": runningProjects.length,
+
+          "itemListElement": runningProjects
+
+        }
+
+      }
+
+    ]
+
+  };
+
+  this.seoService.setSchema(schema);
+
+}
+
+
 }

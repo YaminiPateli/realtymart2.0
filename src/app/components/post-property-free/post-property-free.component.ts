@@ -7,6 +7,7 @@ import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 import { FormControl, FormGroup, Validators, FormBuilder, FormArray } from '@angular/forms';
 import { Title, Meta } from '@angular/platform-browser';
+import { SeoService } from 'src/app/seo.service';
 
 @Component({
   selector: 'app-post-property-free',
@@ -201,6 +202,7 @@ export class PostPropertyFreeComponent {
     public http: HttpClient,
     private toastr: ToastrService,
     private route: Router,
+    private seoService:SeoService
   ) {
     this.setMetaTags(
       'Sell and Rent Your Property For Free on RealtyMart',
@@ -1431,6 +1433,7 @@ export class PostPropertyFreeComponent {
     this.fetchLandZone();
     this.fetchBusinesssector();
     this.fetchCities();
+    this.setPostPropertySchema();
     this.flooroptions = this.flooroptions.concat(
       Array.from({ length: 185 }, (_, i) => (i + 16).toString())
     );
@@ -1667,4 +1670,50 @@ export class PostPropertyFreeComponent {
       event.preventDefault();
     }
   }
+
+  setPostPropertySchema() {
+
+  const schema = {
+
+    "@context": "https://schema.org",
+
+    "@graph": [
+
+      {
+        "@type": "WebPage",
+
+        "@id": "https://www.realtymart.com/post-property-free",
+
+        "name": "Sell and Rent Your Property For Free on RealtyMart",
+
+        "url": "https://www.realtymart.com/post-property-free",
+
+        "description": "Post your residential or commercial property for sale or rent on RealtyMart for free."
+      },
+
+      {
+        "@type": "RealEstateAgent",
+
+        "@id": "https://www.realtymart.com/#realestateagent",
+
+        "name": "RealtyMart",
+
+        "url": "https://www.realtymart.com",
+
+        "description": "RealtyMart is a real estate platform where owners, builders and agents can post properties for sale and rent.",
+
+        "parentOrganization": {
+          "@type": "Organization",
+          "name": "Intelliworkz Business Solutions Pvt. Ltd."
+        }
+
+      }
+
+    ]
+
+  };
+
+  this.seoService.setSchema(schema);
+
+}
 }

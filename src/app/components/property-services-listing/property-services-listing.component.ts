@@ -8,6 +8,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { environment } from 'src/environments/environment';
 import { GeolocationService } from '../service/geolocation.service';
 import { Title, Meta } from '@angular/platform-browser';
+import { SeoService } from 'src/app/seo.service';
 declare var bootstrap: any;
 
 interface City {
@@ -60,7 +61,8 @@ export class PropertyServicesListingComponent implements OnInit {
     private location: Location,
     private tost: ToastrService,
     private spinner: NgxSpinnerService,
-    private geolocationService: GeolocationService
+    private geolocationService: GeolocationService,
+    private seoService:SeoService
   ) {
     this.city = localStorage.getItem('location');
     if(this.city == null){
@@ -212,6 +214,7 @@ export class PropertyServicesListingComponent implements OnInit {
         .subscribe(
           (response: any) => {
             this.singleproperty = response.data;
+            this.setPropertyServiceListingSchema();
             this.loadReviews();
             if (this.singleproperty?.bannerImage) {
               this.singleproperty.bannerImage =
@@ -517,6 +520,51 @@ export class PropertyServicesListingComponent implements OnInit {
     isValidCity(city: string): boolean {
       return this.validcityforselected.includes(city);
     }
+
+  setPropertyServiceListingSchema() {
+
+    const companies = this.singleproperty.companyListing.map(
+      (company: any, index: number) => ({
+
+        "@type": "ListItem",
+
+        "position": index + 1,
+
+        "item": {
+
+          "@type": "Service",
+
+          "name": company.company_name,
+
+          "provider": {
+            "@type": "Organization",
+            "name": company.company_name
+          }
+
+        }
+
+      })
+    );
+
+    this.seoService.setSchema({
+
+      "@context": "https://schema.org",
+
+      "@type": "CollectionPage",
+
+      "url": window.location.href,
+
+      "mainEntity": {
+
+        "@type": "ItemList",
+
+        "itemListElement": companies
+
+      }
+
+    });
+
+  }
 
   // code for filter
   // filterItems() {

@@ -15,6 +15,7 @@ import { Fancybox } from "@fancyapps/ui";
 import { ActivityTrackerService } from '../service/activitytracker.service';
 import { GeolocationService } from '../service/geolocation.service';
 import { SlickCarouselComponent } from 'ngx-slick-carousel';
+import { SeoService } from 'src/app/seo.service';
 
 declare var bootstrap: any;
 declare const google: any;
@@ -114,6 +115,7 @@ activeSection:any;
     private titleService: Title,
     private metaService: Meta,
     private geolocationService: GeolocationService,
+    private seoService:SeoService
   ) {}
 
   slideConfig3 = {
@@ -325,6 +327,7 @@ activeSection:any;
           (propertyData: any) => {
             this.singlepropertyData = propertyData;
             this.singleproperty = this.singlepropertyData?.responseData;
+            this.setPropertySchema(); 
             this.setMetaTags(this.singleproperty.property_meta_title, this.singleproperty.property_meta_description, this.singleproperty.image);
             this.queryPlaceByName(this.singleproperty.project_name);
             Fancybox.bind('[data-fancybox="gallery"]', { });
@@ -335,6 +338,106 @@ activeSection:any;
         );
     }
   }
+
+  setPropertySchema() {
+
+  const schema = {
+
+    "@context": "https://schema.org",
+
+    "@graph": [
+
+      {
+
+        "@type": "RealEstateListing",
+
+        "@id": window.location.href,
+
+        "name":
+          `${this.singleproperty.bedroom || ""} BHK ${this.singleproperty.propertytypename || ""} in ${this.singleproperty.project_name || ""}`,
+
+        "url": window.location.href,
+
+        "description":
+          this.singleproperty.property_description
+            ? this.singleproperty.property_description.replace(/<[^>]*>/g, "")
+            : "",
+
+        "image": this.singleproperty.property_img || [],
+
+        "datePosted": this.singleproperty.created_at,
+
+        "mainEntity": {
+
+          "@type": "Residence",
+
+          "name": this.singleproperty.project_name,
+
+          "numberOfRooms": this.singleproperty.bedroom,
+
+          "numberOfBathroomsTotal": this.singleproperty.bathroom,
+
+          "floorSize": {
+
+            "@type": "QuantitativeValue",
+
+            "value": this.singleproperty.super_area,
+
+            "unitCode": "FTK"
+
+          },
+
+          "address": {
+
+            "@type": "PostalAddress",
+
+            "streetAddress": this.singleproperty.property_address,
+
+            "addressLocality": this.singleproperty.property_locality,
+
+            "addressRegion": "Gujarat",
+
+            "addressCountry": "IN"
+
+          }
+
+        },
+
+        "offers": {
+
+          "@type": "Offer",
+
+          "price":
+
+            this.singleproperty.property_price_show == 0
+              ? this.singleproperty.total_price
+              : "",
+
+          "priceCurrency": "INR",
+
+          "availability": "https://schema.org/InStock"
+
+        },
+
+        "seller": {
+
+          "@type": "Organization",
+
+          "name":
+            this.singleproperty.builder_name || this.singleproperty.owner_name
+
+        }
+
+      }
+
+    ]
+
+  };
+
+  this.seoService.setSchema(schema);
+
+}
+
   resendContactOTP() {
     if (this.isResendEnabled) {
       this.sendOTPContactToMobile(); // Logic to send OTP

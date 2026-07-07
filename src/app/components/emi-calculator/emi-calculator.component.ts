@@ -1,13 +1,14 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Options, LabelType } from 'ngx-slider-v2';
 import { Title, Meta } from '@angular/platform-browser';
+import { SeoService } from 'src/app/seo.service';
 
 @Component({
   selector: 'app-emi-calculator',
   templateUrl: './emi-calculator.component.html',
   styleUrls: ['./emi-calculator.component.css']
 })
-export class EmiCalculatorComponent {
+export class EmiCalculatorComponent implements OnInit {
 
   filters: any;
 
@@ -76,6 +77,7 @@ export class EmiCalculatorComponent {
   constructor(
     private titleService: Title,
     private metaService: Meta,
+    private seoService:SeoService
   ) {
     this.yrToggel = true;
     this.setMetaTags(
@@ -83,6 +85,88 @@ export class EmiCalculatorComponent {
       '',
     );
   }
+
+  ngOnInit(): void {
+    this.setHomeLoanSchema();
+  }
+
+
+  setHomeLoanSchema() {
+
+  const schema = {
+
+    "@context": "https://schema.org",
+
+    "@graph": [
+
+      {
+        "@type": "WebPage",
+
+        "@id": "https://www.realtymart.com/home-loan-emi-calculator",
+
+        "name": "Home Loan EMI Calculator | RealtyMart",
+
+        "url": "https://www.realtymart.com/home-loan-emi-calculator",
+
+        "description": "Calculate your Home Loan EMI instantly using RealtyMart's free Home Loan EMI Calculator.",
+
+        "mainEntity": {
+          "@id": "https://www.realtymart.com/home-loan-emi-calculator#calculator"
+        }
+
+      },
+
+      {
+
+        "@type": "WebApplication",
+
+        "@id": "https://www.realtymart.com/home-loan-emi-calculator#calculator",
+
+        "name": "Home Loan EMI Calculator",
+
+        "applicationCategory": "FinanceApplication",
+
+        "operatingSystem": "Web",
+
+        "url": "https://www.realtymart.com/home-loan-emi-calculator",
+
+        "description": "A free online calculator to estimate monthly home loan EMI, total interest payable and total repayment amount."
+
+      },
+
+      {
+
+        "@type": "FinancialProduct",
+
+        "name": "Home Loan",
+
+        "category": "Home Loan",
+
+        "provider": {
+
+          "@type": "Organization",
+
+          "name": "Intelliworkz Business Solutions Pvt. Ltd.",
+
+          "brand": {
+
+            "@type": "Brand",
+
+            "name": "RealtyMart"
+
+          }
+
+        }
+
+      }
+
+    ]
+
+  };
+
+  this.seoService.setSchema(schema);
+
+}
 
   // meta title
   setMetaTags(title: string, description: string) {

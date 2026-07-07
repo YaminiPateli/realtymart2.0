@@ -15,6 +15,7 @@ import { ToastrService } from 'ngx-toastr';
 import { NgxSpinnerService, NgxSpinnerModule } from 'ngx-spinner';
 import { FormsModule } from '@angular/forms';
 import { CountryCodeInputComponent } from 'src/app/common/country-code-input/country-code-input.component';
+import { SeoService } from 'src/app/seo.service';
 declare var bootstrap: any;
 
 declare const google: any;
@@ -67,7 +68,8 @@ export class ServicesDetailComponent implements OnInit {
     private http: HttpClient,
     private geolocationService: GeolocationService,
     private toastr: ToastrService,
-    private spinner: NgxSpinnerService
+    private spinner: NgxSpinnerService,
+    private seoService:SeoService
   ) { }
 
   enquiryForm = {
@@ -317,6 +319,7 @@ export class ServicesDetailComponent implements OnInit {
             .subscribe(
               (response: any) => {
                 this.singlecompany = response.data;
+                this.setCompanySchema();
                 this.setMetaTags(
                   this.singlecompany.meta_title,
                   this.singlecompany.meta_description,
@@ -685,6 +688,118 @@ export class ServicesDetailComponent implements OnInit {
         this.errorMessage = `Error retrieving place details: ${status}`;
       }
     });
+  }
+
+
+  setCompanySchema() {
+
+    const businessHours = (this.singlecompany.bussiness_hours || [])
+      .filter((day: any) => day.closed === 'on')
+      .map((day: any) => ({
+
+        "@type": "OpeningHoursSpecification",
+
+        "dayOfWeek": [
+          "",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
+        ][Number(day.day)],
+
+        "opens": this.convertTime(day.open_hour),
+
+        "closes": this.convertTime(day.close_hour)
+
+      }));
+
+
+    const schema: any = {
+
+      "@context": "https://schema.org",
+
+      "@type": "ProfessionalService",
+
+      "name": this.singlecompany.company_name,
+
+      "url": window.location.href,
+
+      "logo": this.singlecompany.company_logo,
+
+      "image": [
+        this.singlecompany.company_logo,
+        ...(this.singlecompany.PrtSrcGallerys || [])
+      ],
+
+      "description": this.singlecompany.description
+        ? this.singlecompany.description.replace(/<[^>]*>/g, "")
+        : "",
+
+      "serviceType": this.singlecompany.ps_id,
+
+      "address": {
+
+        "@type": "PostalAddress",
+
+        "streetAddress": this.singlecompany.company_address,
+
+        "addressLocality": "Ahmedabad",
+
+        "addressRegion": "Gujarat",
+
+        "postalCode": "380015",
+
+        "addressCountry": "IN"
+
+      },
+
+      "openingHoursSpecification": businessHours,
+
+      "sameAs": this.singlecompany.company_website
+        ? [this.singlecompany.company_website]
+        : []
+
+    };
+
+    // Add email only if it isn't masked
+    if (
+      this.singlecompany.company_email &&
+      !this.singlecompany.company_email.includes('*')
+    ) {
+      schema.email = this.singlecompany.company_email;
+    }
+
+    // Add phone only if it isn't masked
+    if (
+      this.singlecompany.company_contactno &&
+      !this.singlecompany.company_contactno.includes('*')
+    ) {
+      schema.telephone = this.singlecompany.company_contactno;
+    }
+
+    this.seoService.setSchema(schema);
+
+  }
+  convertTime(time: string): string {
+
+    const [value, modifier] = time.split(' ');
+
+    let [hours, minutes] = value.split(':');
+
+    let h = parseInt(hours, 10);
+
+    if (modifier === 'PM' && h < 12) {
+      h += 12;
+    }
+
+    if (modifier === 'AM' && h === 12) {
+      h = 0;
+    }
+
+    return `${h.toString().padStart(2, '0')}:${minutes}`;
   }
 }
 

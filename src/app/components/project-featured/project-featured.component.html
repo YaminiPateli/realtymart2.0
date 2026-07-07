@@ -5,7 +5,7 @@
         <div class="p-0" [ngClass]=" !latitude && !longitude ? 'col-lg-12' :'col-lg-8'" *ngIf="singleproject?.project_banner_image">
           <img
             src="{{ singleproject?.project_banner_image }}"
-            alt
+            alt="project-banner"
             class="img-fluid"
           />
         </div>
@@ -229,7 +229,7 @@
                   <div class="buy_rent_mg">
                     <img
                       src="{{ item.property_main_img }}"
-                      alt=""
+                      alt="property_main_img"
                       class="img-fluid"
                     />
                   </div>
@@ -478,7 +478,7 @@
                   *ngFor="let amenities of this.singleproject.amenitiess"
                 >
                   <div class="amenit_box">
-                    <img src="{{ amenities.image }}" alt class="img-fluid" />
+                    <img src="{{ amenities.image }}" alt="amenities-img" class="img-fluid" />
                   </div>
                   <p class="amenit_title">{{ amenities.name }}</p>
                 </div>
@@ -585,7 +585,7 @@
                 >
                   <div class="gallery_box">
                     <div class="gallery">
-                      <img src="{{ gallery }}" alt class="img-fluid" />
+                      <img src="{{ gallery }}" alt="gallery-img" class="img-fluid" />
                     </div>
                   </div>
                 </div>

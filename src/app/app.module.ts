@@ -84,6 +84,8 @@ import { ProjectPlanComponent } from './components/project-plan/project-plan.com
 import { FaqComponent } from './common/faq/faq.component';
 import { PaginationComponent } from './common/pagination/pagination.component';
 import { CountryCodeInputComponent } from './common/country-code-input/country-code-input.component';
+import { createMatcher } from './seoUrlMatcher';
+
 
 // Page Routing
 const routes: Routes = [
@@ -91,11 +93,9 @@ const routes: Routes = [
   { path: 'registration', component:RegisterComponent },
   { path: 'property-services', component: PropertyServicesComponent },
   { path: 'property-services/:name', component: PropertyServicesListingComponent },
-  { path: 'builder-listing/:city', component: BuilderListingComponent },
   { path: 'builder-property-listing/:id/:type', component: BuilderPropertyListingComponent },
   { path: 'builder-project-listing/:name', component:BuilderAllProjectListComponent},
   { path: 'explore-builders', component: ExploreBuildersComponent },
-  { path: 'explore-localities/:city', component: ExploreLocalitiesComponent },
   { path: 'buy-new-projects', component: BuyNewProjectsComponent },
   { path: 'gold-package', component: GoldPackageComponent },
   { path: 'your-cart', component: YourCartComponent },
@@ -119,22 +119,26 @@ const routes: Routes = [
   { path: 'blog-details/:blogurl', component:  BlogDetailsComponent },
   { path: 'emi-calculator', component:  EmiCalculatorComponent },
   { path: 'property-details/:name/:id', component:  PropertyDetailsComponent },
-  { path: 'project-details/:name/:id/', component:  ProjectApproveDetailComponent },
   { path: 'top-builders', component:  TopbuildersComponent },
   { path: 'verified-property-buy/:city', component:  VerifiedpropertyComponent },
-  { path: 'verified-property-rent/:city', component:  VerifiedpropertyRentComponent },
+  { path: 'verified-property-rent/:city',  component:  VerifiedpropertyRentComponent },
   { path: 'newly-launched', component:  NewlylaunchedComponent },
   { path: 'owner-property-buy/:city', component:  OwnerpropertyComponent },
   { path: 'owner-property-rent/:city', component:  OwnerpropertyrentComponent },
   { path: 'property-valuation', component:  PropertyValuationComponent },
   { path: 'title-check', component:  TitleCheckComponent },
   { path: 'find-pincode', component:  FindPincodeComponent },
-  { path: 'property-for-buy/:type/:city', component:  PropertytypesbuyComponent },
-  { path: 'property-for-rent/:type/:city', component:  PropertytypesrentComponent },
-  { path: 'projects-in-city/:city', component:  ProjectsincityComponent },
-  { path: 'property-for-buy-in/:city', component: PropertyincitybuyComponent },
-  { path: 'property-for-rent-in/:city', component: PropertyincityrentComponent },
-  { path: 'agent-projects-rent/:id', component:  AgentprojectsrentComponent },
+  { matcher: createMatcher(/^builder-listing-in-(.+)$/, ['city']), component: BuilderListingComponent },
+  { matcher: createMatcher(/^explore-localities-in-(.+)$/, ['city']), component: ExploreLocalitiesComponent},
+  { matcher: createMatcher(/^property-for-buy-in-(.+)$/, ['city']), component: PropertyincitybuyComponent },
+  { matcher: createMatcher(/^property-for-rent-in-(.+)$/, ['city']), component: PropertyincityrentComponent },
+  { matcher: createMatcher(/^(.+)-for-buy-in-(.+)$/, ['type', 'city']), component:  PropertytypesbuyComponent },
+  { matcher: createMatcher(/^(.+)-for-rent-in-(.+)$/, ['type', 'city']), component:  PropertytypesrentComponent },
+  { matcher: createMatcher(/^new-projects-in-(.+)$/, ['city']), component: ProjectsincityComponent},
+  // { path: 'property-for-rent/:type/:city', component:  PropertytypesrentComponent },
+  // { path: 'property-for-buy/:type/:city', component:  PropertytypesbuyComponent },
+  // { path: 'property-for-buy-in/:city', component: PropertyincitybuyComponent },
+  // { path: 'property-for-rent-in/:city', component: PropertyincityrentComponent },
   { path: 'investment-hotspot', component:  InvestmentHotspotComponent },
   { path: 'tips-and-guides', component:  TipsAndGuidesComponent },
   { path: 'localities-projects/:localities', component:  LocalitiesprojectlistingComponent },

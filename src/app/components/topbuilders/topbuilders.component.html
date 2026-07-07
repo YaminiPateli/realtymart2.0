@@ -37,7 +37,7 @@
                             <!-- Use the safe navigation operator to avoid errors -->
                             <ng-container *ngIf="topbuilder">
                               <div class="builder-logos">
-                                <img [src]="topbuilder.builder_logo" alt="" class="img-fluid">
+                                <img [src]="topbuilder.builder_logo" alt="builder_logo" class="img-fluid">
                               </div>
                               <div class="builder-details">
                                 <h4 class="explore-top">{{ topbuilder.name }}</h4>
@@ -59,7 +59,7 @@
               </div>
           </div>
           <div class="all-builder-btn">
-              <a routerLink="/builder-listing/{{ locationget }}">VIEW ALL BUILDERS IN {{ locationget }}</a>
+              <a routerLink="/builder-listing-in-{{ locationget }}">VIEW ALL BUILDERS IN {{ locationget }}</a>
           </div>
       </div>
   </section>

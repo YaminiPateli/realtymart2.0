@@ -8,6 +8,7 @@ import { ActivityTrackerService } from '../service/activitytracker.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
+import { SeoService } from 'src/app/seo.service';
 declare var bootstrap: any;
 
 @Component({
@@ -67,7 +68,8 @@ export class BuilderAllProjectListComponent {
     private activityTrackerService: ActivityTrackerService,
     private spinner: NgxSpinnerService,
     private toastr: ToastrService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private seoService:SeoService
   ) {
     const builderId = this.route.snapshot.paramMap.get('id');
     const propertytype = this.route.snapshot.paramMap.get('type');
@@ -95,6 +97,7 @@ export class BuilderAllProjectListComponent {
           this.allbuilderproject = this.allbuilderprojectData;
           this.builderDetails = response.builderDetails;
           this.original = [...this.allbuilderproject];
+          this.setBuilderProjectSchema();
           this.setMetaTags(
             response.meta.title,
             response.meta.description,
@@ -510,6 +513,91 @@ export class BuilderAllProjectListComponent {
       numericValue *= 100; // Convert crore to lac
     }
     return numericValue;
+  }
+
+
+  setBuilderProjectSchema() {
+
+    const itemList = this.allbuilderproject.map((project: any, index: number) => ({
+
+      "@type": "ListItem",
+
+      "position": index + 1,
+
+      "item": {
+
+        "@type": "ApartmentComplex",
+
+        "name": project.project_name,
+
+        "image": project.project_banner_image,
+
+        "url": `https://www.realtymart.com/${project.firstUrlPart}/${project.secondUrlPart}`,
+
+        "description": project.project_about
+          ? project.project_about.replace(/<[^>]*>/g, "")
+          : "",
+
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": project.project_address,
+          "addressLocality": project.project_localities,
+          "postalCode": project.project_pincode,
+          "addressCountry": "IN"
+        },
+
+        "offers": {
+          "@type": "Offer",
+          "priceCurrency": "INR",
+          "price": project.project_minimum_price
+        }
+
+      }
+
+    }));
+
+
+    const schema = {
+
+      "@context": "https://schema.org",
+
+      "@graph": [
+
+        {
+          "@type": "Organization",
+
+          "@id": window.location.href + "#builder",
+
+          "name": this.builderDetails.name
+        },
+
+        {
+          "@type": "CollectionPage",
+
+          "@id": window.location.href,
+
+          "name": `Projects by ${this.builderDetails.name}`,
+
+          "url": window.location.href,
+
+          "mainEntity": {
+
+            "@type": "ItemList",
+
+            "numberOfItems": this.allbuilderproject.length,
+
+            "itemListElement": itemList
+
+          }
+
+        }
+
+      ]
+
+    };
+
+    this.seoService.setSchema(schema);
+
   }
 
 }

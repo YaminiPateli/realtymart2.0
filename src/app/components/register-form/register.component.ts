@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   Component,
   ElementRef,
   OnDestroy,
@@ -22,6 +23,7 @@ import {
 } from 'ngx-slick-carousel';
 import { environment } from '../../../environments/environment';
 import { CountryCodeInputComponent } from 'src/app/common/country-code-input/country-code-input.component';
+import { SeoService } from 'src/app/seo.service';
 declare var bootstrap: any;
 
 @Component({
@@ -31,7 +33,7 @@ declare var bootstrap: any;
   standalone: true,
   imports: [FormsModule, SlickCarouselModule, CommonModule, CountryCodeInputComponent],
 })
-export class RegisterComponent implements OnDestroy {
+export class RegisterComponent implements AfterViewInit, OnDestroy {
   @ViewChild('slickModal') slickModal!: SlickCarouselComponent;
   @ViewChild('otpModel') otpModel!: ElementRef;
   private apiUrl: string = environment.apiUrl;
@@ -117,6 +119,7 @@ export class RegisterComponent implements OnDestroy {
     private spinner: NgxSpinnerService,
     private fb: FormBuilder,
     private route: Router,
+    private seoService:SeoService
   ) {
     this.country();
     this.services();
@@ -124,9 +127,21 @@ export class RegisterComponent implements OnDestroy {
     this.servicess = 0;
   }
 
+  ngAfterViewInit(): void {
+    this.seoService.setSchema({
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "Register | RealtyMart",
+      "url": window.location.href,
+      "description": "Register on RealtyMart as a Builder, Agent, Owner or Service Provider and grow your business."
+    });
+  }
+
   ngOnDestroy() {
     clearInterval(this.timer);
   }
+
+
 
   startTimer() {
     this.isResendEnabled = false;

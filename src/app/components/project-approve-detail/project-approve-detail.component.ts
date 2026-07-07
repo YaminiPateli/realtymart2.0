@@ -1667,6 +1667,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
       { id: 'brochure', element: document.getElementById('brochure') },
       { id: 'project-detail', element: document.getElementById('project-detail') },
       { id: 'developer', element: document.getElementById('developer') },
+      { id: 'faq', element: document.getElementById('faq') },
     ];
 
     const hEl = document.querySelector('header');

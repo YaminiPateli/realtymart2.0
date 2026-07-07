@@ -124,7 +124,7 @@
                             <div class="col-lg-3 col-md-4 col-6 mb-3 text-center" *ngFor="let service of singlecompany.PrtSrcSevices">
                                 <img class="img-fluid pb-2 serice_flow_img"
                                     src={{service.services_image}}
-                                    alt>
+                                    alt="services_image">
                                 <p>{{service.services_name}}</p>
                             </div>
 
@@ -139,7 +139,7 @@
                             <div class="col-lg-3 col-md-4 col-6 mb-3 text-center" *ngFor="let product of singlecompany.PrtSrcProducts">
                                 <img class="img-fluid pb-2 serice_flow_img"
                                     src={{product.products_image}}
-                                    alt>
+                                    alt="products_image">
                                 <p>{{product.products_name}}</p>
                             </div>
                         </div>
@@ -155,7 +155,7 @@
                                     <div>
                                         <img
                                             src="../../../assets/images/pdf.png"
-                                            alt>
+                                            alt="pdf">
                                     </div>
                                     <div class="catalogues_info">
                                         <h4>{{catlogue.catalogues_name}}</h4>
@@ -179,11 +179,11 @@
                                         class="says_mg d-flex justify-content-between align-items-center mb-2">
                                         <img
                                             src={{testimonial.testimonials_logo}}
-                                            alt
+                                            alt="testimonials_logo"
                                             class="img-fluid testimonials_logo">
                                         <img
                                             src="../../../assets/images/Testimonials.png"
-                                            alt class="img-fluid">
+                                            alt="Testimonials" class="img-fluid">
                                     </div>
                                     <p *ngIf="testimonial.testimonials_description !== null">{{testimonial.testimonials_description}}</p>
                                 </div>

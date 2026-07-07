@@ -46,6 +46,7 @@ import { ActivityTrackerService } from '../service/activitytracker.service';
 import { PropertyplotService } from '../service/propertyplot.service';
 import { HeaderService } from '../service/header.service';
 import { FilteredCities } from 'src/app/filteredcities';
+import { SeoService } from 'src/app/seo.service';
 declare var bootstrap: any;
 interface City {
   cid: number;
@@ -207,7 +208,8 @@ export class HomeComponent implements AfterViewInit, OnInit {
     private datePipe: DatePipe,
     private el: ElementRef,
     private geolocationService: GeolocationService,
-    private headerService: HeaderService
+    private headerService: HeaderService,
+    private seoService:SeoService
   ) {
     this.getLocation();
     this.loadHotDeals();
@@ -289,6 +291,34 @@ export class HomeComponent implements AfterViewInit, OnInit {
 
   ngAfterViewInit() {
     // this.loadHomeBanner();
+    this.seoService.setSchema({
+
+      "@context": "https://schema.org",
+
+      "@graph": [
+
+        {
+          "@type": "Organization",
+          "name": "Intelliworkz Business Solutions Pvt. Ltd.",
+          "url": window.location.href,
+          "logo": window.location.href + "assets/images/logo.svg"
+        },
+
+        {
+          "@type": "WebSite",
+          "name": "RealtyMart",
+          "url": window.location.href,
+        },
+
+        {
+          "@type": "WebPage",
+          "name": "Real Estate Property Portal | RealtyMart",
+          "url": window.location.href
+        }
+
+      ]
+
+    });
   }
 
 

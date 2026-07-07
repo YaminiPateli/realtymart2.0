@@ -16,7 +16,7 @@
               *ngFor="let blog of bloglist.slice(0, initialBlogCount)"
             >
               <div class="blog-main-image">
-                <img [src]="blog.image" alt="" class="img-fluid" />
+                <img [src]="blog.image" alt="blog-main-image" class="img-fluid" />
               </div>
               <div class="blog-list-info">
                 <a target="_blank" [routerLink]="['/blog-details', sanitizeUrl(blog.url)]" class="blog-list-head">{{

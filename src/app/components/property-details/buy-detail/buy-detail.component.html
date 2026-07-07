@@ -14,7 +14,7 @@
           <div class="buy-image">
             <img
               src="{{ singleproperty.property_main_img }}"
-              alt=""
+              alt="property_main_img"
               class="img-fluid"
             />
           </div>
@@ -235,7 +235,7 @@
       <div class="save-box">
         <div class="save-detail">
           <div class="save-area">
-            <img src="../../../assets/images/save-1.png" alt="" />
+            <img src="../../../assets/images/save-1.png" alt="save-property-img" />
             <div class="save-title">
               <h3>Save Property</h3>
               <p>Don't Want to share your details with the agent right now</p>
@@ -639,7 +639,7 @@
         <h4>Verified on realtymart</h4>
         <div class="buy-proj">
             <div class="ongoing-img" *ngFor="let verify of verify">
-              <img src="{{ verify.project_images }}" alt="" class="img-fluid">
+              <img src="{{ verify.project_images }}" alt="verify_project_images" class="img-fluid">
               <div class="ongoing-deatils">
                 <a routerLink="/property-details/{{ verify.propertyfirstUrlPart }}/{{ verify.propertysecondUrlPart }}" class="detail-head">{{ verify.project_name }}</a>
                 <p class="ongoing-location">

@@ -34,7 +34,7 @@
 
 
 .logo-card img {
-  max-height: 33px;
+  height:42px;
   width: auto;
 }
 
@@ -1490,6 +1490,7 @@ google-map {
 
 .builder-name {
   font-size: 16px;
+  font-weight: normal;
   color: #888;
 }
 

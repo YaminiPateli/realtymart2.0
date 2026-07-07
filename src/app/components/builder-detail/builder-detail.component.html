@@ -48,7 +48,7 @@
       <div class="row">
         <div class="col-lg-8" *ngIf="builderDetail?.builder_logo !== null" id="overview">
           <div class="company_llg">
-            <img src="{{ builderDetail?.builder_logo }}" alt="logo" class="img-fluid mb-2" />
+            <img src="{{ builderDetail?.builder_logo }}" alt="builder_logo" class="img-fluid mb-2" />
           </div>
 
           <h3 class="companies-names" *ngIf="builderDetail?.name !== null">
@@ -123,7 +123,7 @@
                     <div class="deal-slider-bar">
                       <div class="main-deals" *ngIf="completedProj">
                         <div class="deal-imgs">
-                          <img src="{{ completedProj.project_banner_image }}" alt="" />
+                          <img src="{{ completedProj.project_banner_image }}" alt="project_banner_image" />
                           <div class="hot-details">
                             <a routerLink="project-details/{{
                                 completedProj.firstUrlPart
@@ -313,7 +313,7 @@
                     <div class="deal-slider-bar">
                       <div class="main-deals" *ngIf="runningProj">
                         <div class="deal-imgs">
-                          <img src="{{ runningProj.project_banner_image }}" alt="" />
+                          <img src="{{ runningProj.project_banner_image }}" alt="project_banner_image" />
                           <div class="hot-details">
                             <a routerLink="project-details/{{
                                 runningProj.firstUrlPart
@@ -464,7 +464,7 @@
                   <div class="builder-main-slid">
                     <a href="builder-detail/{{ topbuilders.builderUrl }}" class="builder-front">
                       <div class="builder-logos">
-                        <img src="{{ topbuilders.builder_logo }}" alt="" class="img-fluid" />
+                        <img src="{{ topbuilders.builder_logo }}" alt="builder_logo" class="img-fluid" />
                       </div>
                       <div class="builder-details">
                         <h4 class="builder-head">{{ topbuilders.name }}</h4>
