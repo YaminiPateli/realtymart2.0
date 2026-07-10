@@ -33,7 +33,7 @@ declare var bootstrap: any;
   standalone: true,
   imports: [FormsModule, SlickCarouselModule, CommonModule, CountryCodeInputComponent],
 })
-export class RegisterComponent implements AfterViewInit, OnDestroy {
+export class RegisterComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('slickModal') slickModal!: SlickCarouselComponent;
   @ViewChild('otpModel') otpModel!: ElementRef;
   private apiUrl: string = environment.apiUrl;
@@ -125,6 +125,10 @@ export class RegisterComponent implements AfterViewInit, OnDestroy {
     this.services();
     this.servicesimg();
     this.servicess = 0;
+  }
+
+  ngOnInit(): void {
+    this.seoService.setCanonicalURL('https://www.realtymart.com/registration');
   }
 
   ngAfterViewInit(): void {

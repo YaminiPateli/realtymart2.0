@@ -19,6 +19,7 @@ import { FilteredCities } from 'src/app/filteredcities';
 import { CountrycodeService } from '../service/countrycode.service';
 import { CountryCodeInputComponent } from 'src/app/common/country-code-input/country-code-input.component';
 import flatpickr from 'flatpickr';
+import { SeoService } from 'src/app/seo.service';
 declare var bootstrap: any;
 
 @Component({
@@ -376,7 +377,8 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     private activityTrackerService: ActivityTrackerService,
     private sanitizer: DomSanitizer,
     private router: Router,
-    private countrycodeService: CountrycodeService
+    private countrycodeService: CountrycodeService,
+    private seoService:SeoService
   ) {
     this._album.push({
       src: 'assets/images/advertisement.png',
@@ -976,6 +978,11 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   zoom = 15;
 
   ngOnInit(): void {
+    const slug = this.route.snapshot.paramMap.get('slug');
+    const id = this.route.snapshot.paramMap.get('id');
+     this.seoService.setCanonicalURL(
+     `https://www.realtymart.com/${slug}-prijid-${id}`
+     );
     this.checkScreenSize();
     const token = localStorage.getItem('myrealtylogintoken');
     if (token) {
@@ -1745,8 +1752,8 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   }
 
   fetchProjectApproveDetails() {
-    const projectName: any = this.route.snapshot.paramMap.get('name');
-    const projectId: any = this.route.snapshot.paramMap.get('id');
+    const projectName = this.route.snapshot.paramMap.get('slug');
+    const projectId = this.route.snapshot.paramMap.get('id');
 
     if (projectName && projectId) {
       this.projectdetailsService
@@ -1755,6 +1762,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
           (projectData: any) => {
             this.singleprojectData = projectData;
             this.singleproject = this.singleprojectData?.data;
+            this.setProjectSchema();
 
             // Populate floor plans from API
             const rawFloorPlans = this.singleproject?.floor_plans;
@@ -1811,17 +1819,11 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
 
             // Project Photos tab: from 3d_project_images (comma-separated filenames)
             const raw3dImages = this.singleproject?.['project_images'];
-            if (typeof raw3dImages === 'string' && raw3dImages.trim()) {
-              this.photoAlbum = raw3dImages.split(',').map((f: string) => imageBaseUrl + '3d_project_images/' + f.trim()).filter((u: string) => u !== imageBaseUrl + '3d_project_images/');
-            } else if (Array.isArray(raw3dImages)) {
+            if (Array.isArray(raw3dImages)) {
               this.photoAlbum = raw3dImages;
             } else {
               this.photoAlbum = [];
             }
-
-            // Layout Photos tab: from project_floor_plan_3d (already full URLs array)
-            const rawFloor3d = this.singleproject?.project_floor_plan_3d;
-            this.layoutAlbum = Array.isArray(rawFloor3d) ? rawFloor3d : [];
 
             // Brochure Images: from project_brochure_images
             const rawBrochureImages = this.singleproject?.project_brochure_images;
@@ -1928,6 +1930,100 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
         );
     }
   }
+
+  setProjectSchema() {
+
+  const schema = {
+    "@context": "https://schema.org",
+    "@graph": [
+
+      {
+        "@type": "WebPage",
+        "@id": window.location.href,
+        "url": window.location.href,
+        "name": this.singleproject.project_name,
+        "description": this.singleproject.project_about
+          ? this.singleproject.project_about.replace(/<[^>]+>/g, "")
+          : "",
+        "primaryImageOfPage": this.singleproject.project_banner_image
+      },
+
+      {
+        "@type": "ApartmentComplex",
+        "@id": window.location.href + "#project",
+
+        "name": this.singleproject.project_name,
+
+        "description": this.singleproject.project_about
+          ? this.singleproject.project_about.replace(/<[^>]+>/g, "")
+          : "",
+
+        "image": [
+          this.singleproject.project_banner_image,
+          this.singleproject.project_logo
+        ],
+
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": this.singleproject.project_address,
+          "addressLocality": this.singleproject.project_localities,
+          "addressRegion": this.singleproject.searchcity,
+          "addressCountry": "IN"
+        },
+
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": this.singleproject.latitude,
+          "longitude": this.singleproject.longitude
+        },
+
+        "numberOfAccommodationUnits": this.singleproject.project_total_units,
+
+        "floorSize": {
+          "@type": "QuantitativeValue",
+          "value": this.singleproject.project_size_in_sqft,
+          "unitCode": "FTK"
+        },
+
+        "amenityFeature": this.singleproject.amenitiess?.map((x:any)=>({
+          "@type":"LocationFeatureSpecification",
+          "name":x.name,
+          "value":true
+        })),
+
+        "offers":{
+          "@type":"Offer",
+          "price":this.singleproject.project_minimum_price,
+          "priceCurrency":"INR",
+          "availability":"https://schema.org/InStock"
+        },
+
+        "brand":{
+          "@type":"Organization",
+          "name":this.singleproject.builderName
+        }
+
+      },
+
+      {
+        "@type":"Organization",
+
+        "@id":window.location.href + "#builder",
+
+        "name":this.singleproject.builderName,
+
+        "logo":this.singleproject.aboutdeveloper?.builderLogo,
+
+        "description":this.singleproject.aboutdeveloper?.developerDescription
+      }
+
+    ]
+  };
+
+  this.seoService.setSchema(schema);
+
+}
+
   fetchProjectReviews(projectId: any) {
     this.http.get(`${this.apiUrl}getreview`).subscribe(
       (res: any) => {

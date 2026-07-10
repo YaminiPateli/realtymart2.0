@@ -9,6 +9,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { Fancybox } from '@fancyapps/ui';
 import { ActivityTrackerService } from '../service/activitytracker.service';
 import { Title, Meta } from '@angular/platform-browser';
+import { SeoService } from 'src/app/seo.service';
 declare var bootstrap: any;
 
 interface City {
@@ -20,7 +21,7 @@ interface City {
   templateUrl: './propertytypesbuy.component.html',
   styleUrls: ['./propertytypesbuy.component.css'],
 })
-export class PropertytypesbuyComponent {
+export class PropertytypesbuyComponent implements OnInit{
   tooltipVisible = false;
   tooltipPosition = { top: '0px', left: '0px' };
   @ViewChild('otpModel') otpModel!: ElementRef;
@@ -108,6 +109,14 @@ export class PropertytypesbuyComponent {
   propertyToLoad = 5;
   loading: boolean = false;
   singleProp: any;
+  activeFilters: { [key: string]: boolean } = {
+    'New Property': false,
+    'Ready to Move': false,
+    'Featured': false,
+    'Farm House': false,
+    'New Construction': false,
+    'Furnished': false,
+  };
 
   constructor(
     private titleService: Title,
@@ -120,8 +129,119 @@ export class PropertytypesbuyComponent {
     private spinner: NgxSpinnerService,
     private activityTrackerService: ActivityTrackerService,
     private router: Router,
-
+    private seoService:SeoService
   ) {}
+
+
+   toggleFilter(filterName: string): void {
+    if (this.activeFilters.hasOwnProperty(filterName)) {
+      this.activeFilters[filterName] = !this.activeFilters[filterName];
+      this.applyFiltersAndSorting();
+    }
+  }
+
+   applyFiltersAndSorting(): void {
+    let data = [...this.original];
+
+      if (this.activeFilters['New Property']) {
+    data = data.filter(
+      (item: any) =>
+        item.transaction_type &&
+        item.transaction_type.toLowerCase() === 'new property'
+    );
+  }
+
+  if (this.activeFilters['Ready to Move']) {
+    data = data.filter(
+      (item: any) =>
+        item.possession_status &&
+        item.possession_status.toLowerCase() === 'ready to move'
+    );
+  }
+
+  if (this.activeFilters['Featured']) {
+    data = data.filter(
+      (item: any) =>
+        (item.property_status &&
+          item.property_status.toLowerCase() === 'featured') ||
+        item.is_featured == 1
+    );
+  }
+
+  if (this.activeFilters['Farm House']) {
+    data = data.filter(
+      (item: any) =>
+        item.property_type &&
+        item.property_type.toLowerCase() === 'farm house'
+    );
+  }
+
+  if (this.activeFilters['New Construction']) {
+    data = data.filter(
+      (item: any) =>
+        item.age_of_construction &&
+        item.age_of_construction.toLowerCase() === 'new construction'
+    );
+  }
+
+  if (this.activeFilters['Furnished']) {
+    data = data.filter(
+      (item: any) =>
+        item.furnishing_status &&
+        item.furnishing_status.toLowerCase() === 'furnished'
+    );
+  }
+
+    switch (this.selectedSortOption) {
+      case 'Price - Low to High':
+        data = data
+          .filter((item: any) => {
+            const priceA =
+              item.total_price !== null && item.total_price !== undefined
+                ? item.total_price
+                : item.rent_amount;
+            return priceA !== null && priceA !== undefined;
+          })
+          .sort((a: any, b: any) => {
+            const priceA =
+              a.total_price !== null ? a.total_price : a.rent_amount;
+            const priceB =
+              b.total_price !== null ? b.total_price : b.rent_amount;
+            return this.convertToLac(priceA) - this.convertToLac(priceB);
+          });
+        break;
+
+      case 'Price - High to Low':
+        data = data
+          .filter((item: any) => {
+            const priceA =
+              item.total_price !== null && item.total_price !== undefined
+                ? item.total_price
+                : item.rent_amount;
+            return priceA !== null && priceA !== undefined;
+          })
+          .sort((a: any, b: any) => {
+            const priceA =
+              a.total_price !== null ? a.total_price : a.rent_amount;
+            const priceB =
+              b.total_price !== null ? b.total_price : b.rent_amount;
+            return this.convertToLac(priceB) - this.convertToLac(priceA);
+          });
+        break;
+
+      case 'Most Recent':
+        data = data.sort((a: any, b: any) => this.sortByRecent(a, b));
+        break;
+
+      case 'Relevance':
+      default:
+        break;
+    }
+
+    this.propertytype = data;
+    this.initialListCount = Math.max(5, Math.min(this.initialListCount, this.propertytype.length || 5));
+  }
+
 
   openGallery(images: string[], event: Event) {
     event.preventDefault(); // Prevents default anchor behavior
@@ -148,6 +268,12 @@ export class PropertytypesbuyComponent {
   }
 
   ngOnInit() {
+  this.type = this.route.snapshot.paramMap.get('type');
+  this.city = this.route.snapshot.paramMap.get('city');
+
+  this.seoService.setCanonicalURL(
+    `https://www.realtymart.com/${this.type}-for-buy-in-${this.city}`
+  );
     const token = localStorage.getItem('myrealtylogintoken');
     if (token) {
       this.is_token = true;
@@ -168,8 +294,6 @@ export class PropertytypesbuyComponent {
         this.resetContactForm();
       });
     }
-    this.type = this.route.snapshot.paramMap.get('type');
-    this.city = this.route.snapshot.paramMap.get('city');
     this.fetchPropertyTypeBuysIn();
   }
 
@@ -214,11 +338,11 @@ export class PropertytypesbuyComponent {
           this.propertytype =
           response.responseData?.propertytypesbuyin?.data  || [];
           this.original = [...this.propertytype, ...(response.responseData?.propertytypesbuyin?.data || []),];
-          
+          this.setPropertyTypeSchema();
           
           console.log(this.propertytype, "proprty type")
-          this.totalItems =
-            response.propertytypesbuyincount;
+          this.propertytypecount =
+            response.responseData?.propertytypesbuyin?.total;
 
             this.itemsPerPage = response.responseData?.propertytypesbuyin.per_page;
 
@@ -242,6 +366,125 @@ export class PropertytypesbuyComponent {
       );
     }
   }
+
+  setPropertyTypeSchema() {
+
+  const properties = this.propertytype.map((item: any, index: number) => ({
+
+    "@type": "ListItem",
+
+    "position": index + 1,
+
+    "item": {
+
+      "@type": "Residence",
+
+      "name": `${item.bedroom ? item.bedroom + ' BHK ' : ''}${item.property_typeName} in ${item.project.project_name}`,
+
+      "url": `https://www.realtymart.com/property-details/${item.propertyfirstUrlPart}/${item.propertysecondUrlPart}`,
+
+      "image": item.property_main_img,
+
+      "description": `For ${item.property_for} ${item.property_typeName} in ${item.project.project_name}, ${item.property_locality}`,
+
+      "address": {
+
+        "@type": "PostalAddress",
+
+        "addressLocality": item.property_locality,
+
+        "addressRegion": this.city,
+
+        "addressCountry": "IN"
+
+      },
+
+      "numberOfRooms": item.bedroom || undefined,
+
+      "numberOfBathroomsTotal": item.bathroom || undefined,
+
+      "floorSize": item.super_area
+        ? {
+            "@type": "QuantitativeValue",
+            "value": item.super_area,
+            "unitCode": "FTK"
+          }
+        : undefined,
+
+      "offers": {
+
+        "@type": "Offer",
+
+        "price": item.property_price_show == 0
+          ? (item.total_price || item.rent_amount)
+          : undefined,
+
+        "priceCurrency": "INR",
+
+        "availability": "https://schema.org/InStock",
+
+        "url": `https://www.realtymart.com/property-details/${item.propertyfirstUrlPart}/${item.propertysecondUrlPart}`
+
+      }
+
+    }
+
+  }));
+
+
+  const schema = {
+
+    "@context": "https://schema.org",
+
+    "@graph": [
+
+      {
+
+        "@type": "CollectionPage",
+
+        "@id": window.location.href,
+
+        "url": window.location.href,
+
+        "name": `${this.capitalizeFirstLetter(this.type)} in ${this.city}`,
+
+        "description": `Browse ${this.type} properties in ${this.city}. Compare prices, amenities, floor plans and contact property owners through RealtyMart.`,
+
+        "publisher": {
+
+          "@type": "Organization",
+
+          "name": "Intelliworkz Business Solutions Pvt. Ltd.",
+
+          "brand": {
+
+            "@type": "Brand",
+
+            "name": "RealtyMart"
+
+          }
+
+        },
+
+        "mainEntity": {
+
+          "@type": "ItemList",
+
+          "numberOfItems": this.propertytype.length,
+
+          "itemListElement": properties
+
+        }
+
+      }
+
+    ]
+
+  };
+
+  this.seoService.setSchema(schema);
+
+}
 
   // meta title
   setMetaTags(title: string, description: string) {
@@ -353,29 +596,7 @@ export class PropertytypesbuyComponent {
   changeSortOption(option: string): void {
     this.selectedSortOption = option;
     this.isDropdownOpen = false;
-    switch (option) {
-      case 'Price - Low to High':
-        this.propertytype = this.propertytypeDataList.sort(
-          (a: any, b: any) => this.sortByPrice(a, b)
-        );
-        break;
-      case 'Price - High to Low':
-        this.propertytype = this.propertytypeDataList.sort(
-          (a: any, b: any) => this.sortByPrice(b, a)
-        );
-        break;
-      case 'Most Recent':
-        this.propertytype = this.propertytypeDataList.sort(
-          (a: any, b: any) => this.sortByRecent(a, b)
-        );
-        break;
-      case 'Relevance':
-        this.propertytype = this.original;
-        break;
-      default:
-        this.propertytype = this.original;
-        break;
-    }
+    this.applyFiltersAndSorting();
   }
 
    private convertToLac(priceString: string): number {

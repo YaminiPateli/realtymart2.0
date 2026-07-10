@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Meta } from '@angular/platform-browser';
 import { SeoService } from 'src/app/seo.service';
 
 @Component({
@@ -8,9 +9,31 @@ import { SeoService } from 'src/app/seo.service';
 })
 export class ContactComponent implements OnInit {
 
-  constructor(private seoService:SeoService){}
+  constructor(private seoService:SeoService, private metaService:Meta){}
 
   ngOnInit(): void {
+  this.seoService.setCanonicalURL(
+    'https://www.realtymart.com/career'
+  );
+  this.metaService.updateTag({
+  name: 'description',
+  content: 'Contact RealtyMart for property buying, selling, renting and real estate enquiries.'
+});
+
+this.metaService.updateTag({
+  property: 'og:title',
+  content: 'Contact RealtyMart | Get in Touch'
+});
+
+this.metaService.updateTag({
+  property: 'og:description',
+  content: 'Contact RealtyMart for property buying, selling, renting and real estate enquiries.'
+});
+
+this.metaService.updateTag({
+  property: 'og:url',
+  content: 'https://www.realtymart.com/contact'
+});
   this.setContactSchema();
 }
 setContactSchema() {

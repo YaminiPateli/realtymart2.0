@@ -9,6 +9,9 @@ import { SeoService } from 'src/app/seo.service';
 export class PrivacyPolicyComponent implements OnInit{
 constructor(private seoService:SeoService){}
 ngOnInit(): void {
+  this.seoService.setCanonicalURL(
+    'https://www.realtymart.com/privacy-policy'
+  );
   this.setPrivacyPolicySchema();
 }
 

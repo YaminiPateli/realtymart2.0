@@ -11,6 +11,7 @@ import { ActivityTrackerService } from '../service/activitytracker.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { GeolocationService } from '../service/geolocation.service';
 import { Title, Meta } from '@angular/platform-browser';
+import { SeoService } from 'src/app/seo.service';
 
 declare var bootstrap: any;
 
@@ -24,7 +25,7 @@ interface City {
   templateUrl: './propertyincityrent.component.html',
   styleUrls: ['./propertyincityrent.component.css']
 })
-export class PropertyincityrentComponent {
+export class PropertyincityrentComponent implements OnInit{
   tooltipVisible = false;
   tooltipPosition = { top: '0px', left: '0px' };
   @ViewChild('otpModel') otpModel!: ElementRef;
@@ -118,6 +119,7 @@ export class PropertyincityrentComponent {
     private router: Router,
     private route: ActivatedRoute,
     private geolocationService: GeolocationService,
+    private seoService:SeoService
   ) {
     this.cityss = localStorage.getItem('location');
 
@@ -161,6 +163,8 @@ export class PropertyincityrentComponent {
           this.ownerlauchedproperty =
             response.data?.data || [];
 
+            this.setPropertyRentSchema();
+
           this.ownerlauchedpropertycount =
             response.data?.total;
 
@@ -189,6 +193,102 @@ export class PropertyincityrentComponent {
         }
       );
   }
+
+  setPropertyRentSchema() {
+
+  const properties = this.ownerlauchedproperty.map((item: any, index: number) => ({
+
+    "@type": "ListItem",
+
+    "position": index + 1,
+
+    "item": {
+
+      "@type": "Residence",
+
+      "name": item.project_name,
+
+      "url": `https://www.realtymart.com/property-details/${item.propertyfirstUrlPart}/${item.propertysecondUrlPart}`,
+
+      "image": item.property_main_img,
+
+      "description": `For Rent ${item.bedroom ? item.bedroom + ' BHK' : item.property_type} in ${item.project_name}`,
+
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": item.property_locality,
+        "addressCountry": "IN"
+      },
+
+      "numberOfRooms": item.bedroom || undefined,
+
+      "floorSize": item.super_area
+        ? {
+            "@type": "QuantitativeValue",
+            "value": item.super_area,
+            "unitCode": "FTK"
+          }
+        : undefined,
+
+      "offers": {
+        "@type": "Offer",
+        "price": item.rent_amount || item.total_price,
+        "priceCurrency": "INR",
+        "availability": "https://schema.org/InStock",
+        "url": `https://www.realtymart.com/property-details/${item.propertyfirstUrlPart}/${item.propertysecondUrlPart}`
+      }
+
+    }
+
+  }));
+
+
+  const schema = {
+
+    "@context": "https://schema.org",
+
+    "@graph": [
+
+      {
+
+        "@type": "CollectionPage",
+
+        "@id": window.location.href,
+
+        "url": window.location.href,
+
+        "name": `Property For Rent in ${this.cityget}`,
+
+        "description": `Browse rental properties in ${this.cityget}. Find apartments, flats, villas, offices, shops and commercial properties available for rent on RealtyMart.`,
+
+        "publisher": {
+          "@type": "Organization",
+          "name": "Intelliworkz Business Solutions Pvt. Ltd.",
+          "brand": {
+            "@type": "Brand",
+            "name": "RealtyMart"
+          }
+        },
+
+        "mainEntity": {
+
+          "@type": "ItemList",
+
+          "numberOfItems": this.ownerlauchedproperty.length,
+
+          "itemListElement": properties
+
+        }
+
+      }
+
+    ]
+
+  };
+
+  this.seoService.setSchema(schema);
+
+}
 
 onPageChange(page: number) {
 
@@ -284,6 +384,11 @@ onPageChange(page: number) {
   // }
 
   ngOnInit() {
+     const city = this.route.snapshot.paramMap.get('city');
+
+  this.seoService.setCanonicalURL(
+    `https://www.realtymart.com/property-for-rent-in-${city}`
+  );
     const token = localStorage.getItem('myrealtylogintoken');
     if (token) {
       this.is_token = true;

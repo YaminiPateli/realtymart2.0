@@ -154,6 +154,12 @@ activeSection:any;
   };
 
   ngOnInit(): void {
+     const name = this.route.snapshot.paramMap.get('name');
+  const id = this.route.snapshot.paramMap.get('id');
+
+  this.seoService.setCanonicalURL(
+    `https://www.realtymart.com/property-details/${name}/${id}`
+  );
     this.fetchPropertyDetails();
     this.fetchVerifiedProperty();
     this.fetchSimilarProperty();

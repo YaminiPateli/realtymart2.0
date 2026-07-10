@@ -10,7 +10,7 @@ import { SeoService } from 'src/app/seo.service';
   templateUrl: './blog-details.component.html',
   styleUrls: ['./blog-details.component.css']
 })
-export class BlogDetailsComponent {
+export class BlogDetailsComponent implements OnInit{
   blogdetailsData: any;
   blogdetails: any;
 
@@ -23,6 +23,14 @@ export class BlogDetailsComponent {
     private seoService:SeoService
   ) {
     this.LoadBlogDetails();
+  }
+
+  ngOnInit(): void {
+    const blogurl = this.route.snapshot.paramMap.get('blogurl');
+
+  this.seoService.setCanonicalURL(
+    `https://www.realtymart.com/blog-details/${blogurl}`
+  );
   }
 
   LoadBlogDetails() {

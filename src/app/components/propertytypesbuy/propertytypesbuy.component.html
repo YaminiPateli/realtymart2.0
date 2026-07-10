@@ -9,7 +9,10 @@
       </div>
     </div>
   </section>
-  <div class="sort_by container justify-content-end">
+  <div class="sort_by container align-items-center justify-content-between pt-4">
+     <div>
+      <h1 class="total_results"> <span class="results">{{propertytypecount}} results | </span><span class="newly-launched">{{type}} for Sale in {{city}}</span></h1>
+    </div>
     <div class="col-lg-3 col-md-3 col-sm-12">
       <div class="tabs_sortby pt-4">
         <div class="tabs_sortby--title" (click)="toggleDropdown()">
@@ -33,6 +36,37 @@
       </div>
     </div>
   </div>
+  <div class="container mt-3">
+    Find {{this.totalItems}}+ projects for Sale in {{city}} only on realtymart.com. Explore ✓ Verified Listings ✓
+    HD Photos ✓ Locality Insights ✓ Affordable & Luxury Options. Enquire Now!
+  </div>
+  <div class="quick-filter-pills container d-flex flex-wrap align-items-center gap-2 my-3">
+    <button type="button" class="filter-pill-btn" [class.active]="activeFilters['New Property']"
+      (click)="toggleFilter('New Property')">
+      New Property
+    </button>
+    <button type="button" class="filter-pill-btn" [class.active]="activeFilters['Ready to Move']"
+      (click)="toggleFilter('Ready to Move')">
+      Ready to Move
+    </button>
+    <button type="button" class="filter-pill-btn" [class.active]="activeFilters['Featured']"
+      (click)="toggleFilter('Featured')">
+      Featured
+    </button>
+    <button type="button" class="filter-pill-btn" [class.active]="activeFilters['Farm House']"
+      (click)="toggleFilter('Farm House')">
+      Farm House
+    </button>
+    <button type="button" class="filter-pill-btn" [class.active]="activeFilters['New Construction']"
+      (click)="toggleFilter('New Construction')">
+      New Construction
+    </button>
+    <button type="button" class="filter-pill-btn" [class.active]="activeFilters['Furnished']"
+      (click)="toggleFilter('Furnished')">
+      Furnished
+    </button>
+  </div>
+
   <section class="property-off">
     <div class="container">
       <div class="maching-myproperties" *ngFor="let item of propertytype">
@@ -78,9 +112,9 @@
                 }}"
                 class="tap-location"
               >
-                <h3 class="groups-companies-names">
+                <h1 class="groups-companies-names">
                   {{ item.property_locality }}
-                </h3>
+                </h1>
               </a>
             
               <a
@@ -206,13 +240,14 @@
          
         </div>
       </div>
+      <div class="fw-bold text-center" *ngIf="propertytype.length === 0">No Data Found!</div>
       <app-pagination
   [currentPage]="currentPage"
   [totalPages]="totalPages"
   (pageChanged)="onPageChange($event)">
 </app-pagination>
+</div>
 
-    </div>
   </section>
 </main>
 

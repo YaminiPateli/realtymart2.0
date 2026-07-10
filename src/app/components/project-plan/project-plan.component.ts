@@ -1,4 +1,5 @@
 import { AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
+import { SeoService } from 'src/app/seo.service';
 
 @Component({
   selector: 'app-project-plan',
@@ -118,13 +119,94 @@ export class ProjectPlanComponent implements OnInit, AfterViewInit {
   ];
 
 
-  constructor() { }
+  constructor(private seoService:SeoService) { }
 
   ngOnInit(): void {
+     this.seoService.setCanonicalURL(
+    'https://www.realtymart.com/project-plan'
+  );
     this.selectedPlan =
       this.plans.find(plan => plan.recommended) || this.plans[0];
     this.scrollToSelectedPlan();
+    this.setPricingSchema();
   }
+
+setPricingSchema() {
+
+  const offers = this.plans.map((plan: any) => ({
+    "@type": "Offer",
+    "name": plan.name,
+    "price": plan.price,
+    "priceCurrency": "INR",
+    "description": `Subscription plan for properties up to ${plan.range}. Includes ${plan.leads} leads per month.`,
+    "availability": "https://schema.org/InStock",
+    "eligibleRegion": {
+      "@type": "Place",
+      "name": "Gujarat"
+    }
+  }));
+
+  const webPage = {
+    "@type": "WebPage",
+    "@id": "https://www.realtymart.com/pricing",
+    "url": "https://www.realtymart.com/pricing",
+    "name": "Pricing Plans | RealtyMart",
+    "description": "Compare RealtyMart subscription plans designed to help builders and property owners generate quality leads and promote their projects.",
+    "mainEntity": {
+      "@id": "https://www.realtymart.com/pricing#catalog"
+    }
+  };
+
+  const service = {
+    "@type": "Service",
+    "@id": "https://www.realtymart.com/pricing#service",
+    "name": "Real Estate Marketing Subscription",
+    "serviceType": "Property Marketing",
+    "provider": {
+      "@type": "Organization",
+      "name": "Intelliworkz Business Solutions Pvt. Ltd.",
+      "brand": {
+        "@type": "Brand",
+        "name": "RealtyMart"
+      }
+    }
+  };
+
+  const offerCatalog = {
+    "@type": "OfferCatalog",
+    "@id": "https://www.realtymart.com/pricing#catalog",
+    "name": "RealtyMart Pricing Plans",
+    "itemListElement": offers
+  };
+
+  const faqPage = {
+    "@type": "FAQPage",
+    "mainEntity": this.faqs.map((faq: any) => ({
+      "@type": "Question",
+      "name": faq.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.answer.replace(/<[^>]+>/g, "")
+      }
+    }))
+  };
+
+  const schema: any = {
+    "@context": "https://schema.org",
+    "@graph": [
+      webPage,
+      service,
+      offerCatalog
+    ]
+  };
+
+  // Add FAQ schema only if FAQs exist
+  if (this.faqs && this.faqs.length > 0) {
+    schema["@graph"].push(faqPage);
+  }
+
+  this.seoService.setSchema(schema);
+}
 
   ngAfterViewInit() {
     if (window.innerWidth < 768) {

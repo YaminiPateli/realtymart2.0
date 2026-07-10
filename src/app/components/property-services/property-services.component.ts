@@ -48,6 +48,7 @@ export class PropertyServicesComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.fetchSportsData();
+    this.seoService.setCanonicalURL('https://www.realtymart.com/property-services');
   }
 
   ngAfterViewInit(): void {

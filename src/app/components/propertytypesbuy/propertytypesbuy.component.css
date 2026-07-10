@@ -128,3 +128,34 @@
     grid-template-columns: repeat(2, 1fr);
 }
 }
+
+
+.filter-pill-btn {
+  background-color: #ffffff;
+  border: 1px solid #dcdcdc;
+  color: #4a4a4a;
+  padding: 6px 16px;
+  border-radius: 50rem;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  outline: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.filter-pill-btn:hover {
+  background-color: #e53726;
+  border-color: #e53726;
+  color: white;
+}
+
+.filter-pill-btn.active {
+  background-color: #e53726;
+  border: 1px solid #e53726;
+  color: white;
+  font-weight: 600;
+}

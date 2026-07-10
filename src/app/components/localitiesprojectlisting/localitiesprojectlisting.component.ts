@@ -8,6 +8,7 @@ import { ActivityTrackerService } from '../service/activitytracker.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
+import { SeoService } from 'src/app/seo.service';
 declare var bootstrap: any;
 
 @Component({
@@ -15,7 +16,7 @@ declare var bootstrap: any;
   templateUrl: './localitiesprojectlisting.component.html',
   styleUrls: ['./localitiesprojectlisting.component.css'],
 })
-export class LocalitiesprojectlistingComponent {
+export class LocalitiesprojectlistingComponent implements OnInit{
   private apiUrl: string = environment.apiUrl;
   @ViewChild('otpModel') otpModel!: ElementRef;
   localitiesprojectsData: any;
@@ -65,7 +66,8 @@ export class LocalitiesprojectlistingComponent {
     private activityTrackerService: ActivityTrackerService,
     private spinner: NgxSpinnerService,
     private toastr: ToastrService,
-    private http: HttpClient
+    private http: HttpClient,
+    private seoService:SeoService
   ) {
     const token = localStorage.getItem('myrealtylogintoken');
     if (token) {
@@ -79,6 +81,11 @@ export class LocalitiesprojectlistingComponent {
 
   ngOnInit(): void {
     this.fetchExploreLocalitiesProjectsList();
+     const localities = this.route.snapshot.paramMap.get('localities');
+
+  this.seoService.setCanonicalURL(
+    `https://www.realtymart.com/localities-projects/${localities}`
+  );
   }
 
   fetchExploreLocalitiesProjectsList() {
@@ -92,6 +99,7 @@ export class LocalitiesprojectlistingComponent {
             this.localitiesprojectsData = localities;
             this.localitiesprojects = this.localitiesprojectsData?.data;
             this.original = [...this.localitiesprojects];
+            this.setLocalityProjectsSchema();
             this.setMetaTags(
               localities.meta.title,
               localities.meta.description
@@ -103,6 +111,121 @@ export class LocalitiesprojectlistingComponent {
         );
     }
   }
+
+  setLocalityProjectsSchema() {
+
+  const projects = this.localitiesprojects.map((project: any, index: number) => ({
+
+    "@type": "ListItem",
+
+    "position": index + 1,
+
+    "item": {
+
+      "@type": "ApartmentComplex",
+
+      "name": project.project_name,
+
+      "url": `https://www.realtymart.com/project-details/${project.firstUrlPart}/${project.secondUrlPart}`,
+
+      "image": project.project_banner_image,
+
+      "description": project.project_about
+        ? project.project_about.replace(/<[^>]*>/g, "")
+        : "",
+
+      "address": {
+
+        "@type": "PostalAddress",
+
+        "addressLocality": project.project_localities,
+
+        "addressRegion": project.searchcity,
+
+        "addressCountry": "IN"
+
+      },
+
+      "brand": {
+
+        "@type": "Organization",
+
+        "name": project.name
+
+      },
+
+      "offers": project.project_price_show == "0"
+        ? {
+
+            "@type": "Offer",
+
+            "price": project.project_minimum_price,
+
+            "priceCurrency": "INR",
+
+            "availability": "https://schema.org/InStock"
+
+          }
+        : undefined
+
+    }
+
+  }));
+
+
+  const schema = {
+
+    "@context": "https://schema.org",
+
+    "@graph": [
+
+      {
+
+        "@type": "CollectionPage",
+
+        "@id": window.location.href,
+
+        "url": window.location.href,
+
+        "name": `Projects in ${this.localitiesprojects[0]?.project_localities}`,
+
+        "description": `Browse residential and commercial projects in ${this.localitiesprojects[0]?.project_localities}. Compare builders, prices, project details and amenities on RealtyMart.`,
+
+        "publisher": {
+
+          "@type": "Organization",
+
+          "name": "Intelliworkz Business Solutions Pvt. Ltd.",
+
+          "brand": {
+
+            "@type": "Brand",
+
+            "name": "RealtyMart"
+
+          }
+
+        },
+
+        "mainEntity": {
+
+          "@type": "ItemList",
+
+          "numberOfItems": this.localitiesprojects.length,
+
+          "itemListElement": projects
+
+        }
+
+      }
+
+    ]
+
+  };
+
+  this.seoService.setSchema(schema);
+
+}
 
   // meta title
   setMetaTags(title: string, description: string) {

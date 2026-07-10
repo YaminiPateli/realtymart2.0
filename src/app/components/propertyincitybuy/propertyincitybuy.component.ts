@@ -11,6 +11,7 @@ import { ActivityTrackerService } from '../service/activitytracker.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { GeolocationService } from '../service/geolocation.service';
 import { Title, Meta } from '@angular/platform-browser';
+import { SeoService } from 'src/app/seo.service';
 
 declare var bootstrap: any;
 
@@ -24,7 +25,7 @@ interface City {
   templateUrl: './propertyincitybuy.component.html',
   styleUrls: ['./propertyincitybuy.component.css']
 })
-export class PropertyincitybuyComponent {
+export class PropertyincitybuyComponent implements OnInit{
   tooltipVisible = false;
   tooltipPosition = { top: '0px', left: '0px' };
   @ViewChild('otpModel') otpModel!: ElementRef;
@@ -118,6 +119,7 @@ export class PropertyincitybuyComponent {
     private router: Router,
     private route: ActivatedRoute,
     private geolocationService: GeolocationService,
+    private seoService:SeoService
   ) {
     this.cityss = localStorage.getItem('location');
 
@@ -181,6 +183,7 @@ export class PropertyincitybuyComponent {
 
           this.ownerlauchedproperty =
             response.data?.data || [];
+            this.setPropertyListingSchema();
 
           this.ownerlauchedpropertycount =
             response.data?.total;
@@ -206,6 +209,103 @@ export class PropertyincitybuyComponent {
         }
       );
   }
+
+setPropertyListingSchema() {
+
+  const properties = this.ownerlauchedproperty.map((item: any, index: number) => ({
+
+    "@type": "ListItem",
+
+    "position": index + 1,
+
+    "item": {
+
+      "@type": "Residence",
+
+      "name": item.project_name,
+
+      "url": `https://www.realtymart.com/property-details/${item.propertyfirstUrlPart}/${item.propertysecondUrlPart}`,
+
+      "image": item.property_main_img,
+
+      "description": `${item.property_for} ${item.bedroom ? item.bedroom + ' BHK' : item.property_type} in ${item.project_name}`,
+
+      "address": {
+
+        "@type": "PostalAddress",
+
+        "addressLocality": item.property_locality,
+
+        "addressCountry": "IN"
+
+      },
+
+      "numberOfRooms": item.bedroom || undefined,
+
+      "floorSize": item.super_area
+        ? {
+            "@type": "QuantitativeValue",
+            "value": item.super_area,
+            "unitCode": "FTK"
+          }
+        : undefined,
+
+      "offers": {
+
+        "@type": "Offer",
+
+        "price": item.total_price || item.rent_amount,
+
+        "priceCurrency": "INR",
+
+        "availability": "https://schema.org/InStock",
+
+        "url": `https://www.realtymart.com/property-details/${item.propertyfirstUrlPart}/${item.propertysecondUrlPart}`
+
+      }
+
+    }
+
+  }));
+
+
+  const schema = {
+
+    "@context": "https://schema.org",
+
+    "@graph": [
+
+      {
+
+        "@type": "CollectionPage",
+
+        "@id": window.location.href,
+
+        "name": "Property Listing",
+
+        "url": window.location.href,
+
+        "description": "Browse residential and commercial properties available for sale and rent on RealtyMart.",
+
+        "mainEntity": {
+
+          "@type": "ItemList",
+
+          "numberOfItems": this.ownerlauchedproperty.length,
+
+          "itemListElement": properties
+
+        }
+
+      }
+
+    ]
+
+  };
+
+  this.seoService.setSchema(schema);
+
+}
 
   onPageChange(page: number) {
 
@@ -281,6 +381,11 @@ export class PropertyincitybuyComponent {
   // }
 
   ngOnInit() {
+    const city = this.route.snapshot.paramMap.get('city');
+
+  this.seoService.setCanonicalURL(
+    `https://www.realtymart.com/property-for-buy-in-${city}`
+  );
     const token = localStorage.getItem('myrealtylogintoken');
     if (token) {
       this.is_token = true;

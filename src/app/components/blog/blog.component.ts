@@ -10,7 +10,7 @@ import { SeoService } from 'src/app/seo.service';
   templateUrl: './blog.component.html',
   styleUrls: ['./blog.component.css']
 })
-export class BlogComponent {
+export class BlogComponent implements OnInit{
   listArray : string[] = [];
   bloglistData: any;
   bloglist: any[] = []; // Assuming bloglist is an array of blog data
@@ -29,6 +29,7 @@ export class BlogComponent {
     );
     this.Loadblogs();
   }
+
 
   // meta title
   setMetaTags(title: string, description: string) {
@@ -50,6 +51,10 @@ export class BlogComponent {
 
   ngOnInit() {
     this.Loadblogs();
+    this.seoService.setCanonicalURL(
+    'https://www.realtymart.com/blog'
+  );
+
   }
 
   Loadblogs() {

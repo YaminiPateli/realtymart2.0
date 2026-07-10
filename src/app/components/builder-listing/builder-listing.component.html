@@ -52,11 +52,9 @@
             <div class="show-ahm-box">
               <div *ngFor="let projects of item.projects">
                 <a
-                  [routerLink]="[
-                    '/project-details',
-                    projects.firstUrlPart,
-                    projects.secondUrlPart
-                  ]"
+                  routerLink="/{{
+                                projects.firstUrlPart
+                              }}-{{ projects.secondUrlPart }}"
                   class="links-taps"
                 >
                   <div class="ahow-ahm-items">

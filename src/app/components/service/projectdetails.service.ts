@@ -17,7 +17,7 @@ export class ProjectdetailsService {
   }
 
   getprojectdetail1(name: string, id: any): Observable<any> {
-    const url = `${this.apiUrl}projectdetails/${name}/${id}`;
+    const url = `${this.apiUrl}projectdetails/${name}/prjid-${id}`;
     return this.http.get(url);
   }
 }

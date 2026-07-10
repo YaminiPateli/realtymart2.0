@@ -269,6 +269,7 @@ export class HomeComponent implements AfterViewInit, OnInit {
   }
   ngOnInit() {
     this.locationCookie = localStorage.getItem('location');
+    this.seoService.setCanonicalURL('https://www.realtymart.com/');
     this.fetchCities();
     this.checkLoggedIn();
     this.propertyServicesHomePage()
@@ -278,6 +279,12 @@ export class HomeComponent implements AfterViewInit, OnInit {
     this.metaService.addTag({
       name: 'description',
       content: 'Find the best real estate services. Buy, sell, and rent properties with ease at realtymart.com. Your one-stop property portal!'
+    });
+    this.metaService.updateTag({
+      property:'og:title', content:'Real Estate Property Portal | Real Estate Services | Buy, Sell, Rent Properties | realtymart.com'
+    });
+    this.metaService.updateTag({
+      property:'og:description',content:'Find the best real estate services. Buy, sell, and rent properties with ease at realtymart.com. Your one-stop property portal!'
     });
     const token = localStorage.getItem('myrealtylogintoken');
     if (token) {

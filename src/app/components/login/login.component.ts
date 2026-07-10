@@ -16,6 +16,7 @@ import { Title, Meta } from '@angular/platform-browser';
 import { GeolocationService } from '../service/geolocation.service';
 import { HeaderService } from '../service/header.service';
 import { CountryCodeInputComponent } from 'src/app/common/country-code-input/country-code-input.component';
+import { SeoService } from 'src/app/seo.service';
 declare var google: any;
 interface ApiResponse {
   status: boolean;
@@ -29,7 +30,7 @@ interface ApiResponse {
   standalone: true,
   imports: [NgIf, FormsModule, CommonModule, CountryCodeInputComponent],
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   private apiUrl: string = environment.apiUrl;
   [x: string]: any;
   propertyget: any;
@@ -61,7 +62,8 @@ export class LoginComponent {
     private location: Location,
     private toastr: ToastrService,
     private geolocationService: GeolocationService,
-    private headerService: HeaderService
+    private headerService: HeaderService,
+    private seoService:SeoService
   ) {
     this.setMetaTags('User Login in RealtyMart', '');
     this.getLocation();
@@ -75,7 +77,6 @@ export class LoginComponent {
     });
     this.spinner.show();
   }
-
   // meta title
   setMetaTags(title: string, description: string) {
     this.titleService.setTitle(title);
@@ -96,10 +97,14 @@ export class LoginComponent {
   }
 
   ngOnInit() {
+      this.seoService.setCanonicalURL(
+    'https://www.realtymart.com/login'
+  );
     const token = localStorage.getItem('myrealtylogintoken');
     if (token) {
       this.route.navigate(['/']);
     }
+    this.setLoginSchema();
   }
 
   ngAfterViewInit() {
@@ -245,4 +250,93 @@ export class LoginComponent {
       console.error('Geolocation not supported by this browser.');
     }
   }
+  setLoginSchema() {
+
+  const schema = {
+
+    "@context": "https://schema.org",
+
+    "@graph": [
+
+      {
+
+        "@type": "WebPage",
+
+        "@id": "https://www.realtymart.com/login",
+
+        "url": "https://www.realtymart.com/login",
+
+        "name": "Login | RealtyMart",
+
+        "description": "Login to your RealtyMart account securely using your mobile number and OTP to access your property listings, saved properties and account dashboard.",
+
+        "isPartOf": {
+
+          "@type": "WebSite",
+
+          "name": "RealtyMart",
+
+          "url": "https://www.realtymart.com"
+
+        },
+
+        "publisher": {
+
+          "@type": "Organization",
+
+          "name": "Intelliworkz Business Solutions Pvt. Ltd.",
+
+          "brand": {
+
+            "@type": "Brand",
+
+            "name": "RealtyMart"
+
+          },
+
+          "url": "https://www.realtymart.com"
+
+        },
+
+        "mainEntity": {
+
+          "@id": "https://www.realtymart.com/login#app"
+
+        }
+
+      },
+
+      {
+
+        "@type": "WebApplication",
+
+        "@id": "https://www.realtymart.com/login#app",
+
+        "name": "RealtyMart Login",
+
+        "applicationCategory": "BusinessApplication",
+
+        "operatingSystem": "Web",
+
+        "url": "https://www.realtymart.com/login",
+
+        "description": "Secure OTP-based login for RealtyMart users.",
+
+        "provider": {
+
+          "@type": "Organization",
+
+          "name": "Intelliworkz Business Solutions Pvt. Ltd."
+
+        }
+
+      }
+
+    ]
+
+  };
+
+  this.seoService.setSchema(schema);
+
+}
 }

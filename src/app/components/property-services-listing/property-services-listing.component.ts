@@ -175,6 +175,11 @@ export class PropertyServicesListingComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    const name = this.route.snapshot.paramMap.get('name');
+
+    this.seoService.setCanonicalURL(
+      `https://www.realtymart.com/property-services/${name}`
+    );
     const token = localStorage.getItem('myrealtylogintoken');
     if (token) {
       this.is_token = true;

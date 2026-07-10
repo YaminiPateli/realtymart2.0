@@ -1871,7 +1871,7 @@
                       <a target="_blank" routerLink="/property-details/{{
                           hotdeal.propertyfirstUrlPart
                         }}/{{ hotdeal.propertysecondUrlPart }}" class="detail-head">
-                        <h2 class="proj-Mhead">{{ hotdeal.projectName }}</h2>
+                        <h1 class="proj-Mhead">{{ hotdeal.projectName }}</h1>
 
                         <!-- <p class="detail-head">{{ hotdeal.builderName }}</p> -->
                         <p class="detail-pera">
@@ -1939,9 +1939,9 @@
                       <img src="{{ proj?.project_images }}" class="img-fluid" alt="project_images" />
                       <div class="hot-details">
                         <a target="_blank"
-                          routerLink="/project-details/{{ proj?.firstUrlPart }}/{{ proj?.secondUrlPart }}"
+                          routerLink="/{{ proj?.firstUrlPart }}-{{ proj?.secondUrlPart }}"
                           class="detail-head">
-                          <h2 class="proj-Mhead">{{ proj?.project_name }}</h2>
+                          <h1 class="proj-Mhead">{{ proj?.project_name }}</h1>
 
                           <p class="detail-pera">
                             {{ proj?.builderName }}
@@ -1971,7 +1971,7 @@
                       </div>
                     </div>
 
-                    <a target="_blank" routerLink="/project-details/{{ proj?.firstUrlPart }}/{{ proj?.secondUrlPart }}"
+                    <a target="_blank" routerLink="/{{ proj?.firstUrlPart }}-{{ proj?.secondUrlPart }}"
                       class="show-deals"><i class="fa fa-thin fa-chevron-right" style="color: #ffffff"></i></a>
                   </div>
                 </div>
@@ -1992,17 +1992,17 @@
             <div class="proj-gallery__card">
               <div class="proj-link">
                 <a target="_blank"
-                  routerLink="/project-details/{{ featuredResidentals?.firstUrlPart }}/{{ featuredResidentals?.secondUrlPart }}">
+                  routerLink="/{{ featuredResidentals?.firstUrlPart }}-{{ featuredResidentals?.secondUrlPart }}">
                   <div class="proj-gallery-image">
                     <img src="{{ featuredResidentals?.project_banner_image }}" alt="project_banner_image" />
                   </div>
                 </a>
                 <div class="proj-gallery-desc">
-                  <a target="_blank" routerLink="/project-details/{{
+                  <a target="_blank" routerLink="/{{
                     featuredResidentals.firstUrlPart
-                  }}/{{ featuredResidentals.secondUrlPart }}">
-                    <h3 class="proj-Mhead">
-                      {{ featuredResidentals.project_name }}</h3>
+                  }}-{{ featuredResidentals.secondUrlPart }}">
+                    <h1 class="proj-Mhead">
+                      {{ featuredResidentals.project_name }}</h1>
                     <p class="mb-para-by">
                       {{ featuredResidentals.project_localities }}
                     </p>
@@ -2054,7 +2054,7 @@
 
         <div class="col-lg-12 col-md-12 col-sm-12 ps-0 ps-lg-0 ps-md-3">
           <a target="_blank" *ngIf="bannerbuilder[0]"
-            routerLink="project-details/{{ bannerbuilder[0].projectfirstUrlPart }}/{{ bannerbuilder[0].projectsecondUrlPart }}">
+            routerLink="/{{ bannerbuilder[0].projectfirstUrlPart }}-{{ bannerbuilder[0].projectsecondUrlPart }}">
             <img src="{{ bannerbuilder[0].project_banner_img }}" alt="project_banner_img" class="img-fluid group-main-img" />
           </a>
         </div>
@@ -2070,20 +2070,18 @@
           <div ngxSlickItem class="slide" *ngFor="let featuredcommercials of featuredcommercials">
             <div class="proj-gallery__card">
               <div class="proj-link">
-                <a target="_blank" routerLink="/project-details/{{
+                <a target="_blank" routerLink="/{{
                   featuredcommercials.firstUrlPart
-                }}/{{ featuredcommercials.secondUrlPart }}">
+                }}-{{ featuredcommercials.secondUrlPart }}">
                   <div class="proj-gallery-image-tow">
                     <img src="{{ featuredcommercials.project_banner_image }}" alt="project_banner_image" />
                   </div>
                 </a>
                 <div class="proj-gallery-desc">
-                  <a target="_blank" routerLink="/project-details/{{
-                    featuredcommercials.firstUrlPart
-                  }}/{{ featuredcommercials.secondUrlPart }}">
-                    <h3 class="proj-Mhead">
+                  <a target="_blank" routerLink="/{{featuredcommercials.firstUrlPart }}-{{ featuredcommercials.secondUrlPart }}">
+                    <h1 class="proj-Mhead">
                       {{ featuredcommercials.project_name }}
-                    </h3>
+                    </h1>
                     <p class="mb-para">{{ featuredcommercials.company_name }}</p>
                     <p class="mb-para-by">
                       {{ featuredcommercials.project_localities }}
@@ -2128,7 +2126,7 @@
                 {{ bannerbuilder[1].property_bhk }}</p>
             </div>
             <div class="group-view">
-              <a target="_blank" routerLink="project-details/{{ bannerbuilder[1].project_name }}/{{ bannerbuilder[1].id }}/{{ bannerbuilder[1].property_type }}">View projects</a>
+              <a target="_blank" routerLink="/{{ bannerbuilder[1].project_name }}-{{ bannerbuilder[1].id }}-{{ bannerbuilder[1].property_type }}">View projects</a>
             </div>
           </div>
         </div> -->
@@ -2150,20 +2148,20 @@
           <div ngxSlickItem class="slide" *ngFor="let featuredBunglowss of featuredBunglowss">
             <div class="proj-gallery__card">
               <div class="proj-link">
-                <a target="_blank" routerLink="/project-details/{{
+                <a target="_blank" routerLink="/{{
                   featuredBunglowss.firstUrlPart
-                }}/{{ featuredBunglowss.secondUrlPart }}">
+                }}-{{ featuredBunglowss.secondUrlPart }}">
                   <div class="proj-gallery-image">
                     <img src="{{ featuredBunglowss.project_banner_image }}" alt="project_banner_image" />
                   </div>
                 </a>
                 <div class="proj-gallery-desc">
-                  <a target="_blank" routerLink="/project-details/{{
+                  <a target="_blank" routerLink="/{{
                     featuredBunglowss.firstUrlPart
-                  }}/{{ featuredBunglowss.secondUrlPart }}">
-                    <h3 class="proj-Mhead">
+                  }}-{{ featuredBunglowss.secondUrlPart }}">
+                    <h1 class="proj-Mhead">
                       {{ featuredBunglowss.project_name }}
-                    </h3>
+                    </h1>
                     <p class="mb-para">{{ featuredBunglowss.company_name }}</p>
                     <p class="mb-para-by">
                       {{ featuredBunglowss.project_localities }}
@@ -2203,20 +2201,20 @@
           <div ngxSlickItem class="slide" *ngFor="let featurefarmhouse of featurefarmhouse">
             <div class="proj-gallery__card">
               <div class="proj-link">
-                <a target="_blank" routerLink="/project-details/{{
+                <a target="_blank" routerLink="/{{
                   featurefarmhouse.firstUrlPart
-                }}/{{ featurefarmhouse.secondUrlPart }}">
+                }}-{{ featurefarmhouse.secondUrlPart }}">
                   <div class="proj-gallery-image-tow">
                     <img src="{{ featurefarmhouse.project_banner_image }}" alt="project_banner_image" />
                   </div>
                 </a>
                 <div class="proj-gallery-desc">
-                  <a target="_blank" routerLink="/project-details/{{
+                  <a target="_blank" routerLink="/{{
                     featurefarmhouse.firstUrlPart
-                  }}/{{ featurefarmhouse.secondUrlPart }}">
-                    <h3 class="proj-Mhead">
+                  }}-{{ featurefarmhouse.secondUrlPart }}">
+                    <h1 class="proj-Mhead">
                       {{ featurefarmhouse.project_name }}
-                    </h3>
+                    </h1>
                     <p class="mb-para">{{ featurefarmhouse.company_name }}</p>
                     <p class="mb-para-by">
                       {{ featurefarmhouse.project_localities }}
@@ -2260,7 +2258,7 @@
                 {{ bannerbuilder[2].property_bhk }}</p>
             </div>
             <div class="group-view">
-              <a target="_blank" routerLink="project-details/{{ bannerbuilder[2].project_name }}/{{ bannerbuilder[2].id }}/{{ bannerbuilder[2].property_type }}">View projects</a>
+              <a target="_blank" routerLink="/{{ bannerbuilder[2].project_name }}-{{ bannerbuilder[2].id }}/{{ bannerbuilder[2].property_type }}">View projects</a>
             </div>
           </div>
         </div> -->
@@ -2282,7 +2280,7 @@
           <div ngxSlickItem class="slide" *ngFor="let featurePlots of featurePlotss">
             <div class="proj-gallery__card">
               <div class="proj-link">
-                <a target="_blank" routerLink="/project-details/{{ featurePlots.firstUrlPart }}/{{
+                <a target="_blank" routerLink="/{{ featurePlots.firstUrlPart }}/{{
                   featurePlots.secondUrlPart
                 }}">
                   <div class="proj-gallery-image">
@@ -2290,10 +2288,10 @@
                   </div>
                 </a>
                 <div class="proj-gallery-desc">
-                  <a target="_blank" routerLink="/project-details/{{ featurePlots.firstUrlPart }}/{{
+                  <a target="_blank" routerLink="/{{ featurePlots.firstUrlPart }}-{{
                   featurePlots.secondUrlPart
                 }}">
-                    <h3 class="proj-Mhead">{{ featurePlots.project_name }}</h3>
+                    <h1 class="proj-Mhead">{{ featurePlots.project_name }}</h1>
                     <!-- <p class="mb-para">{{ featurePlots.company_name }}</p> -->
                     <p class="mb-para-by">
                       {{ featurePlots.project_localities }}

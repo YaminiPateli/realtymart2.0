@@ -125,9 +125,9 @@
                         <div class="deal-imgs">
                           <img src="{{ completedProj.project_banner_image }}" alt="project_banner_image" />
                           <div class="hot-details">
-                            <a routerLink="project-details/{{
+                            <a routerLink="/{{
                                 completedProj.firstUrlPart
-                              }}/{{ completedProj.secondUrlPart }}" class="detail-head"
+                              }}-{{ completedProj.secondUrlPart }}" class="detail-head"
                               *ngIf="completedProj.project_name">
                               <div class="d-flex align-items-center justify-content-between flex-wrap">
                                 {{ completedProj.project_name }}
@@ -315,9 +315,9 @@
                         <div class="deal-imgs">
                           <img src="{{ runningProj.project_banner_image }}" alt="project_banner_image" />
                           <div class="hot-details">
-                            <a routerLink="project-details/{{
+                            <a routerLink="/{{
                                 runningProj.firstUrlPart
-                              }}/{{ runningProj.secondUrlPart }}" class="detail-head"
+                              }}-{{ runningProj.secondUrlPart }}" class="detail-head"
                               *ngIf="runningProj.project_name">{{ runningProj.project_name }}</a>
                             <p class="detail-pera">
                               <b>{{ runningProj.project_type }}</b>

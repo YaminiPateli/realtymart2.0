@@ -152,6 +152,10 @@ const routes: Routes = [
   { path: 'project-approval-details/:name/:id', component: ProjectApproveDetailComponent},
   { path: 'thank-you-register', component:  ThankYouRegisterComponent },
   { path: 'project-plan', component:  ProjectPlanComponent },
+  {
+  matcher: createMatcher(/^(.+)-prjid-(\d+)$/, ['slug', 'id']),
+  component: ProjectApproveDetailComponent
+}
 ];
 
 // register Swiper custom elements

@@ -10,6 +10,7 @@ import { ToastrService } from 'ngx-toastr';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ActivityTrackerService } from '../service/activitytracker.service';
 import { Title, Meta } from '@angular/platform-browser';
+import { SeoService } from 'src/app/seo.service';
 declare var bootstrap: any;
 
 @Component({
@@ -17,7 +18,7 @@ declare var bootstrap: any;
   templateUrl: './explore-localities.component.html',
   styleUrls: ['./explore-localities.component.css']
 })
-export class ExploreLocalitiesComponent {
+export class ExploreLocalitiesComponent implements OnInit{
   @ViewChild('otpModel') otpModel!: ElementRef;
   private apiUrl: string = environment.apiUrl;
   explorelocalitiesData: any;
@@ -81,6 +82,8 @@ export class ExploreLocalitiesComponent {
     private elementRef: ElementRef,
     private spinner: NgxSpinnerService,
     private tost: ToastrService,
+    private seoService:SeoService,
+    private route: ActivatedRoute
   ) {
     setTimeout(() => {
     this.loadExploreLocalities();
@@ -95,7 +98,13 @@ export class ExploreLocalitiesComponent {
       this.formData.termsAccepted = true;
     }
   }
+  ngOnInit(): void {
+  const city = this.route.snapshot.paramMap.get('city');
 
+  this.seoService.setCanonicalURL(
+    `https://www.realtymart.com/explore-localities-in-${city}`
+  );
+}
     // @HostListener('window:scroll', [])
     // onScroll(): void {
     //   const items = document.querySelectorAll('.localiti-box');
@@ -148,6 +157,8 @@ export class ExploreLocalitiesComponent {
             this.explorelocalitiesCount =
               response.data?.total;
 
+              this.setLocalitySchema();
+
             this.setMetaTags(
               response.meta.title,
               response.meta.description,
@@ -168,6 +179,111 @@ export class ExploreLocalitiesComponent {
           }
         );
   }
+
+  setLocalitySchema() {
+
+  const localityList = this.explorelocalities.map((locality: any, index: number) => ({
+
+    "@type": "ListItem",
+
+    "position": index + 1,
+
+    "item": {
+
+      "@type": "Place",
+
+      "name": `${locality.locality.localities}, ${locality.locality.city}`,
+
+      "description": locality.locality.locality_introduction_and_neighbourhood
+        ? locality.locality.locality_introduction_and_neighbourhood.replace(/<[^>]*>/g, "")
+        : "",
+
+      "address": {
+
+        "@type": "PostalAddress",
+
+        "addressLocality": locality.locality.localities,
+
+        "addressRegion": locality.locality.city,
+
+        "addressCountry": "IN"
+
+      },
+
+      "containsPlace": locality.projects.map((project: any) => ({
+
+        "@type": "ApartmentComplex",
+
+        "name": project.project_name,
+
+        "image": project.project_banner_image,
+
+        "url": `https://www.realtymart.com/project-details/${project.firstUrlPart}/${project.secondUrlPart}`,
+
+        "address": {
+
+          "@type": "PostalAddress",
+
+          "streetAddress": project.project_address,
+
+          "addressLocality": project.project_localities,
+
+          "addressCountry": "IN"
+
+        },
+
+        "offers": project.project_price_show == '0'
+          ? {
+              "@type": "Offer",
+              "price": project.project_minimum_price,
+              "priceCurrency": "INR"
+            }
+          : undefined
+
+      }))
+
+    }
+
+  }));
+
+
+  const schema = {
+
+    "@context": "https://schema.org",
+
+    "@graph": [
+
+      {
+
+        "@type": "CollectionPage",
+
+        "@id": window.location.href,
+
+        "name": `Explore Localities in ${this.explorelocalities[0]?.locality.city}`,
+
+        "url": window.location.href,
+
+        "description": `Explore the best residential localities in ${this.explorelocalities[0]?.locality.city}, including available projects, property prices and locality information.`,
+
+        "mainEntity": {
+
+          "@type": "ItemList",
+
+          "numberOfItems": this.explorelocalities.length,
+
+          "itemListElement": localityList
+
+        }
+
+      }
+
+    ]
+
+  };
+
+  this.seoService.setSchema(schema);
+
+}
 
   // meta title
   setMetaTags(title: string, description: string) {

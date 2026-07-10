@@ -28,7 +28,7 @@ declare var bootstrap: any;
   standalone:true,
   imports:[NgSelectModule, CommonModule]
 })
-export class CareerComponent{
+export class CareerComponent implements OnInit{
   private apiUrl: string = environment.apiUrl;
   currentPage: number = 1;
   lastPage: number = 1;
@@ -52,6 +52,12 @@ export class CareerComponent{
     ) {
         this.loadCareer();
         this.loadCareerCategory();
+    }
+
+    ngOnInit(): void {
+     this.seoService.setCanonicalURL(
+    'https://www.realtymart.com/career'
+  );
     }
 
     loadCareer() {

@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
@@ -7,6 +7,7 @@ import { ActivityTrackerService } from '../service/activitytracker.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
+import { SeoService } from 'src/app/seo.service';
 declare var bootstrap: any;
 
 @Component({
@@ -14,7 +15,7 @@ declare var bootstrap: any;
   templateUrl: './builder-listing.component.html',
   styleUrls: ['./builder-listing.component.css'],
 })
-export class BuilderListingComponent {
+export class BuilderListingComponent implements OnInit{
   @ViewChild('otpModel') otpModel!: ElementRef;
   private apiUrl: string = environment.apiUrl;
   allbuilderprojectData: any;
@@ -72,7 +73,8 @@ export class BuilderListingComponent {
     private spinner: NgxSpinnerService,
     private toastr: ToastrService,
     public http: HttpClient,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private seoService:SeoService
   ) {
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: 'instant' });
@@ -87,6 +89,11 @@ export class BuilderListingComponent {
     }
   }
   ngOnInit(): void {
+    const city = this.route.snapshot.paramMap.get('city');
+    
+      this.seoService.setCanonicalURL(
+        `https://www.realtymart.com/builder-listing-in-${city}`
+      );
     this.loadAllBuilders();
   }
 
@@ -425,6 +432,7 @@ export class BuilderListingComponent {
 
             this.allbuilderproject = this.allbuilderproject || [];
             this.allbuilderproject = response.data?.data || [];
+            this.setBuilderListingSchema();
             this.setMetaTags(response.meta.title, response.meta.description);
             this.itemsPerPage = response.data?.per_page || 20; // Get from backend
             this.allbuilderprojectcount = response?.data?.total;
@@ -442,6 +450,133 @@ export class BuilderListingComponent {
         );
     }
   }
+
+  setBuilderListingSchema() {
+
+  const builders = this.allbuilderproject.map((builder: any, index: number) => ({
+
+    "@type": "ListItem",
+
+    "position": index + 1,
+
+    "item": {
+
+      "@type": "RealEstateAgent",
+
+      "name": builder.name,
+
+      "image": builder.builder_logo,
+
+      "url": `https://www.realtymart.com/builder-detail/${builder.builderUrl}`,
+
+      "foundingDate": builder.year,
+
+      "address": {
+
+        "@type": "PostalAddress",
+
+        "addressLocality": builder.citysearch,
+
+        "addressCountry": "IN"
+
+      },
+
+      "memberOf": {
+
+        "@type": "Organization",
+
+        "name": "Intelliworkz Business Solutions Pvt. Ltd.",
+
+        "brand": {
+
+          "@type": "Brand",
+
+          "name": "RealtyMart"
+
+        }
+
+      },
+
+      "makesOffer": builder.projects.map((project: any) => ({
+
+        "@type": "ApartmentComplex",
+
+        "name": project.project_name,
+
+        "image": project.project_banner_image,
+
+        "url": `https://www.realtymart.com/project-details/${project.firstUrlPart}/${project.secondUrlPart}`,
+
+        "address": {
+
+          "@type": "PostalAddress",
+
+          "streetAddress": project.project_address,
+
+          "addressLocality": project.project_localities,
+
+          "addressCountry": "IN"
+
+        },
+
+        "offers": {
+
+          "@type": "Offer",
+
+          "price": project.project_price_show == '0'
+            ? project.project_minimum_price
+            : undefined,
+
+          "priceCurrency": "INR",
+
+          "availability": "https://schema.org/InStock"
+
+        }
+
+      }))
+
+    }
+
+  }));
+
+
+  const schema = {
+
+    "@context": "https://schema.org",
+
+    "@graph": [
+
+      {
+
+        "@type": "CollectionPage",
+
+        "@id": window.location.href,
+
+        "name": `Builders in ${this.allbuilderproject[0]?.citysearch}`,
+
+        "url": window.location.href,
+
+        "description": `Explore builders in ${this.allbuilderproject[0]?.citysearch} along with their ongoing and completed projects.`,
+
+        "mainEntity": {
+
+          "@type": "ItemList",
+
+          "numberOfItems": this.allbuilderproject.length,
+
+          "itemListElement": builders
+
+        }
+
+      }
+
+    ]
+
+  };
+
+  this.seoService.setSchema(schema);
+
+}
 
   onPageChange(page: number): void {
 

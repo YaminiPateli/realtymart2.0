@@ -18,6 +18,7 @@ import { ActivityTrackerService } from '../service/activitytracker.service';
 import { GeolocationService } from '../service/geolocation.service';
 import { Title, Meta } from '@angular/platform-browser';
 import { DatePipe } from '@angular/common';
+import { SeoService } from 'src/app/seo.service';
 declare var bootstrap: any;
 
 interface City {
@@ -30,7 +31,7 @@ interface City {
   styleUrls: ['./newlylaunched.component.css'],
   providers: [DatePipe],
 })
-export class NewlylaunchedComponent {
+export class NewlylaunchedComponent implements OnInit{
   tooltipVisible = false;
   tooltipPosition = { top: '0px', left: '0px' };
   @ViewChild('otpModel') otpModel!: ElementRef;
@@ -114,13 +115,17 @@ export class NewlylaunchedComponent {
     private activityTrackerService: ActivityTrackerService,
     private router: Router,
     private geolocationService: GeolocationService,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private seoService:SeoService
   ) {
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: 'instant' });
     }, 0);
   }
   ngOnInit(): void {
+     this.seoService.setCanonicalURL(
+    'https://www.realtymart.com/newly-launched'
+  );
     const token = localStorage.getItem('myrealtylogintoken');
     if (token) {
       this.is_token = true;
@@ -159,14 +164,12 @@ export class NewlylaunchedComponent {
             this.newlauchedproperty =
         response.data?.data || [];
 
+        this.setNewLaunchProjectSchema();
+
       this.newlauchedpropertycount =
         response.data?.total;
 
-          this.newlauchedproperty = this.newlauchedproperty || [];
-          this.newlauchedproperty = [
-            ...this.newlauchedproperty,
-            ...(response.data?.data || []),
-          ];
+      
           this.setMetaTags(response.meta.title, response.meta.description);
           this.itemsPerPage = Number(response.data?.per_page);
           this.totalPages = Math.ceil(
@@ -184,6 +187,102 @@ export class NewlylaunchedComponent {
       );
   }
 
+  setNewLaunchProjectSchema() {
+
+  const projects = this.newlauchedproperty.map((project: any, index: number) => ({
+
+    "@type": "ListItem",
+
+    "position": index + 1,
+
+    "item": {
+
+      "@type": "ApartmentComplex",
+
+      "name": project.project_name,
+
+      "url": `https://www.realtymart.com/project-details/${project.firstUrlPart}/${project.secondUrlPart}`,
+
+      "image": project.project_banner_image,
+
+      "description": project.project_about
+        ? project.project_about.replace(/<[^>]*>/g, "")
+        : "",
+
+      "address": {
+
+        "@type": "PostalAddress",
+
+        "addressLocality": project.prjlocalities,
+
+        "addressRegion": project.city_name || "",
+
+        "addressCountry": "IN"
+
+      },
+
+      "offers": {
+
+        "@type": "Offer",
+
+        "price": project.project_minimum_price,
+
+        "priceCurrency": "INR",
+
+        "availability": "https://schema.org/PreOrder"
+
+      },
+
+      "brand": {
+
+        "@type": "Organization",
+
+        "name": project.builder_name
+
+      }
+
+    }
+
+  }));
+
+
+  const schema = {
+
+    "@context": "https://schema.org",
+
+    "@graph": [
+
+      {
+
+        "@type": "CollectionPage",
+
+        "@id": window.location.href,
+
+        "name": "Newly Launched Projects",
+
+        "url": window.location.href,
+
+        "description": "Browse newly launched residential and commercial projects on RealtyMart.",
+
+        "mainEntity": {
+
+          "@type": "ItemList",
+
+          "numberOfItems": this.newlauchedproperty.length,
+
+          "itemListElement": projects
+
+        }
+
+      }
+
+    ]
+
+  };
+
+  this.seoService.setSchema(schema);
+
+}
   // @HostListener('window:scroll', [])
   // onScroll(): void {
   //   const items = document.querySelectorAll('.maching-myproperties');

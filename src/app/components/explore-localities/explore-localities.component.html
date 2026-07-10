@@ -21,12 +21,12 @@
               <!-- <div class="localiti-box" *ngFor="let locality of explorelocalities | paginate: { itemsPerPage: itemsPerPage, currentPage: currentPage }; let i = index"> -->
               <div class="head-localiti">
                 <div class="title-head">
-                  <p class="area-heading" *ngIf="
+                  <h1 class="area-heading" *ngIf="
                       locality.locality.city && locality.locality.localities
                     ">
                     {{ locality.locality.localities }},
                     {{ locality.locality.city }}
-                  </p>
+                  </h1>
                   <!-- <p class="local-area">{{ explorelocalities.super_area }}</p> -->
                 </div>
               </div>
@@ -71,7 +71,7 @@
               <div class="builders-ahm-property">
                 <div class="row">
                   <div class="col-lg-6 col-md-12 col-sm-12" *ngFor="let project of locality.projects">
-                    <a routerLink="/project-details/{{ project.firstUrlPart }}/{{
+                    <a routerLink="/{{ project.firstUrlPart }}-{{
                         project.secondUrlPart
                       }}" class="links-taps">
                       <div class="property-details">

@@ -22,6 +22,9 @@ export class TermsConditionsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+  this.seoService.setCanonicalURL(
+    'https://www.realtymart.com/terms-conditions'
+  );
     this.setTermsSchema()
   }
 

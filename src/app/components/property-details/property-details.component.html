@@ -75,9 +75,9 @@
 
                 <div *ngIf="singleproperty?.project_name !== null">
                   <h6 class="facility_title">Project</h6>
-                  <a routerLink="/project-details/{{
+                  <a routerLink="/{{
                       singleproperty?.ProjectfirstUrlPart
-                    }}/{{ singleproperty?.ProjectsecondUrlPart }}" target="_blank" class="project-text"
+                    }}-{{ singleproperty?.ProjectsecondUrlPart }}" target="_blank" class="project-text"
                     style="cursor: pointer">{{ singleproperty?.project_name }}</a>
                 </div>
                 <div *ngIf="singleproperty?.builder_name !== null">

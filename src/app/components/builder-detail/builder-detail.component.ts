@@ -129,6 +129,11 @@ export class BuilderDetailComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+    const id = this.route.snapshot.paramMap.get('id');
+
+  this.seoService.setCanonicalURL(
+    `https://www.realtymart.com/builder-detail/${id}`
+  );
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: 'instant' });
     }, 0);

@@ -14,6 +14,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Fancybox } from '@fancyapps/ui';
 import { ActivityTrackerService } from '../service/activitytracker.service';
 import { GeolocationService } from '../service/geolocation.service';
+import { Meta } from '@angular/platform-browser';
 declare var bootstrap: any;
 
 interface City {
@@ -26,7 +27,7 @@ interface City {
   templateUrl: './matching-properties.component.html',
   styleUrls: ['./matching-properties.component.css'],
 })
-export class MatchingPropertiesComponent {
+export class MatchingPropertiesComponent implements OnInit{
   tooltipVisible = false;
   tooltipPosition = { top: '0px', left: '0px' };
   @ViewChild('otpModel') otpModel!: ElementRef;
@@ -38,6 +39,14 @@ export class MatchingPropertiesComponent {
   filteredData: any[] = [];
   selectedSortOption: string = 'Relevance';
   isDropdownOpen: boolean = false;
+  activeFilters: { [key: string]: boolean } = {
+    'New Property': false,
+    'Ready to Move': false,
+    'Featured': false,
+    'Farm House': false,
+    'New Construction': false,
+    'Furnished': false,
+  };
   paginatedData: any[] = [];
   currentPage: number = 1;
   pageSize: number = 5;
@@ -106,7 +115,8 @@ export class MatchingPropertiesComponent {
     private elementRef: ElementRef,
     private activityTrackerService: ActivityTrackerService,
     private geolocationService: GeolocationService,
-    private spinner: NgxSpinnerService
+    private spinner: NgxSpinnerService,
+    private metaService:Meta
   ) {
     const navigation = this.router.getCurrentNavigation();
 
@@ -147,6 +157,29 @@ export class MatchingPropertiesComponent {
   }
 
   ngOnInit() {
+    this.metaService.updateTag({
+      property: 'og:title',
+      content: 'Real Estate Property Portal | Buy, Sell & Rent Properties | RealtyMart'
+    });
+
+    this.metaService.updateTag({
+      property: 'og:description',
+      content: 'Search verified residential and commercial properties, apartments, villas, plots and offices across India.'
+    });
+    this.metaService.updateTag({
+      property: 'og:url',
+      content: window.location.href
+    });
+
+    this.metaService.updateTag({
+      property: 'og:type',
+      content: 'website'
+    });
+
+    this.metaService.updateTag({
+      property: 'og:site_name',
+      content: 'RealtyMart'
+    });
     const token = localStorage.getItem('myrealtylogintoken');
     if (token) {
       this.is_token = true;
@@ -157,9 +190,10 @@ export class MatchingPropertiesComponent {
       this.formDataphone.contactusername = localStorage.getItem('name') || '';
       this.formDataphone.contactuseremail = localStorage.getItem('email') || '';
       this.formDataphone.contactcontact_no =
-        localStorage.getItem('contact_no') || '';
+      localStorage.getItem('contact_no') || '';
       this.formDataphone.termsContactAccepted = true;
     }
+    this.city = localStorage.getItem('location') || '';
   }
   checkLoggedIn() {
     this.checkToken = localStorage.getItem('myrealtylogintoken');
@@ -173,12 +207,71 @@ export class MatchingPropertiesComponent {
   changeSortOption(option: string): void {
     this.selectedSortOption = option;
     this.isDropdownOpen = false;
+    this.applyFiltersAndSorting();
+  }
 
-    let sortedData;
+  toggleFilter(filterName: string): void {
+    if (this.activeFilters.hasOwnProperty(filterName)) {
+      this.activeFilters[filterName] = !this.activeFilters[filterName];
+      this.applyFiltersAndSorting();
+    }
+  }
 
-    switch (option) {
+  applyFiltersAndSorting(): void {
+    let data = [...this.original];
+
+      if (this.activeFilters['New Property']) {
+    data = data.filter(
+      (item: any) =>
+        item.transaction_type &&
+        item.transaction_type.toLowerCase() === 'new property'
+    );
+  }
+
+  if (this.activeFilters['Ready to Move']) {
+    data = data.filter(
+      (item: any) =>
+        item.possession_status &&
+        item.possession_status.toLowerCase() === 'ready to move'
+    );
+  }
+
+  if (this.activeFilters['Featured']) {
+    data = data.filter(
+      (item: any) =>
+        (item.property_status &&
+          item.property_status.toLowerCase() === 'featured') ||
+        item.is_featured == 1
+    );
+  }
+
+  if (this.activeFilters['Farm House']) {
+    data = data.filter(
+      (item: any) =>
+        item.property_type &&
+        item.property_type.toLowerCase() === 'farm house'
+    );
+  }
+
+  if (this.activeFilters['New Construction']) {
+    data = data.filter(
+      (item: any) =>
+        item.age_of_construction &&
+        item.age_of_construction.toLowerCase() === 'new construction'
+    );
+  }
+
+  if (this.activeFilters['Furnished']) {
+    data = data.filter(
+      (item: any) =>
+        item.furnishing_status &&
+        item.furnishing_status.toLowerCase() === 'furnished'
+    );
+  }
+
+    switch (this.selectedSortOption) {
       case 'Price - Low to High':
-        sortedData = [...this.searchdata]
+        data = data
           .filter((item: any) => {
             const priceA =
               item.total_price !== null && item.total_price !== undefined
@@ -193,11 +286,10 @@ export class MatchingPropertiesComponent {
               b.total_price !== null ? b.total_price : b.rent_amount;
             return this.convertToLac(priceA) - this.convertToLac(priceB);
           });
-        this.searchdata = sortedData;
         break;
 
       case 'Price - High to Low':
-        sortedData = [...this.searchdata]
+        data = data
           .filter((item: any) => {
             const priceA =
               item.total_price !== null && item.total_price !== undefined
@@ -212,21 +304,19 @@ export class MatchingPropertiesComponent {
               b.total_price !== null ? b.total_price : b.rent_amount;
             return this.convertToLac(priceB) - this.convertToLac(priceA);
           });
-        this.searchdata = sortedData;
         break;
 
       case 'Most Recent':
-        sortedData = [...this.searchdata].sort((a: any, b: any) =>
-          this.sortByRecent(a, b)
-        );
-        this.searchdata = sortedData;
+        data = data.sort((a: any, b: any) => this.sortByRecent(a, b));
         break;
 
       case 'Relevance':
       default:
-        this.searchdata = [...this.original];
         break;
     }
+
+    this.searchdata = data;
+    this.initialListCount = Math.max(5, Math.min(this.initialListCount, this.searchdata.length || 5));
   }
 
   private sortByRecent(a: any, b: any): number {

@@ -1429,6 +1429,9 @@ export class PostPropertyFreeComponent {
   }
 
   ngOnInit() {
+  this.seoService.setCanonicalURL(
+    'https://www.realtymart.com/post-property-free'
+  );
     this.fetchPropertyType();
     this.fetchLandZone();
     this.fetchBusinesssector();

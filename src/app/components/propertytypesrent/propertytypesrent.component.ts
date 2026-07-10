@@ -15,6 +15,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { Fancybox } from '@fancyapps/ui';
 import { ActivityTrackerService } from '../service/activitytracker.service';
 import { Title, Meta } from '@angular/platform-browser';
+import { SeoService } from 'src/app/seo.service';
 declare var bootstrap: any;
 
 interface City {
@@ -27,7 +28,7 @@ interface City {
   templateUrl: './propertytypesrent.component.html',
   styleUrls: ['./propertytypesrent.component.css'],
 })
-export class PropertytypesrentComponent {
+export class PropertytypesrentComponent implements OnInit{
   tooltipVisible = false;
   tooltipPosition = { top: '0px', left: '0px' };
   @ViewChild('otpModel') otpModel!: ElementRef;
@@ -126,7 +127,8 @@ originalPropertytype: any[] = [];
     private elementRef: ElementRef,
     private spinner: NgxSpinnerService,
     private activityTrackerService: ActivityTrackerService,
-    private router: Router
+    private router: Router,
+    private seoService:SeoService
   ) {}
 
   openGallery(images: string[], event: Event) {
@@ -154,6 +156,12 @@ originalPropertytype: any[] = [];
   }
 
   ngOnInit(): void {
+    const type = this.route.snapshot.paramMap.get('type');
+  const city = this.route.snapshot.paramMap.get('city');
+
+  this.seoService.setCanonicalURL(
+    `https://www.realtymart.com/${type}-for-rent-in-${city}`
+  );
     const token = localStorage.getItem('myrealtylogintoken');
     if (token) {
       this.is_token = true;
@@ -252,7 +260,7 @@ originalPropertytype: any[] = [];
               ...this.propertytype,
               ...(response.responseData?.propertytypesrentin?.data || []),
             ];
-
+            this.setPropertyTypeSchema();
             this.originalPropertytype = [
               ...this.propertytype,
               ...(response.responseData?.propertytypesrentin?.data || []),
@@ -284,6 +292,125 @@ originalPropertytype: any[] = [];
         );
     }
   }
+
+setPropertyTypeSchema() {
+
+  const propertyItems = this.propertytype.map((item: any, index: number) => ({
+
+    "@type": "ListItem",
+
+    "position": index + 1,
+
+    "item": {
+
+      "@type": "Residence",
+
+      "name": `${item.bedroom ? item.bedroom + ' BHK ' : ''}${item.property_typeName} in ${item.project.project_name}`,
+
+      "url": `https://www.realtymart.com/property-details/${item.propertyfirstUrlPart}/${item.propertysecondUrlPart}`,
+
+      "image": item.property_main_img,
+
+      "description": `For ${item.property_for} ${item.property_typeName} in ${item.project.project_name}, ${item.property_locality}`,
+
+      "address": {
+
+        "@type": "PostalAddress",
+
+        "addressLocality": item.property_locality,
+
+        "addressRegion": this.city,
+
+        "addressCountry": "IN"
+
+      },
+
+      "numberOfRooms": item.bedroom || undefined,
+
+      "numberOfBathroomsTotal": item.bathroom || undefined,
+
+      "floorSize": item.ploat_area
+        ? {
+            "@type": "QuantitativeValue",
+            "value": item.ploat_area,
+            "unitText": "sq ft"
+          }
+        : undefined,
+
+      "offers": {
+
+        "@type": "Offer",
+
+        "price": item.property_price_show == 0
+          ? (item.total_price || item.rent_amount)
+          : undefined,
+
+        "priceCurrency": "INR",
+
+        "availability": "https://schema.org/InStock",
+
+        "url": `https://www.realtymart.com/property-details/${item.propertyfirstUrlPart}/${item.propertysecondUrlPart}`
+
+      }
+
+    }
+
+  }));
+
+
+  const schema = {
+
+    "@context": "https://schema.org",
+
+    "@graph": [
+
+      {
+
+        "@type": "CollectionPage",
+
+        "@id": window.location.href,
+
+        "url": window.location.href,
+
+        "name": `${this.capitalizeFirstLetter(this.type)} in ${this.city}`,
+
+        "description": `Browse ${this.type} properties in ${this.city}. Compare prices, amenities, property details and contact owners on RealtyMart.`,
+
+        "publisher": {
+
+          "@type": "Organization",
+
+          "name": "Intelliworkz Business Solutions Pvt. Ltd.",
+
+          "brand": {
+
+            "@type": "Brand",
+
+            "name": "RealtyMart"
+
+          }
+
+        },
+
+        "mainEntity": {
+
+          "@type": "ItemList",
+
+          "numberOfItems": this.propertytype.length,
+
+          "itemListElement": propertyItems
+
+        }
+
+      }
+
+    ]
+
+  };
+
+  this.seoService.setSchema(schema);
+
+}
 
   // meta title
   setMetaTags(title: string, description: string) {
