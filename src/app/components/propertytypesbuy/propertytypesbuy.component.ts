@@ -28,7 +28,7 @@ export class PropertytypesbuyComponent implements OnInit{
   @ViewChild('otpContactModel') otpContactModel!: ElementRef;
   private apiUrl: string = environment.apiUrl;
   propertytypeData: any;
-  propertytypecount: any;
+  propertytypecount: number = 0;
   propertytype: any;
   type: any;
   original: any[] = [];
@@ -342,7 +342,7 @@ export class PropertytypesbuyComponent implements OnInit{
           
           console.log(this.propertytype, "proprty type")
           this.propertytypecount =
-            response.responseData?.propertytypesbuyin?.total;
+            response.responseData?.propertytypesbuyin?.total || 0;
 
             this.itemsPerPage = response.responseData?.propertytypesbuyin.per_page;
 
