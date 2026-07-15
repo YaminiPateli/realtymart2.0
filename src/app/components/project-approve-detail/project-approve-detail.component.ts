@@ -1886,6 +1886,11 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
               // resolve against city1 first, then fall back to the locality.
               const cityDisplayName = this.getCityDisplayName(this.singleproject);
 
+              this.reels = [];
+              this.allReels = [];
+              this.seenReelKeys.clear();
+              this.videoAlbum = [];
+
               this.singleproject.project_video.forEach((element: {
                 video_source: string,
                 proj_video_link: string,
@@ -1897,45 +1902,59 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
                 property_type?: string,
                 bhk?: string[],
                 project_about_developer?: any
-              }) => {
+              }, idx: number) => {
                 if (element.video_source === "youtube") {
                   this.videoAlbum.push(element)
                 } else {
-                  // Enrich real API video entries with the same fields the
-                  // fallback/dummy reels get, so the "View Details" card has
-                  // data to bind to and the reel filter panel (segment /
-                  // property type / BHK) has something to match against.
-                  // Without this, project_about_developer is undefined and
-                  // the property card renders blank, and segment/property_type/
-                  // bhk are undefined so filters silently return zero results.
-                  const enrichedElement = {
-                    ...element,
-                    proj_builderName: element.proj_builderName || this.singleproject.builderName || "",
-                    project_localities: element.project_localities || this.singleproject.project_localities || "",
-                    segment: element.segment || this.singleproject.property_for || "",
-                    property_type: element.property_type || this.singleproject.project_type || "",
-                    bhk: element.bhk && element.bhk.length ? element.bhk : bhkTypes,
-                    project_name: (element as any).project_name || (element as any).proj_name || this.singleproject.project_name || "",
-                    city_id: (element as any).city_id || this.singleproject.project_city || null,
-                    city: (element as any).city || cityDisplayName || "",
-                    project_about_developer: element.project_about_developer || {
-                      logo: this.singleproject.project_logo || null,
-                      project_name: this.singleproject.project_name || "",
-                      city: cityDisplayName,
-                      city_id: this.singleproject.project_city || null,
-                      image: this.singleproject.project_banner_image || (this.singleproject.project_images && this.singleproject.project_images[0]) || "",
-                      minPrice: this.singleproject.project_minimum_price || "",
-                      maxPrice: this.singleproject.project_maximum_price || "",
-                      type: bhkTypes.length ? bhkTypes.join(' - ') : ((Array.isArray(this.singleproject.project_type) ? this.singleproject.project_type.join(', ') : this.singleproject.project_type) || ""),
-                      minSize: minCarpetArea !== null ? `${minCarpetArea} SqFt` : "",
-                      maxSize: maxCarpetArea !== null ? `${maxCarpetArea} SqFt` : "",
-                      contact_no: this.singleproject.project_contact_no || ""
-                    }
-                  };
-                  this.reels.push(enrichedElement);
-                  const reelKey = `${enrichedElement.proj_video_link || ''}_${enrichedElement.proj_video_file || ''}_${(element as any).id || ''}`;
+                  let videoFile = element.proj_video_file || '';
+                  if (videoFile && typeof videoFile === 'string' && !videoFile.startsWith('http') && !videoFile.startsWith('data:')) {
+                    videoFile = `https://realtymart.com/backend/public/images/project_video/${videoFile}`;
+                  }
+                  let videoThumb = element.proj_video_thumbnail || '';
+                  if (videoThumb && typeof videoThumb === 'string' && !videoThumb.startsWith('http') && !videoThumb.startsWith('data:')) {
+                    videoThumb = `https://realtymart.com/backend/public/images/project_video_thumbnail/${videoThumb}`;
+                  }
+                  const videoLink = element.proj_video_link || '';
+
+                  const reelKey = this.getReelUniqueKey(videoLink, videoFile, this.singleproject.id, idx);
                   if (!this.seenReelKeys.has(reelKey)) {
                     this.seenReelKeys.add(reelKey);
+
+                    // Enrich real API video entries with the same fields the
+                    // fallback/dummy reels get, so the "View Details" card has
+                    // data to bind to and the reel filter panel (segment /
+                    // property type / BHK) has something to match against.
+                    const enrichedElement = {
+                      ...element,
+                      id: this.singleproject.id || (element as any).id || null,
+                      proj_video_file: videoFile,
+                      proj_video_thumbnail: videoThumb,
+                      proj_video_link: videoLink,
+                      proj_builderName: element.proj_builderName || this.singleproject.builderName || "",
+                      project_localities: element.project_localities || this.singleproject.project_localities || "",
+                      segment: element.segment || this.singleproject.property_for || "",
+                      property_type: element.property_type || this.singleproject.project_type || "",
+                      bhk: element.bhk && element.bhk.length ? element.bhk : bhkTypes,
+                      project_name: (element as any).project_name || (element as any).proj_name || this.singleproject.project_name || "",
+                      city_id: (element as any).city_id || this.singleproject.project_city || null,
+                      city: (element as any).city || cityDisplayName || "",
+                      project_about_developer: element.project_about_developer || {
+                        id: this.singleproject.id || (element as any).id || null,
+                        logo: this.singleproject.project_logo || null,
+                        project_name: this.singleproject.project_name || "",
+                        city: cityDisplayName,
+                        city_id: this.singleproject.project_city || null,
+                        builderName: element.proj_builderName || this.singleproject.builderName || "",
+                        image: this.singleproject.project_banner_image || (this.singleproject.project_images && this.singleproject.project_images[0]) || "",
+                        minPrice: this.singleproject.project_minimum_price || "",
+                        maxPrice: this.singleproject.project_maximum_price || "",
+                        type: bhkTypes.length ? bhkTypes.join(' - ') : ((Array.isArray(this.singleproject.project_type) ? this.singleproject.project_type.join(', ') : this.singleproject.project_type) || ""),
+                        minSize: minCarpetArea !== null ? `${minCarpetArea} SqFt` : "",
+                        maxSize: maxCarpetArea !== null ? `${maxCarpetArea} SqFt` : "",
+                        contact_no: this.singleproject.project_contact_no || ""
+                      }
+                    };
+                    this.reels.push(enrichedElement);
                     this.allReels.push(enrichedElement);
                   }
                 }
@@ -3123,11 +3142,36 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     this.updateSanitizedReelUrl();
   }
 
+  getReelUniqueKey(videoLink?: string, videoFile?: string, projId?: any, vIdx?: number): string {
+    const normFile = (videoFile || '').trim().toLowerCase();
+    const normLink = (videoLink || '').trim().toLowerCase();
+    if (normFile) {
+      const fileName = normFile.substring(normFile.lastIndexOf('/') + 1);
+      return `file_${fileName}`;
+    }
+    if (normLink) {
+      return `link_${normLink}`;
+    }
+    return `empty_${projId || ''}_${vIdx ?? ''}`;
+  }
+
   extractReelsFromProjects(projects: any[]): void {
     if (!projects || !Array.isArray(projects)) return;
     let addedCount = 0;
 
     projects.forEach((proj: any, idx: number) => {
+      if (this.singleproject && proj) {
+        const currentId = this.singleproject.id;
+        const projId = proj.id;
+        if (currentId !== undefined && projId !== undefined && String(currentId) === String(projId)) {
+          return;
+        }
+        const currentName = String(this.singleproject.project_name || '').trim().toLowerCase();
+        const projNameStr = String(proj.project_name || proj.proj_name || '').trim().toLowerCase();
+        if (currentName && projNameStr && currentName === projNameStr) {
+          return;
+        }
+      }
       let videos = proj.project_video || proj.videos || [];
       if (typeof videos === 'string') {
         try { videos = JSON.parse(videos); } catch (e) { videos = []; }
@@ -3211,7 +3255,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
           }
 
           if (videoLink || videoFile) {
-            const reelKey = `${videoLink}_${videoFile}_${proj.id || idx}_${vIdx}`;
+            const reelKey = this.getReelUniqueKey(videoLink, videoFile, proj.id || idx, vIdx);
             if (!this.seenReelKeys.has(reelKey)) {
               let logoUrl = proj.project_logo || video.project_logo || null;
               if (logoUrl && typeof logoUrl === 'string' && !logoUrl.startsWith('http') && !logoUrl.startsWith('data:')) {
