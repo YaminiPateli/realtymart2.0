@@ -19,6 +19,11 @@ import { FilteredCities } from 'src/app/filteredcities';
 import { CountrycodeService } from '../service/countrycode.service';
 import { CountryCodeInputComponent } from 'src/app/common/country-code-input/country-code-input.component';
 import flatpickr from 'flatpickr';
+import { PropertytyperesidentialService } from '../service/propertytyperesidential.service';
+import { PropertytypecommercialService } from '../service/propertytypecommercial.service';
+import { PropertytypeothertypesService } from '../service/propertytypeothertypes.service';
+import { PropertyplotService } from '../service/propertyplot.service';
+import { PropertytypepgService } from '../service/propertytypepg.service';
 import { SeoService } from 'src/app/seo.service';
 declare var bootstrap: any;
 
@@ -137,6 +142,20 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   otpError: boolean = false;
   isResendEnabled = false;
   reels: any[] = [];
+  allReels: any[] = [];
+  filteredReels: any[] = [];
+  selectedReelCity: any = null;
+  selectedReelSearch: string = '';
+  seenReelKeys: Set<string> = new Set<string>();
+  isFetchingAllProjectsReels: boolean = false;
+  lastFetchedCityForFilter: string | null = null;
+  cityProjectsMap: { [key: string]: any[] } = {};
+  availablePropertyTypes: string[] = ['Flat', 'Bungalow', 'Villa', 'Penthouse', 'Row House', 'Studio', 'Farm House', 'Duplex'];
+  propertyresidential: any[] = [];
+  propertycommercial: any[] = [];
+  propertyother: any[] = [];
+  propertyplot: any[] = [];
+  propertypg: any[] = [];
   openModel = 0;
   remainingTime: number = 60;
   scheduleVisitData: any = {
@@ -339,7 +358,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   showFilters = false;
   selectedSegments: string[] = ['Buy'];
   selectedPropertyTypes: string[] = [];
-  selectedBHKs: string[] = ['2 BHK'];
+  selectedBHKs: string[] = [];
   city1: { cid: number, cname: string }[] = [];
   priceTooltipVisible: boolean = false;
   showStickyHeader = false;
@@ -378,7 +397,12 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     private sanitizer: DomSanitizer,
     private router: Router,
     private countrycodeService: CountrycodeService,
-    private seoService:SeoService
+    private seoService:SeoService,
+    private propertyresidentialservice: PropertytyperesidentialService,
+    private propertycommercialservice: PropertytypecommercialService,
+    private propertyotherservice: PropertytypeothertypesService,
+    private propertyplotservice: PropertyplotService,
+    private propertypgservice: PropertytypepgService
   ) {
     this._album.push({
       src: 'assets/images/advertisement.png',
@@ -1000,6 +1024,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     this.observeSections();
     this.detectActiveSectionOnScroll();
     this.fetchProjectApproveDetails();
+    this.loadPropertyTypes();
     // this.loadissponsored();
     // this.loadisverified();
     if (this.latitude && this.longitude) {
@@ -1751,6 +1776,18 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     }
   }
 
+  private getCityDisplayName(proj: any): string {
+    const cityId = proj?.project_city;
+    if (cityId !== undefined && cityId !== null && this.city1 && this.city1.length) {
+      const matched = this.city1.find(c => String(c.cid) === String(cityId));
+      if (matched) {
+        return matched.cname;
+      }
+    }
+    return proj?.project_localities || proj?.project_city || '';
+  }
+
+
   fetchProjectApproveDetails() {
     const projectName = this.route.snapshot.paramMap.get('slug');
     const projectId = this.route.snapshot.paramMap.get('id');
@@ -1834,84 +1871,99 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
             } else {
               this.projectBrochureImages = [];
             }
-            if(this.singleproject.id === 1){
-              
-              this.singleproject.project_video.push({
-                video_source: "video",
-                proj_video_link: "",
-                proj_video_file: "../../../assets/reels/reel-1.mp4",
-                proj_video_thumbnail: "../../../assets/images/reel-1-thumbnail.jpg",
-                proj_builderName: "Aarsh Group",
-                project_localities: "Gota",
-                project_about_developer: {
-                  logo: null,
-                  project_name: "Aquavista",
-                  city: "Ahemdabad",
-                  image: "../../../assets/images/",
-                  minPrice: this.singleproject.project_minimum_price,
-                  maxPrice: this.singleproject.project_maximum_price,
-                  type: "3BHK - 4BHK",
-                  minSize: "1168 SqFt",
-                  maxSize: "1566 SqFt",
-                  contact_no: ""
-                }
-              },
-                {
-                  video_source: "video",
-                  proj_video_link: "",
-                  proj_video_file: "../../../assets/reels/reel-2.mp4",
-                  proj_video_thumbnail: "../../../assets/images/reel-2-thumbnail.jpg",
-                  proj_builderName: "Aarsh Group",
-                   project_localities: "Gota",
-                  project_about_developer: {
-                  logo: null,
-                  project_name: "Aquavista",
-                  city: "Ahemdabad",
-                  image: "../../../assets/images/",
-                  minPrice: this.singleproject.project_minimum_price,
-                  maxPrice: this.singleproject.project_maximum_price,
-                  type: "3BHK - 4BHK",
-                  minSize: "1168 SqFt",
-                  maxSize: "1566 SqFt",
-                  contact_no: ""
-                }
-                },
-                {
-                  video_source: "video",
-                  proj_video_link: "",
-                  proj_video_file: "../../../assets/reels/reel-3.mp4",
-                  proj_video_thumbnail: "../../../assets/images/reel-3-thumbnail.jpg",
-                  proj_builderName: "Aarsh Group",
-                   project_localities: "Gota",
-                   project_about_developer: {
-                  logo: null,
-                  project_name: "Aquavista",
-                  city: "Ahemdabad",
-                  image: "../../../assets/images/",
-                  minPrice: this.singleproject.project_minimum_price,
-                  maxPrice: this.singleproject.project_maximum_price,
-                  type: "3BHK - 4BHK",
-                  minSize: "1168 SqFt",
-                  maxSize: "1566 SqFt",
-                  contact_no: ""
-                }
-                }
-              )
-            }
             if (this.singleproject.project_video.length > 0) {
+              // BHK types actually come from the floor_plans array (each entry
+              // has its own bhk_type + carpet_area), not a flat "bhk" field on
+              // the project. floorPlanList is already parsed above.
+              const bhkTypes = Array.from(new Set(
+                (this.floorPlanList || []).map(fp => fp.bhk_type).filter(Boolean)
+              ));
+              // Strip units/commas (e.g. "1,168 SqFt") before parsing so real
+              // values don't get silently dropped as NaN.
+              const carpetAreas = (this.floorPlanList || [])
+                .map(fp => parseFloat(String(fp.carpet_area ?? '').replace(/[^\d.]/g, '')))
+                .filter(n => !isNaN(n) && n > 0);
+              const minCarpetArea = carpetAreas.length ? Math.min(...carpetAreas) : null;
+              const maxCarpetArea = carpetAreas.length ? Math.max(...carpetAreas) : null;
+              // project_city is a raw ID (e.g. "783"), never show it directly —
+              // resolve against city1 first, then fall back to the locality.
+              const cityDisplayName = this.getCityDisplayName(this.singleproject);
+
+              this.reels = [];
+              this.allReels = [];
+              this.seenReelKeys.clear();
+              this.videoAlbum = [];
+
               this.singleproject.project_video.forEach((element: {
                 video_source: string,
                 proj_video_link: string,
                 proj_video_file: string,
-                proj_video_thumbnail: string
-              }) => {
+                proj_video_thumbnail: string,
+                proj_builderName?: string,
+                project_localities?: string,
+                segment?: string,
+                property_type?: string,
+                bhk?: string[],
+                project_about_developer?: any
+              }, idx: number) => {
                 if (element.video_source === "youtube") {
                   this.videoAlbum.push(element)
                 } else {
-                  this.reels.push(element)
+                  let videoFile = element.proj_video_file || '';
+                  if (videoFile && typeof videoFile === 'string' && !videoFile.startsWith('http') && !videoFile.startsWith('data:')) {
+                    videoFile = `https://realtymart.com/backend/public/images/project_video/${videoFile}`;
+                  }
+                  let videoThumb = element.proj_video_thumbnail || '';
+                  if (videoThumb && typeof videoThumb === 'string' && !videoThumb.startsWith('http') && !videoThumb.startsWith('data:')) {
+                    videoThumb = `https://realtymart.com/backend/public/images/project_video_thumbnail/${videoThumb}`;
+                  }
+                  const videoLink = element.proj_video_link || '';
+
+                  const reelKey = this.getReelUniqueKey(videoLink, videoFile, this.singleproject.id, idx);
+                  if (!this.seenReelKeys.has(reelKey)) {
+                    this.seenReelKeys.add(reelKey);
+
+                    // Enrich real API video entries with the same fields the
+                    // fallback/dummy reels get, so the "View Details" card has
+                    // data to bind to and the reel filter panel (segment /
+                    // property type / BHK) has something to match against.
+                    const enrichedElement = {
+                      ...element,
+                      id: this.singleproject.id || (element as any).id || null,
+                      proj_video_file: videoFile,
+                      proj_video_thumbnail: videoThumb,
+                      proj_video_link: videoLink,
+                      proj_builderName: element.proj_builderName || this.singleproject.builderName || "",
+                      project_localities: element.project_localities || this.singleproject.project_localities || "",
+                      segment: element.segment || this.singleproject.property_for || "",
+                      property_type: element.property_type || this.singleproject.project_type || "",
+                      bhk: element.bhk && element.bhk.length ? element.bhk : bhkTypes,
+                      project_name: (element as any).project_name || (element as any).proj_name || this.singleproject.project_name || "",
+                      city_id: (element as any).city_id || this.singleproject.project_city || null,
+                      city: (element as any).city || cityDisplayName || "",
+                      project_about_developer: element.project_about_developer || {
+                        id: this.singleproject.id || (element as any).id || null,
+                        logo: this.singleproject.project_logo || null,
+                        project_name: this.singleproject.project_name || "",
+                        city: cityDisplayName,
+                        city_id: this.singleproject.project_city || null,
+                        builderName: element.proj_builderName || this.singleproject.builderName || "",
+                        image: this.singleproject.project_banner_image || (this.singleproject.project_images && this.singleproject.project_images[0]) || "",
+                        minPrice: this.singleproject.project_minimum_price || "",
+                        maxPrice: this.singleproject.project_maximum_price || "",
+                        type: bhkTypes.length ? bhkTypes.join(' - ') : ((Array.isArray(this.singleproject.project_type) ? this.singleproject.project_type.join(', ') : this.singleproject.project_type) || ""),
+                        minSize: minCarpetArea !== null ? `${minCarpetArea} SqFt` : "",
+                        maxSize: maxCarpetArea !== null ? `${maxCarpetArea} SqFt` : "",
+                        contact_no: this.singleproject.project_contact_no || ""
+                      }
+                    };
+                    this.reels.push(enrichedElement);
+                    this.allReels.push(enrichedElement);
+                  }
                 }
               });
             }
+            this.onReelFilterChange();
 
             // Auto-select first tab that has content
             if (this.photoAlbum.length > 0) this.galleryActiveTab = 'photos';
@@ -2538,6 +2590,24 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   }
 
   viewPropertyFromReel() {
+    if (this.reels && this.reels[this.activeReelIndex]) {
+      const reel = this.reels[this.activeReelIndex];
+      const reelId = reel.id || (reel.project_about_developer && reel.project_about_developer.id);
+      const currentId = this.singleproject?.id || (this.singleprojectData && this.singleprojectData.data && this.singleprojectData.data.id);
+
+      if (reelId && currentId && String(reelId) !== String(currentId)) {
+        this.closeReelsView();
+        const firstPart = reel.firstUrlPart || (reel.project_about_developer && reel.project_about_developer.firstUrlPart) || (reel.project_name ? String(reel.project_name).toLowerCase().replace(/[^a-z0-9]+/g, '-') : 'project');
+        const secondPart = reel.secondUrlPart || (reel.project_about_developer && reel.project_about_developer.secondUrlPart) || (reelId ? `prjid-${reelId}` : '');
+        if (firstPart && secondPart) {
+          this.router.navigate(['/project-details', firstPart, secondPart]).then(() => {
+            window.location.reload();
+          });
+          return;
+        }
+      }
+    }
+
     this.closeReelsView();
     setTimeout(() => {
       this.scrollToSection('overview');
@@ -2659,6 +2729,28 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     return this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
   }
 
+  syncFilterCityWithActiveReel(): void {
+    if (!this.reels || !this.reels[this.activeReelIndex] || !this.city1 || !this.city1.length) {
+      return;
+    }
+    const reel = this.reels[this.activeReelIndex];
+    const reelCityId = Number(reel.city_id || (reel.project_about_developer && reel.project_about_developer.city_id));
+    const reelCityName = String(reel.city || reel.project_localities || (reel.project_about_developer && reel.project_about_developer.city) || '').toLowerCase();
+
+    let matchedCity = this.city1.find((c: any) => Number(c.cid) === reelCityId);
+    if (!matchedCity && reelCityName) {
+      matchedCity = this.city1.find((c: any) => {
+        const cnameLower = String(c.cname || '').toLowerCase();
+        return cnameLower && (reelCityName.includes(cnameLower) || cnameLower.includes(reelCityName));
+      });
+    }
+
+    if (matchedCity && this.selectedReelCity !== matchedCity.cid) {
+      this.selectedReelCity = matchedCity.cid;
+      this.onReelFilterChange();
+    }
+  }
+
   updateSanitizedReelUrl(): void {
     if (this.reels && this.reels[this.activeReelIndex]) {
       const reel = this.reels[this.activeReelIndex];
@@ -2671,6 +2763,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     } else {
       this.currentSanitizedVideoUrl = null;
     }
+    this.syncFilterCityWithActiveReel();
   }
 
   @HostListener('window:keydown', ['$event'])
@@ -2870,18 +2963,21 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   }
 
   resetFilters(): void {
-    this.selectedSegments = [];
     this.selectedPropertyTypes = [];
     this.selectedBHKs = [];
+    this.selectedReelSearch = '';
+    this.updateAvailablePropertyTypes();
+    this.onReelFilterChange();
   }
 
   selectSegment(segment: string): void {
-    const index = this.selectedSegments.indexOf(segment);
-    if (index > -1) {
-      this.selectedSegments.splice(index, 1);
+    if (this.selectedSegments.includes(segment)) {
+      this.selectedSegments = [];
     } else {
-      this.selectedSegments.push(segment);
+      this.selectedSegments = [segment];
     }
+    this.updateAvailablePropertyTypes();
+    this.onReelFilterChange();
   }
 
   selectPropertyType(type: string): void {
@@ -2891,6 +2987,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     } else {
       this.selectedPropertyTypes.push(type);
     }
+    this.onReelFilterChange();
   }
 
   selectBHK(bhk: string): void {
@@ -2900,6 +2997,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     } else {
       this.selectedBHKs.push(bhk);
     }
+    this.onReelFilterChange();
   }
 
   isSegmentSelected(segment: string): boolean {
@@ -2914,6 +3012,411 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     return this.selectedBHKs.includes(bhk);
   }
 
+  loadPropertyTypes(): void {
+    this.propertyresidentialservice.getpropertytyperesidential()?.subscribe((res: any) => {
+      this.propertyresidential = res?.data || [];
+      this.updateAvailablePropertyTypes();
+    });
+    this.propertycommercialservice.getpropertytypecommercial()?.subscribe((res: any) => {
+      this.propertycommercial = res?.data || [];
+      this.updateAvailablePropertyTypes();
+    });
+    this.propertyotherservice.getpropertytypeother()?.subscribe((res: any) => {
+      this.propertyother = res?.data || [];
+      this.updateAvailablePropertyTypes();
+    });
+    this.propertyplotservice.getpropertytypeplot()?.subscribe((res: any) => {
+      this.propertyplot = res?.data || [];
+      this.updateAvailablePropertyTypes();
+    });
+    this.propertypgservice.getpropertytypepg()?.subscribe((res: any) => {
+      this.propertypg = res?.data || [];
+      this.updateAvailablePropertyTypes();
+    });
+  }
+
+  updateAvailablePropertyTypes(): void {
+    if (!this.selectedSegments || this.selectedSegments.length === 0) {
+      const defaultSet = new Set<string>();
+      if (this.propertyresidential && this.propertyresidential.length) {
+        this.propertyresidential.forEach((item: any) => defaultSet.add(item.name));
+      } else {
+        ['Flat', 'Bungalow', 'Villa', 'Penthouse', 'Row House', 'Studio', 'Duplex'].forEach(t => defaultSet.add(t));
+      }
+      if (this.propertyother && this.propertyother.length) {
+        this.propertyother.forEach((item: any) => defaultSet.add(item.name));
+      } else {
+        defaultSet.add('Farm House');
+      }
+      this.availablePropertyTypes = Array.from(defaultSet);
+      return;
+    }
+
+    const typesSet = new Set<string>();
+    this.selectedSegments.forEach((seg: string) => {
+      const segLower = seg.toLowerCase().trim();
+      if (segLower === 'buy' || segLower === 'rent') {
+        const resList = this.propertyresidential && this.propertyresidential.length
+          ? this.propertyresidential.map((item: any) => item.name)
+          : ['Flat', 'Bungalow', 'Villa', 'Penthouse', 'Row House', 'Studio', 'Duplex'];
+        const othList = this.propertyother && this.propertyother.length
+          ? this.propertyother.map((item: any) => item.name)
+          : ['Farm House'];
+        resList.forEach((t: string) => typesSet.add(t));
+        othList.forEach((t: string) => typesSet.add(t));
+      } else if (segLower === 'commercial') {
+        const commList = this.propertycommercial && this.propertycommercial.length
+          ? this.propertycommercial.map((item: any) => item.name)
+          : ['Office Space', 'Shop / Showroom', 'Commercial Land', 'Co-Working Space', 'Warehouse / Godown', 'Industrial Building', 'Industrial Shed', 'Institutional Land'];
+        commList.forEach((t: string) => typesSet.add(t));
+      } else if (segLower === 'plots' || segLower === 'plot') {
+        const plotList = this.propertyplot && this.propertyplot.length
+          ? this.propertyplot.map((item: any) => item.name)
+          : ['Residential Land & Plot', 'Commercial Land', 'Industrial Plot', 'Agricultural Land', 'Farm House Plot'];
+        plotList.forEach((t: string) => typesSet.add(t));
+      } else if (segLower === 'farm house' || segLower === 'farmhouse') {
+        const fhList = this.propertyother && this.propertyother.length
+          ? this.propertyother.map((item: any) => item.name)
+          : ['Farm House'];
+        fhList.forEach((t: string) => typesSet.add(t));
+      } else if (segLower === 'pg') {
+        const pgList = this.propertypg && this.propertypg.length
+          ? this.propertypg.map((item: any) => item.name)
+          : ['Boys PG', 'Girls PG', 'Co-Ed PG', 'Paying Guest'];
+        pgList.forEach((t: string) => typesSet.add(t));
+      } else {
+        ['Flat', 'Bungalow', 'Villa'].forEach((t: string) => typesSet.add(t));
+      }
+    });
+
+    this.availablePropertyTypes = Array.from(typesSet);
+
+    if (this.selectedPropertyTypes && this.selectedPropertyTypes.length > 0) {
+      this.selectedPropertyTypes = this.selectedPropertyTypes.filter((pt: string) =>
+        this.availablePropertyTypes.includes(pt)
+      );
+    }
+  }
+
+  onReelFilterChange(): void {
+    if (this.selectedReelCity && this.selectedReelCity !== 'null' && this.selectedReelCity !== 'Select City') {
+      const cityIdNum = Number(this.selectedReelCity);
+      let cityName = '';
+      if (this.city1 && this.city1.length > 0) {
+        const selectedCityObj = this.city1.find((c: any) => Number(c.cid) === cityIdNum || String(c.cid) === String(this.selectedReelCity));
+        if (selectedCityObj && selectedCityObj.cname) {
+          cityName = selectedCityObj.cname;
+        }
+      }
+      if (!cityName && typeof this.selectedReelCity === 'string' && isNaN(Number(this.selectedReelCity))) {
+        cityName = this.selectedReelCity;
+      }
+
+      if (cityName && this.lastFetchedCityForFilter !== cityName) {
+        this.lastFetchedCityForFilter = cityName;
+        this.http.get<any>(`${environment.apiUrl}projectincity/${cityName}`).subscribe(
+          (res: any) => {
+            const projectsInCity = res.data?.data || res.responseData || [];
+            if (Array.isArray(projectsInCity)) {
+              this.extractReelsFromProjects(projectsInCity);
+              this.cityProjectsMap[cityName] = projectsInCity;
+              this.applyReelFiltersSync();
+            }
+          },
+          (err: any) => console.error(`Error fetching projectincity for ${cityName}:`, err)
+        );
+      }
+    }
+    this.applyReelFiltersSync();
+  }
+
+  applyReelFiltersSync(): void {
+    if (!this.allReels || this.allReels.length === 0) {
+      this.filteredReels = [];
+      return;
+    }
+
+    this.filteredReels = this.allReels.filter((reel: any) => {
+      if (this.selectedReelCity && this.selectedReelCity !== 'null' && this.selectedReelCity !== 'Select City') {
+        const cityIdNum = Number(this.selectedReelCity);
+        const matchCityId = Number(reel.city_id || (reel.project_about_developer && reel.project_about_developer.city_id));
+        let matchCityName = false;
+        let cityName = '';
+        if (this.city1 && this.city1.length > 0) {
+          const selectedCityObj = this.city1.find((c: any) => Number(c.cid) === cityIdNum || String(c.cid) === String(this.selectedReelCity));
+          if (selectedCityObj && selectedCityObj.cname) {
+            cityName = selectedCityObj.cname;
+            const cityNameLower = cityName.toLowerCase();
+            const reelLocLower = String(reel.project_localities || reel.city || (reel.project_about_developer && reel.project_about_developer.city) || '').toLowerCase();
+            matchCityName = reelLocLower.includes(cityNameLower) || cityNameLower.includes(reelLocLower);
+          }
+        }
+        if (!cityName && typeof this.selectedReelCity === 'string' && isNaN(Number(this.selectedReelCity))) {
+          cityName = this.selectedReelCity;
+          const cityNameLower = cityName.toLowerCase();
+          const reelLocLower = String(reel.project_localities || reel.city || (reel.project_about_developer && reel.project_about_developer.city) || '').toLowerCase();
+          matchCityName = reelLocLower.includes(cityNameLower) || cityNameLower.includes(reelLocLower);
+        }
+
+        let matchInCityProjects = false;
+        if (cityName && this.cityProjectsMap[cityName] && Array.isArray(this.cityProjectsMap[cityName])) {
+          matchInCityProjects = this.cityProjectsMap[cityName].some((proj: any) => 
+            (proj.id !== undefined && reel.id !== undefined && String(proj.id) === String(reel.id)) ||
+            (proj.project_name && reel.project_name && proj.project_name.toLowerCase() === reel.project_name.toLowerCase()) ||
+            (proj.project_name && reel.proj_name && proj.project_name.toLowerCase() === reel.proj_name.toLowerCase())
+          );
+        }
+
+        if (matchCityId !== cityIdNum && !matchCityName && !matchInCityProjects) {
+          return false;
+        }
+      }
+
+      if (this.selectedReelSearch && this.selectedReelSearch.trim() !== '') {
+        const searchLower = this.selectedReelSearch.trim().toLowerCase();
+        const area = String(reel.project_localities || reel.area || reel.localities || reel.city || (reel.project_about_developer && reel.project_about_developer.city) || '').toLowerCase();
+        const project = String(reel.project_name || reel.proj_name || (reel.project_about_developer && reel.project_about_developer.project_name) || '').toLowerCase();
+        const builder = String(reel.proj_builderName || reel.builderName || (reel.project_about_developer && reel.project_about_developer.builderName) || '').toLowerCase();
+        if (!area.includes(searchLower) && !project.includes(searchLower) && !builder.includes(searchLower)) {
+          return false;
+        }
+      }
+
+      if (this.selectedSegments && this.selectedSegments.length > 0) {
+        const reelSegment = String(reel.segment || reel.property_for || (reel.project_about_developer && reel.project_about_developer.segment) || '').toLowerCase();
+        const matchesSegment = this.selectedSegments.some((seg: string) => {
+          const segLower = seg.toLowerCase();
+          return reelSegment.includes(segLower) || segLower.includes(reelSegment);
+        });
+        if (!matchesSegment) {
+          return false;
+        }
+      }
+
+      if (this.selectedPropertyTypes && this.selectedPropertyTypes.length > 0) {
+        const rawType = reel.property_type || reel.project_type || (reel.project_about_developer && reel.project_about_developer.type) || '';
+        const reelTypes: string[] = Array.isArray(rawType)
+          ? rawType.map((t: any) => String(t).toLowerCase())
+          : String(rawType).split(',').map(s => s.trim().toLowerCase());
+        const matchesType = this.selectedPropertyTypes.some((type: string) => {
+          const typeLower = type.toLowerCase();
+          return reelTypes.some((rt: string) => rt.includes(typeLower) || typeLower.includes(rt));
+        });
+        if (!matchesType) {
+          return false;
+        }
+      }
+
+      if (this.selectedBHKs && this.selectedBHKs.length > 0) {
+        const rawBhk = reel.bhk || (reel.project_about_developer && reel.project_about_developer.type) || '';
+        const reelBhks: string[] = Array.isArray(rawBhk)
+          ? rawBhk.map((b: any) => String(b).toLowerCase())
+          : String(rawBhk).split(',').map(s => s.trim().toLowerCase());
+        const matchesBHK = this.selectedBHKs.some((bhk: string) => {
+          const bhkLower = bhk.toLowerCase().replace(/\s+/g, '');
+          return reelBhks.some((rb: string) => {
+            const rbLower = rb.replace(/\s+/g, '');
+            return rbLower.includes(bhkLower) || bhkLower.includes(rbLower);
+          });
+        });
+        if (!matchesBHK) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }
+
+  applyAndShowFilteredReels(): void {
+    if (!this.filteredReels || this.filteredReels.length === 0) {
+      this.toastr.info('No reels found matching selected filters');
+      return;
+    }
+    this.showFilters = false;
+    this.reels = [...this.filteredReels];
+    this.activeReelIndex = 0;
+    this.updateSanitizedReelUrl();
+  }
+
+  getReelUniqueKey(videoLink?: string, videoFile?: string, projId?: any, vIdx?: number): string {
+    const normFile = (videoFile || '').trim().toLowerCase();
+    const normLink = (videoLink || '').trim().toLowerCase();
+    if (normFile) {
+      const fileName = normFile.substring(normFile.lastIndexOf('/') + 1);
+      return `file_${fileName}`;
+    }
+    if (normLink) {
+      return `link_${normLink}`;
+    }
+    return `empty_${projId || ''}_${vIdx ?? ''}`;
+  }
+
+  extractReelsFromProjects(projects: any[]): void {
+    if (!projects || !Array.isArray(projects)) return;
+    let addedCount = 0;
+
+    projects.forEach((proj: any, idx: number) => {
+      if (this.singleproject && proj) {
+        const currentId = this.singleproject.id;
+        const projId = proj.id;
+        if (currentId !== undefined && projId !== undefined && String(currentId) === String(projId)) {
+          return;
+        }
+        const currentName = String(this.singleproject.project_name || '').trim().toLowerCase();
+        const projNameStr = String(proj.project_name || proj.proj_name || '').trim().toLowerCase();
+        if (currentName && projNameStr && currentName === projNameStr) {
+          return;
+        }
+      }
+      let videos = proj.project_video || proj.videos || [];
+      if (typeof videos === 'string') {
+        try { videos = JSON.parse(videos); } catch (e) { videos = []; }
+      }
+      if (!Array.isArray(videos) || videos.length === 0) {
+        let vFiles: string[] = [];
+        let vLinks: string[] = [];
+        let vThumbs: string[] = [];
+        let vSources: string[] = [];
+        try {
+          if (typeof proj.proj_video_file === 'string' && proj.proj_video_file.trim().startsWith('[')) {
+            vFiles = JSON.parse(proj.proj_video_file);
+          } else if (proj.proj_video_file && typeof proj.proj_video_file === 'string') {
+            vFiles = [proj.proj_video_file];
+          } else if (Array.isArray(proj.proj_video_file)) {
+            vFiles = proj.proj_video_file;
+          }
+        } catch(e) {}
+        try {
+          if (typeof proj.proj_video_link === 'string' && proj.proj_video_link.trim().startsWith('[')) {
+            vLinks = JSON.parse(proj.proj_video_link);
+          } else if (proj.proj_video_link && typeof proj.proj_video_link === 'string') {
+            vLinks = [proj.proj_video_link];
+          } else if (Array.isArray(proj.proj_video_link)) {
+            vLinks = proj.proj_video_link;
+          }
+        } catch(e) {}
+        try {
+          if (typeof proj.proj_video_thumbnail === 'string' && proj.proj_video_thumbnail.trim().startsWith('[')) {
+            vThumbs = JSON.parse(proj.proj_video_thumbnail);
+          } else if (proj.proj_video_thumbnail && typeof proj.proj_video_thumbnail === 'string') {
+            vThumbs = [proj.proj_video_thumbnail];
+          } else if (Array.isArray(proj.proj_video_thumbnail)) {
+            vThumbs = proj.proj_video_thumbnail;
+          }
+        } catch(e) {}
+        try {
+          if (typeof proj.video_source === 'string' && proj.video_source.trim().startsWith('[')) {
+            vSources = JSON.parse(proj.video_source);
+          } else if (proj.video_source && typeof proj.video_source === 'string') {
+            vSources = [proj.video_source];
+          } else if (Array.isArray(proj.video_source)) {
+            vSources = proj.video_source;
+          }
+        } catch(e) {}
+
+        const maxLen = Math.max(vFiles.length, vLinks.length);
+        if (maxLen > 0) {
+          videos = [];
+          for (let i = 0; i < maxLen; i++) {
+            videos.push({
+              video_source: vSources[i] || 'file',
+              proj_video_file: vFiles[i] || '',
+              proj_video_link: vLinks[i] || '',
+              proj_video_thumbnail: vThumbs[i] || ''
+            });
+          }
+        }
+      }
+
+      if (Array.isArray(videos) && videos.length > 0) {
+        const projName = proj.project_name || proj.proj_name || '';
+        const builderName = proj.builderName || proj.proj_builderName || proj.project_builder_name || proj.builder_name || 'Aarsh Group';
+        const localities = proj.prjlocalities || proj.project_localities || proj.localities || proj.address || proj.area || 'Ahmedabad';
+        const segment = proj.property_for || proj.segment || 'Buy';
+        const propertyType = proj.project_type || proj.property_type || proj.projectType || 'Flat';
+        const bhk = proj.bhk || (Array.isArray(proj.floor_plans) ? proj.floor_plans.map((fp: any) => fp.bhk_type).filter(Boolean) : (typeof proj.floor_plans === 'string' ? (() => { try { return JSON.parse(proj.floor_plans).map((fp: any) => fp.bhk_type).filter(Boolean); } catch(e) { return ['2 BHK', '3 BHK']; } })() : ['2 BHK', '3 BHK']));
+        const cityId = proj.city_id || proj.project_city || null;
+        const cityName = proj.city || proj.searchcity || localities;
+
+        videos.forEach((video: any, vIdx: number) => {
+          const videoSrc = video.video_source || 'file';
+          const videoLink = video.proj_video_link || video.link || '';
+          let videoFile = video.proj_video_file || video.file || '';
+          if (videoFile && !videoFile.startsWith('http') && !videoFile.startsWith('data:')) {
+            videoFile = `https://realtymart.com/backend/public/images/project_video/${videoFile}`;
+          }
+          let videoThumb = video.proj_video_thumbnail || video.thumbnail || '';
+          if (videoThumb && !videoThumb.startsWith('http') && !videoThumb.startsWith('data:')) {
+            videoThumb = `https://realtymart.com/backend/public/images/project_video_thumbnail/${videoThumb}`;
+          }
+
+          if (videoLink || videoFile) {
+            const reelKey = this.getReelUniqueKey(videoLink, videoFile, proj.id || idx, vIdx);
+            if (!this.seenReelKeys.has(reelKey)) {
+              let logoUrl = proj.project_logo || video.project_logo || null;
+              if (logoUrl && typeof logoUrl === 'string' && !logoUrl.startsWith('http') && !logoUrl.startsWith('data:')) {
+                logoUrl = `https://realtymart.com/backend/public/images/project_logo/${logoUrl}`;
+              }
+              let bannerUrl = proj.project_banner_image || video.project_banner_image || null;
+              if (bannerUrl && typeof bannerUrl === 'string' && !bannerUrl.startsWith('http') && !bannerUrl.startsWith('data:')) {
+                bannerUrl = `https://realtymart.com/backend/public/images/project_banner_image/${bannerUrl}`;
+              } else if (!bannerUrl && logoUrl) {
+                bannerUrl = logoUrl;
+              }
+              const firstUrlPart = proj.firstUrlPart || proj.projectfirstUrlPart || video.firstUrlPart || (projName ? String(projName).toLowerCase().replace(/[^a-z0-9]+/g, '-') : 'project');
+              const secondUrlPart = proj.secondUrlPart || proj.projectsecondUrlPart || video.secondUrlPart || (proj.id ? `prjid-${proj.id}` : '');
+               const bhkTypes = Array.from(new Set(
+                (this.floorPlanList || []).map(fp => fp.bhk_type).filter(Boolean)
+              ));
+              this.seenReelKeys.add(reelKey);
+              const enriched = {
+                ...video,
+                id: proj.id || video.id || null,
+                video_source: videoSrc,
+                proj_video_link: videoLink,
+                proj_video_file: videoFile,
+                proj_video_thumbnail: videoThumb,
+                proj_builderName: video.proj_builderName || video.builderName || builderName,
+                project_localities: video.project_localities || video.localities || video.area || localities,
+                segment: video.segment || video.property_for || segment,
+                property_type: video.property_type || video.project_type || propertyType,
+                bhk: video.bhk || bhk,
+                city_id: video.city_id || cityId,
+                project_name: video.project_name || video.proj_name || projName,
+                firstUrlPart: firstUrlPart,
+                secondUrlPart: secondUrlPart,
+                project_about_developer: {
+                  id: proj.id || video.id || null,
+                  logo: logoUrl,
+                  project_name: video.project_name || video.proj_name || projName,
+                  city: video.city || cityName,
+                  city_id: video.city_id || cityId,
+                  builderName: video.proj_builderName || video.builderName || builderName,
+                  image: bannerUrl || '',
+                  minPrice: proj.project_minimum_price || video.minPrice || '',
+                  maxPrice: proj.project_maximum_price || video.maxPrice || '',
+                  minSize:  video.minSize || '',
+                  maxSize: video.maxSize || '',
+                  type: video.bhk?.length ? (Array.isArray(video.bhk) ? video.bhk.join(' - ') : video.bhk) : "",
+                  contact_no: proj.project_contact_no || video.contact_no || '',
+                  firstUrlPart: firstUrlPart,
+                  secondUrlPart: secondUrlPart
+                }
+              };
+              this.allReels.push(enriched);
+              addedCount++;
+            }
+          }
+        });
+      }
+    });
+
+    if (addedCount > 0) {
+      this.onReelFilterChange();
+    }
+  }
+
   fetchCities() {
     this.http.get<{ data: { id: number; name: string }[] }>(`${environment.apiUrl}cities`).subscribe(
       (response: any) => {
@@ -2922,6 +3425,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
           cid: city.id,
           cname: city.name
         }));
+        this.syncFilterCityWithActiveReel();
       },
       (error: any) => {
         console.error('API Error:', error);
