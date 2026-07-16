@@ -142,6 +142,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   otpError: boolean = false;
   isResendEnabled = false;
   reels: any[] = [];
+  projectReels: any[] = [];
   allReels: any[] = [];
   filteredReels: any[] = [];
   selectedReelCity: any = null;
@@ -151,6 +152,9 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   lastFetchedCityForFilter: string | null = null;
   cityProjectsMap: { [key: string]: any[] } = {};
   availablePropertyTypes: string[] = ['Flat', 'Bungalow', 'Villa', 'Penthouse', 'Row House', 'Studio', 'Farm House', 'Duplex'];
+  defaultPropertyTypes: string[] = ['Flat', 'Bungalow', 'Villa', 'Penthouse', 'Row House', 'Studio', 'Farm House', 'Duplex'];
+  availableSegments: string[] = ['Buy', 'Rent', 'Farm House', 'Plots', 'Commercial'];
+  availableBHKs: string[] = ['1 BHK', '2 BHK', '3 BHK', '4 BHK', '4+ BHK'];
   propertyresidential: any[] = [];
   propertycommercial: any[] = [];
   propertyother: any[] = [];
@@ -1788,6 +1792,52 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   }
 
 
+  groupFloorPlansByBhk(rawList: any[]): any[] {
+    if (!Array.isArray(rawList) || rawList.length === 0) return [];
+    const groupedMap = new Map<string, { bhk_type: string, carpet_areas: number[], raw_areas: string[], images: string[] }>();
+
+    rawList.forEach((fp: any) => {
+      const bhkType = (fp.bhk_type || '').trim();
+      const key = bhkType.toLowerCase() || 'other';
+      if (!groupedMap.has(key)) {
+        groupedMap.set(key, { bhk_type: bhkType || 'Floor Plan', carpet_areas: [], raw_areas: [], images: [] });
+      }
+      const entry = groupedMap.get(key)!;
+      if (fp.carpet_area) {
+        const rawAreaStr = String(fp.carpet_area).trim();
+        if (rawAreaStr && !entry.raw_areas.includes(rawAreaStr)) {
+          entry.raw_areas.push(rawAreaStr);
+        }
+        const num = parseFloat(rawAreaStr.replace(/[^\d.]/g, ''));
+        if (!isNaN(num) && num > 0 && !entry.carpet_areas.includes(num)) {
+          entry.carpet_areas.push(num);
+        }
+      }
+      const parsedImages = this.parseImagesArray(fp.image);
+      parsedImages.forEach((img: string) => {
+        if (img && !entry.images.includes(img)) {
+          entry.images.push(img);
+        }
+      });
+    });
+
+    return Array.from(groupedMap.values()).map(entry => {
+      let areaDisplay = '';
+      if (entry.carpet_areas.length > 0) {
+        const minArea = Math.min(...entry.carpet_areas);
+        const maxArea = Math.max(...entry.carpet_areas);
+        areaDisplay = minArea === maxArea ? `${minArea}` : `${minArea} - ${maxArea}`;
+      } else if (entry.raw_areas.length > 0) {
+        areaDisplay = entry.raw_areas.join(' - ');
+      }
+      return {
+        bhk_type: entry.bhk_type,
+        carpet_area: areaDisplay,
+        image: entry.images
+      };
+    });
+  }
+
   fetchProjectApproveDetails() {
     const projectName = this.route.snapshot.paramMap.get('slug');
     const projectId = this.route.snapshot.paramMap.get('id');
@@ -1804,20 +1854,12 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
             // Populate floor plans from API
             const rawFloorPlans = this.singleproject?.floor_plans;
             if (Array.isArray(rawFloorPlans) && rawFloorPlans.length > 0) {
-              this.floorPlanList = rawFloorPlans.map((fp: any) => ({
-                bhk_type: fp.bhk_type || '',
-                carpet_area: fp.carpet_area || '',
-                image: this.parseImagesArray(fp.image)
-              }));
+              this.floorPlanList = this.groupFloorPlansByBhk(rawFloorPlans);
             } else if (typeof rawFloorPlans === 'string' && rawFloorPlans.trim()) {
               try {
                 const parsed = JSON.parse(rawFloorPlans);
                 if (Array.isArray(parsed)) {
-                  this.floorPlanList = parsed.map((fp: any) => ({
-                    bhk_type: fp.bhk_type || '',
-                    carpet_area: fp.carpet_area || '',
-                    image: this.parseImagesArray(fp.image)
-                  }));
+                  this.floorPlanList = this.groupFloorPlansByBhk(parsed);
                 }
               } catch (e) {
                 console.error('Error parsing floor_plans:', e);
@@ -1890,6 +1932,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
               const cityDisplayName = this.getCityDisplayName(this.singleproject);
 
               this.reels = [];
+              this.projectReels = [];
               this.allReels = [];
               this.seenReelKeys.clear();
               this.videoAlbum = [];
@@ -1953,11 +1996,13 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
                         maxPrice: this.singleproject.project_maximum_price || "",
                         type: bhkTypes.length ? bhkTypes.join(' - ') : ((Array.isArray(this.singleproject.project_type) ? this.singleproject.project_type.join(', ') : this.singleproject.project_type) || ""),
                         minSize: minCarpetArea !== null ? `${minCarpetArea} SqFt` : "",
-                        maxSize: maxCarpetArea !== null ? `${maxCarpetArea} SqFt` : "",
+                        maxSize: (maxCarpetArea !== null && maxCarpetArea !== minCarpetArea) ? `${maxCarpetArea} SqFt` : "",
                         contact_no: this.singleproject.project_contact_no || ""
                       }
                     };
                     this.reels.push(enrichedElement);
+                    this.projectReels.push(enrichedElement);
+                    this.buildReelCache(enrichedElement);
                     this.allReels.push(enrichedElement);
                   }
                 }
@@ -2568,6 +2613,9 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   closeReelsView() {
     this.showReelsView = false;
     this.showReelDetailCard = false;
+    if (this.projectReels && this.projectReels.length > 0) {
+      this.reels = [...this.projectReels];
+    }
     document.body.style.overflow = '';
     const urlWithoutParams = window.location.pathname;
     window.history.replaceState({}, '', urlWithoutParams);
@@ -2745,9 +2793,16 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
       });
     }
 
-    if (matchedCity && this.selectedReelCity !== matchedCity.cid) {
-      this.selectedReelCity = matchedCity.cid;
-      this.onReelFilterChange();
+    if (matchedCity) {
+      if (this.selectedReelCity !== matchedCity.cid) {
+        this.selectedReelCity = matchedCity.cid;
+        this.applyReelFiltersSync();
+      }
+      setTimeout(() => {
+        if (matchedCity && matchedCity.cname) {
+          this.fetchCityProjectsForFilterIfNeeded(matchedCity.cname);
+        }
+      }, 50);
     }
   }
 
@@ -2959,6 +3014,24 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     this.showFilters = !this.showFilters;
     if (this.showFilters) {
       this.showReelDetailCard = false;
+      setTimeout(() => {
+        if (this.selectedReelCity && this.selectedReelCity !== 'null' && this.selectedReelCity !== 'Select City') {
+          const cityIdNum = Number(this.selectedReelCity);
+          let cityName = '';
+          if (this.city1 && this.city1.length > 0) {
+            const selectedCityObj = this.city1.find((c: any) => Number(c.cid) === cityIdNum || String(c.cid) === String(this.selectedReelCity));
+            if (selectedCityObj && selectedCityObj.cname) {
+              cityName = selectedCityObj.cname;
+            }
+          }
+          if (!cityName && typeof this.selectedReelCity === 'string' && isNaN(Number(this.selectedReelCity))) {
+            cityName = this.selectedReelCity;
+          }
+          if (cityName) {
+            this.fetchCityProjectsForFilterIfNeeded(cityName);
+          }
+        }
+      }, 5);
     }
   }
 
@@ -3012,6 +3085,10 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     return this.selectedBHKs.includes(bhk);
   }
 
+  trackByFn(index: number, item: any): any {
+    return item;
+  }
+
   loadPropertyTypes(): void {
     this.propertyresidentialservice.getpropertytyperesidential()?.subscribe((res: any) => {
       this.propertyresidential = res?.data || [];
@@ -3048,7 +3125,10 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
       } else {
         defaultSet.add('Farm House');
       }
-      this.availablePropertyTypes = Array.from(defaultSet);
+      const newTypes = Array.from(defaultSet);
+      if (newTypes.length !== this.availablePropertyTypes.length || !newTypes.every((v, i) => v === this.availablePropertyTypes[i])) {
+        this.availablePropertyTypes = newTypes;
+      }
       return;
     }
 
@@ -3089,13 +3169,42 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
       }
     });
 
-    this.availablePropertyTypes = Array.from(typesSet);
+    const newTypes = Array.from(typesSet);
+    if (newTypes.length !== this.availablePropertyTypes.length || !newTypes.every((v, i) => v === this.availablePropertyTypes[i])) {
+      this.availablePropertyTypes = newTypes;
+    }
 
     if (this.selectedPropertyTypes && this.selectedPropertyTypes.length > 0) {
-      this.selectedPropertyTypes = this.selectedPropertyTypes.filter((pt: string) =>
+      const filteredSelected = this.selectedPropertyTypes.filter((pt: string) =>
         this.availablePropertyTypes.includes(pt)
       );
+      if (filteredSelected.length !== this.selectedPropertyTypes.length) {
+        this.selectedPropertyTypes = filteredSelected;
+      }
     }
+  }
+
+  fetchCityProjectsForFilterIfNeeded(cityName: string): void {
+    if (!cityName || this.lastFetchedCityForFilter === cityName) {
+      return;
+    }
+    this.lastFetchedCityForFilter = cityName;
+    if (this.cityProjectsMap[cityName]) {
+      this.extractReelsFromProjects(this.cityProjectsMap[cityName]);
+      this.applyReelFiltersSync();
+      return;
+    }
+    this.http.get<any>(`${environment.apiUrl}projectincity/${cityName}`).subscribe(
+      (res: any) => {
+        const projectsInCity = res.data?.data || res.responseData || [];
+        if (Array.isArray(projectsInCity)) {
+          this.cityProjectsMap[cityName] = projectsInCity;
+          this.extractReelsFromProjects(projectsInCity);
+          this.applyReelFiltersSync();
+        }
+      },
+      (err: any) => console.error(`Error fetching projectincity for ${cityName}:`, err)
+    );
   }
 
   onReelFilterChange(): void {
@@ -3113,21 +3222,96 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
       }
 
       if (cityName && this.lastFetchedCityForFilter !== cityName) {
-        this.lastFetchedCityForFilter = cityName;
-        this.http.get<any>(`${environment.apiUrl}projectincity/${cityName}`).subscribe(
-          (res: any) => {
-            const projectsInCity = res.data?.data || res.responseData || [];
-            if (Array.isArray(projectsInCity)) {
-              this.extractReelsFromProjects(projectsInCity);
-              this.cityProjectsMap[cityName] = projectsInCity;
-              this.applyReelFiltersSync();
-            }
-          },
-          (err: any) => console.error(`Error fetching projectincity for ${cityName}:`, err)
-        );
+        setTimeout(() => {
+          this.fetchCityProjectsForFilterIfNeeded(cityName);
+        }, 10);
       }
     }
     this.applyReelFiltersSync();
+  }
+
+  buildReelCache(reel: any): void {
+    if (reel._filterCacheBuilt === 2) return;
+    const rawType = reel.property_type || reel.project_type || (reel.project_about_developer && reel.project_about_developer.type) || '';
+    reel._cachedTypesLower = Array.isArray(rawType)
+      ? rawType.map((t: any) => String(t).toLowerCase().trim())
+      : String(rawType).split(',').map(s => s.trim().toLowerCase());
+
+    const rawSegment = reel.segment || reel.property_for || (reel.project_about_developer && reel.project_about_developer.segment) || '';
+    reel._cachedSegmentArray = Array.isArray(rawSegment)
+      ? rawSegment.map((s: any) => String(s).toLowerCase().trim())
+      : String(rawSegment).split(/[,/|-]+/).map(s => s.trim().toLowerCase()).filter(Boolean);
+    reel._cachedSegmentLower = String(rawSegment).toLowerCase().trim();
+
+    const rawBhkList: string[] = [];
+    if (reel.bhk) {
+      if (Array.isArray(reel.bhk)) {
+        reel.bhk.forEach((b: any) => rawBhkList.push(String(b)));
+      } else {
+        rawBhkList.push(String(reel.bhk));
+      }
+    }
+    if (reel.bhk_type) rawBhkList.push(String(reel.bhk_type));
+    if (reel.type) rawBhkList.push(String(reel.type));
+    if (reel.project_about_developer && reel.project_about_developer.type) rawBhkList.push(String(reel.project_about_developer.type));
+
+    const bhkSet = new Set<string>();
+    rawBhkList.forEach((raw: string) => {
+      if (!raw) return;
+      raw.split(/[,/\-]+/).forEach((s: string) => {
+        const cleaned = s.trim().toLowerCase().replace(/\s+/g, '');
+        if (cleaned && (/\d/.test(cleaned) || cleaned.includes('bhk'))) {
+          bhkSet.add(cleaned);
+        }
+      });
+    });
+    reel._cachedBhksLower = Array.from(bhkSet);
+
+    const area = String(reel.project_localities || reel.area || reel.localities || reel.city || (reel.project_about_developer && reel.project_about_developer.city) || '').toLowerCase();
+    const project = String(reel.project_name || reel.proj_name || (reel.project_about_developer && reel.project_about_developer.project_name) || '').toLowerCase();
+    const builder = String(reel.proj_builderName || reel.builderName || (reel.project_about_developer && reel.project_about_developer.builderName) || '').toLowerCase();
+    reel._cachedSearchText = `${area} ${project} ${builder}`;
+    reel._cachedLocLower = area;
+    reel._filterCacheBuilt = 2;
+  }
+
+  matchBHKItem(sb: string, rb: string): boolean {
+    if (!sb || !rb) return false;
+
+    const sbClean = sb.trim().toLowerCase().replace(/\s+/g, '');
+    const rbClean = rb.trim().toLowerCase().replace(/\s+/g, '');
+
+    const rbNumMatch = rbClean.match(/^(\d+(?:\.\d+)?)/) || rbClean.match(/(\d+(?:\.\d+)?)\s*\+?\s*bhk/);
+    const rbVal = rbNumMatch ? parseFloat(rbNumMatch[1]) : NaN;
+
+    if (sbClean === '4+bhk' || sbClean.includes('4+')) {
+      if (!isNaN(rbVal) && rbVal >= 4) {
+        return true;
+      }
+      if (rbClean.includes('4+') || rbClean.includes('5+') || rbClean.includes('6+')) {
+        return true;
+      }
+      return false;
+    }
+
+    if (sbClean === '4bhk') {
+      if (!isNaN(rbVal) && (rbVal === 4 || rbVal >= 4)) {
+        return true;
+      }
+      if (rbClean.includes('4+') || rbClean === '4bhk') {
+        return true;
+      }
+      return false;
+    }
+
+    const sbNumMatch = sbClean.match(/^(\d+(?:\.\d+)?)/);
+    const sbVal = sbNumMatch ? parseFloat(sbNumMatch[1]) : NaN;
+
+    if (!isNaN(sbVal) && !isNaN(rbVal)) {
+      return sbVal === rbVal;
+    }
+
+    return rbClean === sbClean || rbClean.split(/[-/]/).includes(sbClean);
   }
 
   applyReelFiltersSync(): void {
@@ -3136,89 +3320,69 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
       return;
     }
 
+    const selectedTypesLower = (this.selectedPropertyTypes || []).map(t => t.toLowerCase().trim());
+    const selectedSegmentsLower = (this.selectedSegments || []).map(s => s.toLowerCase().trim());
+    const selectedBHKsLower = (this.selectedBHKs || []).map(b => b.toLowerCase().replace(/\s+/g, ''));
+    const selectedSearchLower = (this.selectedReelSearch || '').trim().toLowerCase();
+
+    let cityNameLower = '';
+    let cityIdNum: number | null = null;
+    if (this.selectedReelCity && this.selectedReelCity !== 'null' && this.selectedReelCity !== 'Select City') {
+      cityIdNum = Number(this.selectedReelCity);
+      if (this.city1 && this.city1.length > 0) {
+        const selectedCityObj = this.city1.find((c: any) => Number(c.cid) === cityIdNum || String(c.cid) === String(this.selectedReelCity));
+        if (selectedCityObj && selectedCityObj.cname) {
+          cityNameLower = selectedCityObj.cname.toLowerCase();
+        }
+      }
+      if (!cityNameLower && typeof this.selectedReelCity === 'string' && isNaN(Number(this.selectedReelCity))) {
+        cityNameLower = this.selectedReelCity.toLowerCase();
+      }
+    }
+
     this.filteredReels = this.allReels.filter((reel: any) => {
-      if (this.selectedReelCity && this.selectedReelCity !== 'null' && this.selectedReelCity !== 'Select City') {
-        const cityIdNum = Number(this.selectedReelCity);
+      if (reel._filterCacheBuilt !== 2) {
+        this.buildReelCache(reel);
+      }
+
+      if (cityIdNum !== null && !isNaN(cityIdNum)) {
         const matchCityId = Number(reel.city_id || (reel.project_about_developer && reel.project_about_developer.city_id));
         let matchCityName = false;
-        let cityName = '';
-        if (this.city1 && this.city1.length > 0) {
-          const selectedCityObj = this.city1.find((c: any) => Number(c.cid) === cityIdNum || String(c.cid) === String(this.selectedReelCity));
-          if (selectedCityObj && selectedCityObj.cname) {
-            cityName = selectedCityObj.cname;
-            const cityNameLower = cityName.toLowerCase();
-            const reelLocLower = String(reel.project_localities || reel.city || (reel.project_about_developer && reel.project_about_developer.city) || '').toLowerCase();
-            matchCityName = reelLocLower.includes(cityNameLower) || cityNameLower.includes(reelLocLower);
-          }
+        if (cityNameLower) {
+          matchCityName = reel._cachedLocLower.includes(cityNameLower) || cityNameLower.includes(reel._cachedLocLower);
         }
-        if (!cityName && typeof this.selectedReelCity === 'string' && isNaN(Number(this.selectedReelCity))) {
-          cityName = this.selectedReelCity;
-          const cityNameLower = cityName.toLowerCase();
-          const reelLocLower = String(reel.project_localities || reel.city || (reel.project_about_developer && reel.project_about_developer.city) || '').toLowerCase();
-          matchCityName = reelLocLower.includes(cityNameLower) || cityNameLower.includes(reelLocLower);
-        }
-
-        let matchInCityProjects = false;
-        if (cityName && this.cityProjectsMap[cityName] && Array.isArray(this.cityProjectsMap[cityName])) {
-          matchInCityProjects = this.cityProjectsMap[cityName].some((proj: any) => 
-            (proj.id !== undefined && reel.id !== undefined && String(proj.id) === String(reel.id)) ||
-            (proj.project_name && reel.project_name && proj.project_name.toLowerCase() === reel.project_name.toLowerCase()) ||
-            (proj.project_name && reel.proj_name && proj.project_name.toLowerCase() === reel.proj_name.toLowerCase())
-          );
-        }
-
-        if (matchCityId !== cityIdNum && !matchCityName && !matchInCityProjects) {
+        if (matchCityId !== cityIdNum && !matchCityName) {
           return false;
         }
       }
 
-      if (this.selectedReelSearch && this.selectedReelSearch.trim() !== '') {
-        const searchLower = this.selectedReelSearch.trim().toLowerCase();
-        const area = String(reel.project_localities || reel.area || reel.localities || reel.city || (reel.project_about_developer && reel.project_about_developer.city) || '').toLowerCase();
-        const project = String(reel.project_name || reel.proj_name || (reel.project_about_developer && reel.project_about_developer.project_name) || '').toLowerCase();
-        const builder = String(reel.proj_builderName || reel.builderName || (reel.project_about_developer && reel.project_about_developer.builderName) || '').toLowerCase();
-        if (!area.includes(searchLower) && !project.includes(searchLower) && !builder.includes(searchLower)) {
-          return false;
-        }
+      if (selectedSearchLower && !reel._cachedSearchText.includes(selectedSearchLower)) {
+        return false;
       }
 
-      if (this.selectedSegments && this.selectedSegments.length > 0) {
-        const reelSegment = String(reel.segment || reel.property_for || (reel.project_about_developer && reel.project_about_developer.segment) || '').toLowerCase();
-        const matchesSegment = this.selectedSegments.some((seg: string) => {
-          const segLower = seg.toLowerCase();
-          return reelSegment.includes(segLower) || segLower.includes(reelSegment);
-        });
+      if (selectedSegmentsLower.length > 0) {
+        const matchesSegment = selectedSegmentsLower.some(seg => 
+          reel._cachedSegmentLower.includes(seg) || seg.includes(reel._cachedSegmentLower) ||
+          (reel._cachedSegmentArray && reel._cachedSegmentArray.some((cs: string) => cs.includes(seg) || seg.includes(cs)))
+        );
         if (!matchesSegment) {
           return false;
         }
       }
 
-      if (this.selectedPropertyTypes && this.selectedPropertyTypes.length > 0) {
-        const rawType = reel.property_type || reel.project_type || (reel.project_about_developer && reel.project_about_developer.type) || '';
-        const reelTypes: string[] = Array.isArray(rawType)
-          ? rawType.map((t: any) => String(t).toLowerCase())
-          : String(rawType).split(',').map(s => s.trim().toLowerCase());
-        const matchesType = this.selectedPropertyTypes.some((type: string) => {
-          const typeLower = type.toLowerCase();
-          return reelTypes.some((rt: string) => rt.includes(typeLower) || typeLower.includes(rt));
-        });
+      if (selectedTypesLower.length > 0) {
+        const matchesType = selectedTypesLower.some(st => 
+          reel._cachedTypesLower.some((rt: string) => rt.includes(st) || st.includes(rt))
+        );
         if (!matchesType) {
           return false;
         }
       }
 
-      if (this.selectedBHKs && this.selectedBHKs.length > 0) {
-        const rawBhk = reel.bhk || (reel.project_about_developer && reel.project_about_developer.type) || '';
-        const reelBhks: string[] = Array.isArray(rawBhk)
-          ? rawBhk.map((b: any) => String(b).toLowerCase())
-          : String(rawBhk).split(',').map(s => s.trim().toLowerCase());
-        const matchesBHK = this.selectedBHKs.some((bhk: string) => {
-          const bhkLower = bhk.toLowerCase().replace(/\s+/g, '');
-          return reelBhks.some((rb: string) => {
-            const rbLower = rb.replace(/\s+/g, '');
-            return rbLower.includes(bhkLower) || bhkLower.includes(rbLower);
-          });
-        });
+      if (selectedBHKsLower.length > 0) {
+        const matchesBHK = selectedBHKsLower.some(sb => 
+          reel._cachedBhksLower.some((rb: string) => this.matchBHKItem(sb, rb))
+        );
         if (!matchesBHK) {
           return false;
         }
@@ -3335,7 +3499,26 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
         const localities = proj.prjlocalities || proj.project_localities || proj.localities || proj.address || proj.area || 'Ahmedabad';
         const segment = proj.property_for || proj.segment || 'Buy';
         const propertyType = proj.project_type || proj.property_type || proj.projectType || 'Flat';
-        const bhk = proj.bhk || (Array.isArray(proj.floor_plans) ? proj.floor_plans.map((fp: any) => fp.bhk_type).filter(Boolean) : (typeof proj.floor_plans === 'string' ? (() => { try { return JSON.parse(proj.floor_plans).map((fp: any) => fp.bhk_type).filter(Boolean); } catch(e) { return ['2 BHK', '3 BHK']; } })() : ['2 BHK', '3 BHK']));
+        let floorPlansArray: any[] = [];
+        if (Array.isArray(proj.floor_plans)) {
+          floorPlansArray = proj.floor_plans;
+        } else if (typeof proj.floor_plans === 'string' && proj.floor_plans.trim()) {
+          try {
+            const parsed = JSON.parse(proj.floor_plans);
+            if (Array.isArray(parsed)) floorPlansArray = parsed;
+          } catch (e) {}
+        }
+
+        const bhk = Array.from(new Set(floorPlansArray.map((fp: any) => fp.bhk_type).filter(Boolean)));
+
+        const carpetAreas = floorPlansArray
+          .map(fp => parseFloat(String(fp.carpet_area ?? '').replace(/[^\d.]/g, '')))
+          .filter(n => !isNaN(n) && n > 0);
+        const minAreaNum = carpetAreas.length ? Math.min(...carpetAreas) : null;
+        const maxAreaNum = carpetAreas.length ? Math.max(...carpetAreas) : null;
+        const calcMinSize = minAreaNum !== null ? `${minAreaNum} SqFt` : "";
+        const calcMaxSize = (maxAreaNum !== null && maxAreaNum !== minAreaNum) ? `${maxAreaNum} SqFt` : "";
+
         const cityId = proj.city_id || proj.project_city || null;
         const cityName = proj.city || proj.searchcity || localities;
 
@@ -3381,9 +3564,11 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
                 project_localities: video.project_localities || video.localities || video.area || localities,
                 segment: video.segment || video.property_for || segment,
                 property_type: video.property_type || video.project_type || propertyType,
-                bhk: video.bhk || bhk,
+                bhk: video.bhk && Array.isArray(video.bhk) ? Array.from(new Set(video.bhk)) : bhk,
                 city_id: video.city_id || cityId,
                 project_name: video.project_name || video.proj_name || projName,
+                minSize: minAreaNum !== null ? calcMinSize : '',
+                maxSize: minAreaNum !== null ? calcMaxSize : '',
                 firstUrlPart: firstUrlPart,
                 secondUrlPart: secondUrlPart,
                 project_about_developer: {
@@ -3396,14 +3581,15 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
                   image: bannerUrl || '',
                   minPrice: proj.project_minimum_price || video.minPrice || '',
                   maxPrice: proj.project_maximum_price || video.maxPrice || '',
-                  minSize:  video.minSize || '',
-                  maxSize: video.maxSize || '',
-                  type: video.bhk?.length ? (Array.isArray(video.bhk) ? video.bhk.join(' - ') : video.bhk) : "",
+                  minSize: minAreaNum !== null ? calcMinSize : '',
+                  maxSize: minAreaNum !== null ? calcMaxSize : '',
+                  type: bhk && Array.isArray(bhk) && bhk.length ? Array.from(new Set(bhk)).join(' - ') : (typeof bhk === 'string' ? bhk : ""),
                   contact_no: proj.project_contact_no || video.contact_no || '',
                   firstUrlPart: firstUrlPart,
                   secondUrlPart: secondUrlPart
                 }
               };
+              this.buildReelCache(enriched);
               this.allReels.push(enriched);
               addedCount++;
             }
@@ -3413,7 +3599,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     });
 
     if (addedCount > 0) {
-      this.onReelFilterChange();
+      this.applyReelFiltersSync();
     }
   }
 
@@ -3738,7 +3924,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
       return;
     }
 
-    this.router.navigate(['/project-details', item.project_url]);
+    window.location.href = item.project_url
   }
 
   @HostListener('window:resize')

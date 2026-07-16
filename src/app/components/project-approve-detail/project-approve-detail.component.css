@@ -17,7 +17,7 @@
   bottom: 20px;
   left: 30px;
   background: #fff;
-  padding: 12px 18px;
+  padding: 0.5%;
   border-radius: 8px;
   z-index: 2;
 }
@@ -34,7 +34,7 @@
 
 
 .logo-card img {
-  height:42px;
+  height:48px;
   width: auto;
 }
 
@@ -75,7 +75,7 @@
   .logo-card {
     left: 15px;
     bottom: 15px;
-    padding: 10px 15px;
+    padding: 0.5%;
   }
 
   .photo-count-container {
@@ -90,11 +90,12 @@
   .logo-card {
     left: 10px;
     bottom: 10px;
-    padding: 6px 10px;
+    padding: 0.5%;
   }
 
   .logo-card img {
-    max-height: 32px;
+    height: 48px;
+    width: auto;
   }
 
   .photo-count-container {
@@ -3927,9 +3928,9 @@ google-map {
   z-index: 10;
   pointer-events: none;
 
-  backdrop-filter: blur(8px);
+  /* backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.15); */
 
   transition: opacity 0.3s ease;
 }

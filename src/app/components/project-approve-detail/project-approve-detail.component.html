@@ -43,7 +43,7 @@
               <div class="mb-search__property__data">
                 <span class="ms-2 builder-name-by text-muted small">
                   by
-                  <a href="#" class="builder-link text-decoration-underline">
+                  <a routerLink="/builder-detail/{{singleproject?.aboutdeveloper.builderUrl}}" class="builder-link text-decoration-underline">
                     {{ singleproject?.builderName }}
                   </a>
                 </span>
@@ -539,7 +539,7 @@
             About Developer
           </h2>
 
-          <div class="slider-nav" *ngIf="showSliderNav">
+          <div class="slider-nav">
             <button class="nav-btn" (click)="slideLeft()">
               <img src="../../../assets/images/arrow-left.png" alt="arrow-left" srcset="">
             </button>
@@ -1216,7 +1216,7 @@
         <div class="reels-prop-specs">
           <div class="reels-prop-type">{{ reels[activeReelIndex].project_about_developer.type }}</div>
           <div class="reels-prop-size">{{ reels[activeReelIndex].project_about_developer.minSize }}{{
-            reels[activeReelIndex].project_about_developer.maxSize ? (' - ' + reels[activeReelIndex].project_about_developer.maxSize) : '' }}</div>
+            reels[activeReelIndex].project_about_developer.maxSize && reels[activeReelIndex].project_about_developer.maxSize !== reels[activeReelIndex].project_about_developer.minSize ? (' - ' + reels[activeReelIndex].project_about_developer.maxSize) : '' }}</div>
         </div>
 
         <!-- Buttons -->
@@ -1276,7 +1276,7 @@
 
         <div class="reels-filter-tags">
 
-          <button class="filter-tag" *ngFor="let item of ['Buy','Rent','Farm House','Plots','Commercial']"
+          <button class="filter-tag" *ngFor="let item of availableSegments; trackBy: trackByFn"
             [class.active]="isSegmentSelected(item)" (click)="selectSegment(item)">
             {{item}}
           </button>
@@ -1295,7 +1295,7 @@
         <div class="reels-filter-tags">
 
           <button class="filter-tag"
-            *ngFor="let item of (availablePropertyTypes && availablePropertyTypes.length > 0 ? availablePropertyTypes : ['Flat','Bungalow','Villa','Penthouse','Row House','Studio','Farm House','Duplex'])"
+            *ngFor="let item of (availablePropertyTypes && availablePropertyTypes.length > 0 ? availablePropertyTypes : defaultPropertyTypes); trackBy: trackByFn"
             [class.active]="isPropertyTypeSelected(item)" (click)="selectPropertyType(item)">
             {{item}}
           </button>
@@ -1313,7 +1313,7 @@
 
         <div class="reels-filter-tags">
 
-          <button class="filter-tag" *ngFor="let item of ['1 BHK','2 BHK','3 BHK','4 BHK','4+ BHK']"
+          <button class="filter-tag" *ngFor="let item of availableBHKs; trackBy: trackByFn"
             [class.active]="isBHKSelected(item)" (click)="selectBHK(item)">
             {{item}}
           </button>
