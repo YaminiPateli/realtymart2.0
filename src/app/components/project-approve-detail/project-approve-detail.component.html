@@ -220,9 +220,9 @@
           <a style="cursor: pointer" (click)="scrollToSection('reels')"
             [ngClass]="{ active: activeSection === 'reels' }">Reels</a>
         </li>
-        <li *ngIf="floorPlanList.length > 0" class="{'active': activeSection === 'floorPlan'}">
+        <li *ngIf="floorPlanList.length > 0 || masterPlanList.length > 0" class="{'active': activeSection === 'floorPlan'}">
           <a style="cursor: pointer" (click)="scrollToSection('floorPlan')"
-            [ngClass]="{ active: activeSection === 'floorPlan' }">Floor plan</a>
+            [ngClass]="{ active: activeSection === 'floorPlan' }">Plan</a>
         </li>
         <li class="{'active': activeSection === 'address'}"
           *ngIf="this.hasKeysOrValues(this.singleproject.project_address)">
@@ -396,39 +396,63 @@
 
         <hr class="mt-4">
       </section>
-      <section id="floorPlan" class="floor-plan-section mb-5" *ngIf="floorPlanList.length > 0">
+      <section id="floorPlan" class="floor-plan-section mb-5" *ngIf="floorPlanList.length > 0 || masterPlanList.length > 0">
 
-        <h2 class="section-title">Floor Plan</h2>
+        <h2 class="section-title">Plan</h2>
 
-        <!-- Tabs: one per floor plan entry -->
-        <div class="floor-tabs d-flex align-items-center flex-wrap">
-          <button *ngFor="let plan of floorPlanList; let i = index" class="floor-tab"
-            [class.active]="selectedFloorPlanIndex === i" (click)="goToFloorPlanSlide(i)">
-            {{ plan.bhk_type }}
+        <!-- Top-level Tab buttons: Floor Plans / Master Plan (styled like BUY / RENT tab row) -->
+        <div class="plan-toggle-tabs d-flex mb-4" *ngIf="floorPlanList.length > 0 && masterPlanList.length > 0">
+          <button class="plan-toggle-btn" [class.active]="activePlanTab === 'floorPlan'" (click)="activePlanTab = 'floorPlan'">
+            FLOOR PLANS
+          </button>
+          <button class="plan-toggle-btn" [class.active]="activePlanTab === 'masterPlan'" (click)="activePlanTab = 'masterPlan'">
+            MASTER PLAN
           </button>
         </div>
 
-        <!-- Area -->
-        <p class="floor-area" *ngIf="selectedFloorPlan?.carpet_area">
-          Carpet {{ selectedFloorPlan!.carpet_area }} SqFt
-        </p>
+        <!-- FLOOR PLANS VIEW -->
+        <div *ngIf="activePlanTab === 'floorPlan' && floorPlanList.length > 0">
+          <!-- Tabs: one per floor plan entry -->
+          <div class="floor-tabs d-flex align-items-center flex-wrap">
+            <button *ngFor="let plan of floorPlanList; let i = index" class="floor-tab"
+              [class.active]="selectedFloorPlanIndex === i" (click)="goToFloorPlanSlide(i)">
+              {{ plan.bhk_type }}
+            </button>
+          </div>
 
-        <!-- Floor Plan Image Slider with Fancybox -->
-        <div class="floor-plan-card p-3 border"
-          *ngIf="selectedFloorPlan && selectedFloorPlan.image && selectedFloorPlan.image.length > 0">
-          <ng-container *ngFor="let plan of floorPlanList; let i = index">
-            <ngx-slick-carousel *ngIf="selectedFloorPlanIndex === i" class="carousel floor-plan-slick-slider"
-              #floorSlickModal="slick-carousel" [config]="floorPlanSlideConfig">
-              <div ngxSlickItem *ngFor="let imgUrl of plan.image; let idx = index" class="slide">
-                <div class="floor-image-wrapper">
-                  <a [href]="imgUrl" data-fancybox="floor-plans"
-                    [attr.data-caption]="plan.bhk_type + (plan.carpet_area ? ' - Carpet ' + plan.carpet_area + ' SqFt' : '') + ' (Image ' + (idx + 1) + ')'">
-                    <img [src]="imgUrl" class="floor-image" alt="Floor Plan {{ plan.bhk_type }} - {{ idx + 1 }}">
-                  </a>
+          <!-- Area -->
+          <p class="floor-area" *ngIf="selectedFloorPlan?.carpet_area">
+            Carpet {{ selectedFloorPlan!.carpet_area }} SqFt
+          </p>
+
+          <!-- Floor Plan Image Slider with Fancybox -->
+          <div class="floor-plan-card p-3 border"
+            *ngIf="selectedFloorPlan && selectedFloorPlan.image && selectedFloorPlan.image.length > 0">
+            <ng-container *ngFor="let plan of floorPlanList; let i = index">
+              <ngx-slick-carousel *ngIf="selectedFloorPlanIndex === i" class="carousel floor-plan-slick-slider"
+                #floorSlickModal="slick-carousel" [config]="floorPlanSlideConfig">
+                <div ngxSlickItem *ngFor="let imgUrl of plan.image; let idx = index" class="slide">
+                  <div class="floor-image-wrapper">
+                    <a [href]="imgUrl" data-fancybox="floor-plans"
+                      [attr.data-caption]="plan.bhk_type + (plan.carpet_area ? ' - Carpet ' + plan.carpet_area + ' SqFt' : '') + ' (Image ' + (idx + 1) + ')'">
+                      <img [src]="imgUrl" class="floor-image" alt="Floor Plan {{ plan.bhk_type }} - {{ idx + 1 }}">
+                    </a>
+                  </div>
                 </div>
-              </div>
-            </ngx-slick-carousel>
-          </ng-container>
+              </ngx-slick-carousel>
+            </ng-container>
+          </div>
+        </div>
+
+        <!-- MASTER PLAN VIEW -->
+        <div *ngIf="activePlanTab === 'masterPlan' && masterPlanList.length > 0">
+          <div class="floor-plan-card p-3 border">
+            <div class="floor-image-wrapper">
+              <a [href]="masterPlanList[0]" data-fancybox="master-plans" data-caption="Master Plan">
+                <img [src]="masterPlanList[0]" class="floor-image" alt="Master Plan">
+              </a>
+            </div>
+          </div>
         </div>
 
       </section>
@@ -1089,9 +1113,9 @@
         <button class="reels-icon-btn" (click)="toggleReelsMute()" title="Mute / Unmute">
           <i class="fa-solid" [ngClass]="isReelsMuted ? 'fa-volume-xmark' : 'fa-volume-high'"></i>
         </button>
-        <!-- <button class="reels-icon-btn" title="Settings" (click)="toggleFilters()">
+        <button class="reels-icon-btn" title="Settings" (click)="toggleFilters()">
           <i class="fa-solid fa-sliders"></i>
-        </button> -->
+        </button>
         <button class="reels-icon-btn" title="Share" (click)="openReelShareModal(activeReelIndex)">
           <i class="fa-solid fa-share-nodes"></i>
         </button>

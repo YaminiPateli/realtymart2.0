@@ -153,7 +153,7 @@ const routes: Routes = [
   { path: 'thank-you-register', component:  ThankYouRegisterComponent },
   { path: 'project-plan', component:  ProjectPlanComponent },
   {
-  matcher: createMatcher(/^(.+)-prjid-(\d+)$/, ['slug', 'id']),
+  matcher: createMatcher(/^(.+)$/, ['slug']),
   component: ProjectApproveDetailComponent
 }
 ];

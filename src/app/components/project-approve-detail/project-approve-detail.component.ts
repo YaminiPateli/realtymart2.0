@@ -174,6 +174,8 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   // Floor plans – populated from API `floor_plans` array
   floorPlanList: { bhk_type: string; carpet_area: string; image: string[] }[] = [];
   selectedFloorPlanIndex: number = 0;
+  masterPlanList: string[] = [];
+  activePlanTab: 'floorPlan' | 'masterPlan' = 'floorPlan';
 
   get selectedFloorPlan() {
     return this.floorPlanList[this.selectedFloorPlanIndex] || null;
@@ -441,6 +443,15 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
 
     });
     Fancybox.bind('[data-fancybox="floor-plans"]', {
+      Toolbar: {
+        display: {
+          left: [],
+          middle: [],
+          right: ["zoom", "close"],
+        },
+      },
+    });
+    Fancybox.bind('[data-fancybox="master-plans"]', {
       Toolbar: {
         display: {
           left: [],
@@ -1840,11 +1851,10 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
 
   fetchProjectApproveDetails() {
     const projectName = this.route.snapshot.paramMap.get('slug');
-    const projectId = this.route.snapshot.paramMap.get('id');
 
-    if (projectName && projectId) {
+    if (projectName) {
       this.projectdetailsService
-        .getprojectdetail1(projectName, projectId)
+        .getprojectdetailFromSlug(projectName)
         .subscribe(
           (projectData: any) => {
             this.singleprojectData = projectData;
@@ -1866,6 +1876,37 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
               }
             }
             this.selectedFloorPlanIndex = 0;
+
+            // Populate master plans from API
+            const rawMasterPlans = [
+              ...this.parseImagesArray(this.singleproject?.project_master_plan),
+              ...this.parseImagesArray(this.singleproject?.project_master_plan_3d),
+              ...this.parseImagesArray(this.singleproject?.master_plan)
+            ];
+            this.masterPlanList = Array.from(new Set(rawMasterPlans.map(img => {
+              if (!img) return '';
+              let imgStr = String(img).trim();
+              if (imgStr.startsWith('http') || imgStr.startsWith('data:') || imgStr.startsWith('/assets')) {
+                return imgStr;
+              }
+              if (imgStr.startsWith('backend/') || imgStr.includes('backend/public/images')) {
+                return imgStr.startsWith('/') ? `https://realtymart.com${imgStr}` : `https://realtymart.com/${imgStr}`;
+              }
+              if (imgStr.startsWith('/')) {
+                return `https://realtymart.com${imgStr}`;
+              }
+              return `https://realtymart.com/backend/public/images/project_master_plan/${imgStr}`;
+            }).filter(Boolean)));
+
+            if (this.masterPlanList.length > 0) {
+              this.layoutAlbum = [...this.masterPlanList];
+            }
+
+            if (this.floorPlanList.length === 0 && this.masterPlanList.length > 0) {
+              this.activePlanTab = 'masterPlan';
+            } else {
+              this.activePlanTab = 'floorPlan';
+            }
 
             // Populate FAQs from project_faq if available
             const rawFaqs = this.singleproject?.project_faq;

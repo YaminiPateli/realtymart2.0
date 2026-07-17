@@ -20,4 +20,8 @@ export class ProjectdetailsService {
     const url = `${this.apiUrl}projectdetails/${name}/prjid-${id}`;
     return this.http.get(url);
   }
+   getprojectdetailFromSlug(name: string): Observable<any> {
+    const url = `${this.apiUrl}project-details/${name}`;
+    return this.http.get(url);
+  }
 }

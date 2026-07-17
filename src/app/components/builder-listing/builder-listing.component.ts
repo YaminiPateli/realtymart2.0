@@ -505,7 +505,7 @@ export class BuilderListingComponent implements OnInit{
 
         "image": project.project_banner_image,
 
-        "url": `https://www.realtymart.com/project-details/${project.firstUrlPart}/${project.secondUrlPart}`,
+        "url": `https://www.realtymart.com/${project.firstUrlPart}`,
 
         "address": {
 

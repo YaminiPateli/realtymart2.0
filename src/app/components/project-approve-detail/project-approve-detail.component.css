@@ -858,6 +858,33 @@ ul.flore_links::-webkit-scrollbar-thumb {
   margin-bottom: 24px;
 }
 
+/* Plan Toggle Tabs (Floor Plan vs Master Plan) */
+.plan-toggle-tabs {
+  border-bottom: 1px solid #e0e0e0;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.plan-toggle-btn {
+  background: transparent;
+  border: 1px solid #e0e0e0;
+  border-bottom: 3px solid transparent;
+  color: #666;
+  padding: 12px 15px;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 6px 6px 0 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.plan-toggle-btn.active {
+  color: #111;
+  border-color: #e0e0e0;
+  border-bottom: 3px solid #ef3f23;
+  background: #fff;
+}
+
 /* Tabs */
 
 .floor-tabs {
