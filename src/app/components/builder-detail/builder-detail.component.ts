@@ -832,21 +832,7 @@ export class BuilderDetailComponent implements OnInit, AfterViewInit {
       navbar.classList.remove('sticky');
     }
 
-    if (header) {
-      const isMenuOpen = document.getElementById('navbarSupportedContent')?.classList.contains('show') ||
-                         document.getElementById('navbarSupportedContent')?.classList.contains('collapsing');
-      const isMobileOrTablet = window.innerWidth <= 991;
-      const headerHeight = isMobileOrTablet ? 115 : (header.offsetHeight || 75);
-      const hideThreshold = this.stickyOffset - headerHeight;
 
-      if (!isMenuOpen && this.stickyOffset > 0 && currentScroll > 0 && currentScroll >= hideThreshold) {
-        header.classList.add('header-hidden');
-        this.isHeaderHidden = true;
-      } else {
-        header.classList.remove('header-hidden');
-        this.isHeaderHidden = false;
-      }
-    }
 
     this.detectActiveSectionOnScroll();
   }

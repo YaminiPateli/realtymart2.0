@@ -598,18 +598,7 @@ export class ServicesDetailComponent implements OnInit {
       navbar.classList.remove('sticky');
     }
 
-    if (header) {
-      const headerHeight = header.offsetHeight || 75;
-      const hideThreshold = Math.max(0, this.stickyOffset - headerHeight);
 
-      if (currentScroll >= hideThreshold) {
-        header.classList.add('header-hidden');
-        this.isHeaderHidden = true;
-      } else {
-        header.classList.remove('header-hidden');
-        this.isHeaderHidden = false;
-      }
-    }
 
     this.detectActiveSectionOnScroll();
   }

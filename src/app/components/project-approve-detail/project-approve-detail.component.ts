@@ -2020,7 +2020,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
                       proj_builderName: element.proj_builderName || this.singleproject.builderName || "",
                       project_localities: element.project_localities || this.singleproject.project_localities || "",
                       segment: element.segment || this.singleproject.property_for || "",
-                      property_type: element.property_type || this.singleproject.project_type || "",
+                      property_type: element.property_type || (element as any).projectType || (element as any).project_type || this.singleproject.project_type || this.singleproject.projectType || "",
                       bhk: element.bhk && element.bhk.length ? element.bhk : bhkTypes,
                       project_name: (element as any).project_name || (element as any).proj_name || this.singleproject.project_name || "",
                       city_id: (element as any).city_id || this.singleproject.project_city || null,
@@ -2035,7 +2035,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
                         image: this.singleproject.project_banner_image || (this.singleproject.project_images && this.singleproject.project_images[0]) || "",
                         minPrice: this.singleproject.project_minimum_price || "",
                         maxPrice: this.singleproject.project_maximum_price || "",
-                        type: bhkTypes.length ? bhkTypes.join(' - ') : ((Array.isArray(this.singleproject.project_type) ? this.singleproject.project_type.join(', ') : this.singleproject.project_type) || ""),
+                        type: bhkTypes.length ? bhkTypes.join(' - ') : ((Array.isArray(this.singleproject.project_type) ? this.singleproject.project_type.join(', ') : (Array.isArray(this.singleproject.projectType) ? this.singleproject.projectType.join(', ') : (this.singleproject.project_type || this.singleproject.projectType || ""))) || ""),
                         minSize: minCarpetArea !== null ? `${minCarpetArea} SqFt` : "",
                         maxSize: (maxCarpetArea !== null && maxCarpetArea !== minCarpetArea) ? `${maxCarpetArea} SqFt` : "",
                         contact_no: this.singleproject.project_contact_no || ""
@@ -3273,10 +3273,30 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
 
   buildReelCache(reel: any): void {
     if (reel._filterCacheBuilt === 2) return;
-    const rawType = reel.property_type || reel.project_type || (reel.project_about_developer && reel.project_about_developer.type) || '';
-    reel._cachedTypesLower = Array.isArray(rawType)
-      ? rawType.map((t: any) => String(t).toLowerCase().trim())
-      : String(rawType).split(',').map(s => s.trim().toLowerCase());
+    const rawType = reel.property_type || reel.project_type || reel.projectType || reel.type || (reel.project_about_developer && reel.project_about_developer.type) || '';
+    let parsedTypes: string[] = [];
+    if (Array.isArray(rawType)) {
+      parsedTypes = rawType.map((t: any) => String(t));
+    } else if (typeof rawType === 'string') {
+      let cleaned = rawType.trim();
+      if (cleaned.startsWith('[')) {
+        try {
+          const parsedJson = JSON.parse(cleaned);
+          if (Array.isArray(parsedJson)) {
+            parsedTypes = parsedJson.map((t: any) => String(t));
+          } else {
+            parsedTypes = [String(parsedJson)];
+          }
+        } catch (e) {
+          parsedTypes = cleaned.replace(/[[\]'"]/g, '').split(',');
+        }
+      } else {
+        parsedTypes = cleaned.replace(/[[\]'"]/g, '').split(',');
+      }
+    } else if (rawType) {
+      parsedTypes = [String(rawType)];
+    }
+    reel._cachedTypesLower = parsedTypes.map((t: string) => t.trim().toLowerCase()).filter(Boolean);
 
     const rawSegment = reel.segment || reel.property_for || (reel.project_about_developer && reel.project_about_developer.segment) || '';
     reel._cachedSegmentArray = Array.isArray(rawSegment)
@@ -3539,7 +3559,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
         const builderName = proj.builderName || proj.proj_builderName || proj.project_builder_name || proj.builder_name || 'Aarsh Group';
         const localities = proj.prjlocalities || proj.project_localities || proj.localities || proj.address || proj.area || 'Ahmedabad';
         const segment = proj.property_for || proj.segment || 'Buy';
-        const propertyType = proj.project_type || proj.property_type || proj.projectType || 'Flat';
+        const propertyType = proj.projectType || proj.property_type || proj.project_type || 'Flat';
         let floorPlansArray: any[] = [];
         if (Array.isArray(proj.floor_plans)) {
           floorPlansArray = proj.floor_plans;
@@ -3604,7 +3624,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
                 proj_builderName: video.proj_builderName || video.builderName || builderName,
                 project_localities: video.project_localities || video.localities || video.area || localities,
                 segment: video.segment || video.property_for || segment,
-                property_type: video.property_type || video.project_type || propertyType,
+                property_type: video.property_type || video.projectType || video.project_type || propertyType,
                 bhk: video.bhk && Array.isArray(video.bhk) ? Array.from(new Set(video.bhk)) : bhk,
                 city_id: video.city_id || cityId,
                 project_name: video.project_name || video.proj_name || projName,

@@ -128,8 +128,35 @@
   z-index: 97;
   background-color: #fff;
   transition: top 0.2s ease;
+  top: 116px;
 }
 
 .top_flore.scrolling-down {
   top: 0 !important;
+}
+
+@media(max-width:991px){
+  .top_flore{
+    top: 109px;
+  }
+  .top_flore .nav_box {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    white-space: nowrap;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  .top_flore .nav_box::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+  }
+  .top_flore .nav_box li {
+    flex: 0 0 auto;
+  }
+}
+
+@media(max-width:768px){
+  .top_flore{
+    top: 106px;
+  }
 }

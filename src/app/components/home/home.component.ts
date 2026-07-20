@@ -488,35 +488,40 @@ export class HomeComponent implements AfterViewInit, OnInit {
   loadFeaturedResidentalProjects() {
     this.featureresidentalService.futureresidentalget(this.city)?.subscribe((featureResidentalData: any) => {
       this.featureResidentalData = featureResidentalData;
-      this.featuredResidentals = this.featureResidentalData?.data;
+      let data = this.featureResidentalData?.data;
+      this.featuredResidentals = data && !Array.isArray(data) ? Object.values(data) : data;
     });
   }
 
   loadFeaturedCommercialProjects() {
     this.featurecommercialService.featurecommercialget(this.city)?.subscribe((featuredcommercialData: any) => {
       this.featureCommercialData = featuredcommercialData;
-      this.featuredcommercials = this.featureCommercialData?.data;
+      let data = this.featureCommercialData?.data;
+      this.featuredcommercials = data && !Array.isArray(data) ? Object.values(data) : data;
     });
   }
 
   loadFeaturedBunglowsProjects() {
     this.featurebunglowsService.featurebunglowsvillasget(this.city)?.subscribe((featureBunglowsData: any) => {
       this.featureBunglowsData = featureBunglowsData;
-      this.featuredBunglowss = this.featureBunglowsData?.data;
+      let data = this.featureBunglowsData?.data;
+      this.featuredBunglowss = data && !Array.isArray(data) ? Object.values(data) : data;
     });
   }
 
   loadFarmHouseProjects() {
     this.farmHouseProjects.featurefarmhouseget(this.city)?.subscribe((featureFarmData: any) => {
       this.featureFarmData = featureFarmData;
-      this.featurefarmhouse = this.featureFarmData?.data;
+      let data = this.featureFarmData?.data;
+      this.featurefarmhouse = data && !Array.isArray(data) ? Object.values(data) : data;
     });
   }
 
   loadFeaturedPlotsProjects() {
     this.featureplotsService.featuredplotsget(this.city)?.subscribe((featurePlotsData: any) => {
       this.featurePlotsData = featurePlotsData;
-      this.featurePlotss = this.featurePlotsData?.data;
+      let data = this.featurePlotsData?.data;
+      this.featurePlotss = data && !Array.isArray(data) ? Object.values(data) : data;
     });
   }
 

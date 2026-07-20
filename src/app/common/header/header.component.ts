@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ElementRef, Renderer2 } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ElementRef, Renderer2, HostListener } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { PropertyservicesService } from '../../components/service/propertyservices.service';
@@ -43,6 +43,15 @@ export class HeaderComponent implements AfterViewInit {
   city: any;
   locationFooter: any;
   validCities: string[] = ['Ahmedabad', 'Rajkot', 'Surat', 'Vadodara', 'Mumbai', 'Navi Mumbai', 'Pune', 'Bangalore', 'NCR', 'Delhi', 'Gurgaon', 'Hyderabad'];
+
+  @HostListener('window:scroll', [])
+  onWindowScroll() {
+    const header = document.querySelector('header');
+    if (header) {
+      const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+      header.classList.toggle('scrolled', currentScroll > 150);
+    }
+  }
 
   constructor(
     public http: HttpClient,
@@ -338,57 +347,4 @@ export class HeaderComponent implements AfterViewInit {
         }
       );
   }
-}
-
-let lastScrollTopGlobal = 0;
-let lastHeaderClickTime = 0;
-
-document.addEventListener('click', (event) => {
-  const target = event.target as HTMLElement;
-  if (target && target.closest('header')) {
-    lastHeaderClickTime = Date.now();
-  }
-});
-
-function handleScroll() {
-  if ((window as any).__projectDetailActive) {
-    return;
-  }
-
-  const header = document.querySelector('header');
-
-  if (header) {
-    const currentScroll =
-      window.pageYOffset || document.documentElement.scrollTop;
-
-    header.classList.toggle('scrolled', currentScroll > 150);
-
-    if (Date.now() - lastHeaderClickTime < 1000) {
-      lastScrollTopGlobal = currentScroll;
-      return;
-    }
-
-    const scrollDifference = currentScroll - lastScrollTopGlobal;
-    const threshold = 10; // Ignore tiny scroll movements
-
-    if (currentScroll > 100) {
-      if (scrollDifference > threshold) {
-        // scrolling down
-        header.classList.add('header-hidden');
-        lastScrollTopGlobal = currentScroll;
-      } else if (scrollDifference < -threshold) {
-        // scrolling up
-        header.classList.remove('header-hidden');
-        lastScrollTopGlobal = currentScroll;
-      }
-    } else {
-      header.classList.remove('header-hidden');
-      lastScrollTopGlobal = currentScroll;
-    }
-  }
-}
-
-window.addEventListener('scroll', handleScroll);
-function ngOnInit() {
-  throw new Error('Function not implemented.');
 }
