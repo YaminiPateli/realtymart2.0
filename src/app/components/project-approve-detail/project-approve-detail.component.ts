@@ -536,7 +536,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   openPhotoViewer(index: number = 0): void {
     const allImages = [
       ...this.photoAlbum.map((a: any) => a.src || a),
-      ...this.layoutAlbum.map((a: any) => a.src || a)
+      // ...this.layoutAlbum.map((a: any) => a.src || a)
     ];
     if (allImages.length > 0) {
       this.galleryImages = allImages;
@@ -1897,10 +1897,6 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
               }
               return `https://realtymart.com/backend/public/images/project_master_plan/${imgStr}`;
             }).filter(Boolean)));
-
-            if (this.masterPlanList.length > 0) {
-              this.layoutAlbum = [...this.masterPlanList];
-            }
 
             if (this.floorPlanList.length === 0 && this.masterPlanList.length > 0) {
               this.activePlanTab = 'masterPlan';
@@ -3931,18 +3927,8 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
     this.spinner.show();
 
     const payload = {
-      contact_no: localStorage.getItem('contact_no') || '',
-      useremail: localStorage.getItem('email') || '',
-      username: localStorage.getItem('name') || '',
-      project_Id: this.singleproject.id,
-      builder_id: '',
-      leads_type: 'Project',
-      leads_for: this.singleproject.property_for,
-      receiver_user_id: this.singleproject.user_id,
-      countrycode: this.countryCode,
-      request_price: 0,
-      visit_date_time: this.scheduleVisitData.visitDateTime,
-      remarks: this.scheduleVisitData.remarks || '',
+      date: this.scheduleVisitData.visitDateTime,
+      message: this.scheduleVisitData.remarks || '',
     };
 
     const token = localStorage.getItem('myrealtylogintoken');
@@ -3950,16 +3936,13 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
       .set('Authorization', `Bearer ${token}`)
       .set('Accept', 'application/json');
 
-    this.http.post(`${this.apiUrl}storeinquiry`, payload, { headers }).subscribe(
+    this.http.post(`${this.apiUrl}scheduled-visit`, payload, { headers }).subscribe(
       (response: any) => {
         this.spinner.hide();
         if (response.status === true) {
           this.activityTrackerService.logActivity('Schedule Visit Inquiry stored', '');
-          this.toastr.success('Visit scheduled successfully!');
+          this.toastr.success(response.message);
           this.closeScheduleVisitModal();
-          setTimeout(() => {
-            window.location.reload();
-          }, 100);
         } else {
           this.toastr.error('Failed to schedule visit. Please try again.');
         }
@@ -4004,5 +3987,6 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
       ? length > 2 // Mobile: show arrows if more than 2 cards
       : length > 3; // Desktop: show arrows if more than 3 cards
   }
+
 
 }

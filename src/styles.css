@@ -7929,3 +7929,20 @@ body.gallery-open .modal-backdrop {
     align-items: start !important;
   }
 }
+
+.flatpickr-day.flatpickr-disabled,
+.flatpickr-day.flatpickr-disabled:hover,
+.flatpickr-day.prevMonthDay,
+.flatpickr-day.nextMonthDay,
+.flatpickr-day.notAllowed,
+.flatpickr-day.notAllowed.prevMonthDay,
+.flatpickr-day.notAllowed.nextMonthDay {
+  color: darkgray !important;
+  border-color: transparent;
+  cursor: default;
+}
+
+.flatpickr-calendar.static {
+    position: absolute;
+    top: calc(100% + (-59px)) !important;
+}
