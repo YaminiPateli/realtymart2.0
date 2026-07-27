@@ -83,6 +83,7 @@ export class BuilderDetailComponent implements OnInit, AfterViewInit {
   city: any;
   city1: City[] = [];
   validcityforselected: any;
+  googleMapUrl: string = '';
 
   cmprj = {
     city: 'All Cities',
@@ -131,9 +132,15 @@ export class BuilderDetailComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
 
-  this.seoService.setCanonicalURL(
-    `https://www.realtymart.com/builder-detail/${id}`
-  );
+    const header = document.querySelector('header');
+    if (header) {
+      header.classList.remove('header-hidden');
+    }
+    this.isHeaderHidden = false;
+
+    this.seoService.setCanonicalURL(
+      `https://www.realtymart.com/builder-detail/${id}`
+    );
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: 'instant' });
     }, 0);
@@ -258,6 +265,8 @@ export class BuilderDetailComponent implements OnInit, AfterViewInit {
       this.builderDetailService.getsinglebuilderdetail(builderDetailsId).subscribe(
         (res: any) => {
           this.builderDetail = res.data;
+          const encodedAddress = encodeURIComponent(this.builderDetail?.map_link);
+          this.googleMapUrl =  `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
           this.setBuilderSchema();
           this.setMetaTags(this.builderDetail.meta_title, this.builderDetail.meta_description, this.builderDetail.builder_logo);
           this.filteredRunningProjects = [...this.builderDetail.runningproject];
@@ -818,21 +827,25 @@ export class BuilderDetailComponent implements OnInit, AfterViewInit {
   checkScroll() {
     const header = document.querySelector('header');
     const navbar = document.getElementById('navbar');
-    if (!navbar) return;
 
-    if (!navbar.classList.contains('sticky') && navbar.offsetTop > 0) {
-      this.stickyOffset = navbar.offsetTop;
+    if (header) {
+      header.classList.remove('header-hidden');
+      this.isHeaderHidden = false;
     }
 
-    const currentScroll = window.pageYOffset || document.documentElement.scrollTop || 0;
+    if (navbar) {
+      if (!navbar.classList.contains('sticky') && navbar.offsetTop > 0) {
+        this.stickyOffset = navbar.offsetTop;
+      }
 
-    if (currentScroll > this.stickyOffset) {
-      navbar.classList.add('sticky');
-    } else {
-      navbar.classList.remove('sticky');
+      const currentScroll = window.pageYOffset || document.documentElement.scrollTop || 0;
+
+      if (currentScroll > this.stickyOffset) {
+        navbar.classList.add('sticky');
+      } else {
+        navbar.classList.remove('sticky');
+      }
     }
-
-
 
     this.detectActiveSectionOnScroll();
   }

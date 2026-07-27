@@ -57,7 +57,7 @@ export class ServicesDetailComponent implements OnInit {
   dynamicUrl: any;
   serviceName = this.route.snapshot.paramMap.get('name');
   serviceId = this.route.snapshot.paramMap.get('id');
-
+  googleMapUrl:string = "";
   constructor(
     private titleService: Title,
     private metaService: Meta,
@@ -194,7 +194,6 @@ export class ServicesDetailComponent implements OnInit {
   ngOnInit(): void {
      const name = this.route.snapshot.paramMap.get('name');
   const id = this.route.snapshot.paramMap.get('id');
-
   this.seoService.setCanonicalURL(
     `https://www.realtymart.com/company-detail/${name}/${id}`
   );
@@ -325,6 +324,8 @@ export class ServicesDetailComponent implements OnInit {
             .subscribe(
               (response: any) => {
                 this.singlecompany = response.data;
+                const encodedAddress = encodeURIComponent(this.singlecompany?.company_map);
+                this.googleMapUrl =  `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
                 this.setCompanySchema();
                 this.setMetaTags(
                   this.singlecompany.meta_title,

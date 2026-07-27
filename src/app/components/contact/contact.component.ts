@@ -8,11 +8,17 @@ import { SeoService } from 'src/app/seo.service';
   styleUrls: ['./contact.component.css']
 })
 export class ContactComponent implements OnInit {
+  googleMapUrl:string = ""
 
   constructor(private seoService:SeoService, private metaService:Meta){}
 
   ngOnInit(): void {
-  this.seoService.setCanonicalURL(
+
+    const query = `A401-412, Intelliworkz Business Solutions Pvt. Ltd, World Trade Tower, Nr. BMW Showroom, SG Highway, Ahmedabad - 380051 Gujarat - India.`;
+
+    this.googleMapUrl =
+      `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+    this.seoService.setCanonicalURL(
     'https://www.realtymart.com/career'
   );
   this.metaService.updateTag({

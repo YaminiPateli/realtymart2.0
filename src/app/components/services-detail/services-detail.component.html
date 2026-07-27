@@ -202,7 +202,7 @@
                             <p *ngIf="singlecompany.company_address !== null">{{singlecompany.company_address}} </p>
 
                             <div class="d-flex align-items-center flex-wrap our_time">
-                                <a *ngIf="singlecompany?.company_map != null" class="directions" target="_blank" [href]="'https://www.google.com/maps/place/' + singlecompany?.company_map?.replace(' ', '')">Get Directions</a>
+                                <a *ngIf="singlecompany?.company_map != null" class="directions" target="_blank" [href]="googleMapUrl">Get Directions</a>
                                     <ul class="dropdown list-unstyled" *ngIf="singlecompany.bussiness_hours !== null">
                                         <p class="m-0"><b>Business Hours</b></p>
                                         <div *ngFor="let businessHour of reorderBusinessHours() || []">

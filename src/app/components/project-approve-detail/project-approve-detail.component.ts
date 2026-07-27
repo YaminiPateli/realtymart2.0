@@ -1082,7 +1082,10 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
       if (!isNaN(lat) && !isNaN(lng)) {
         this.center = { lat, lng };
         this.markerPosition = { lat, lng };
-        this.googleMapUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+       const query = `${this.singleproject.project_address}`;
+
+this.googleMapUrl =
+  `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
       }
     }
   }

@@ -34,7 +34,7 @@
 
 
 .logo-card img {
-  height:48px;
+  height: 48px;
   width: auto;
 }
 
@@ -299,7 +299,7 @@
 .sticky-nav-wrapper {
   position: sticky;
   top: 75px !important;
-  z-index: 1 !important;
+  z-index: 95 !important;
   background-color: #fff !important;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
   transition: box-shadow 0.3s ease;
@@ -4689,7 +4689,8 @@ google-map {
 .visit-flatpickr-input {
   width: 100%;
   cursor: pointer;
-  padding-right: 40px !important;  /* leave room for the calendar icon */
+  padding-right: 40px !important;
+  /* leave room for the calendar icon */
   font-size: 15px !important;
   font-weight: 500;
   color: #1d1d1d;
@@ -4708,7 +4709,8 @@ google-map {
   transform: translateY(-50%);
   color: #888;
   font-size: 16px;
-  pointer-events: none;   /* clicks fall through to the input */
+  pointer-events: none;
+  /* clicks fall through to the input */
 }
 
 /* Ensure the flatpickr calendar dropdown renders above the Bootstrap modal */

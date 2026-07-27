@@ -160,7 +160,7 @@
         <!-- Left Section: Title and Price -->
         <div class="col-lg-6 col-md-5 d-flex flex-column justify-content-center">
           <h3 class="sticky-project-name mb-1">{{ singleproject?.project_name }}</h3>
-          <div class="sticky-project-price">
+          <div *ngIf="singleproject?.project_minimum_price && singleproject?.project_maximum_price" class="sticky-project-price">
             <span class="price-icon-sticky"><img  alt="tag" src="../../../assets/images/Tag.svg"></span>
             ₹ {{singleproject?.project_minimum_price}} - ₹{{ singleproject?.project_maximum_price }}
           </div>
@@ -403,10 +403,10 @@
         <!-- Top-level Tab buttons: Floor Plans / Master Plan (styled like BUY / RENT tab row) -->
         <div class="plan-toggle-tabs d-flex mb-4" *ngIf="floorPlanList.length > 0 && masterPlanList.length > 0">
           <button class="plan-toggle-btn" [class.active]="activePlanTab === 'floorPlan'" (click)="activePlanTab = 'floorPlan'">
-            FLOOR PLANS
+            Floor Plans
           </button>
           <button class="plan-toggle-btn" [class.active]="activePlanTab === 'masterPlan'" (click)="activePlanTab = 'masterPlan'">
-            MASTER PLAN
+            Master Plan
           </button>
         </div>
 
