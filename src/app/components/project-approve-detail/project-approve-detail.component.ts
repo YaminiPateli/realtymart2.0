@@ -172,7 +172,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
 
 
   // Floor plans – populated from API `floor_plans` array
-  floorPlanList: { bhk_type: string; carpet_area: string; image: string[] }[] = [];
+  floorPlanList: { bhk_type: string; carpet_area: string; sbu?: string; image: string[] }[] = [];
   selectedFloorPlanIndex: number = 0;
   masterPlanList: string[] = [];
   activePlanTab: 'floorPlan' | 'masterPlan' = 'floorPlan';
@@ -1808,26 +1808,54 @@ this.googleMapUrl =
 
   groupFloorPlansByBhk(rawList: any[]): any[] {
     if (!Array.isArray(rawList) || rawList.length === 0) return [];
-    const groupedMap = new Map<string, { bhk_type: string, carpet_areas: number[], raw_areas: string[], images: string[] }>();
+    const groupedMap = new Map<string, {
+      bhk_type: string,
+      carpet_areas: number[],
+      raw_carpet_areas: string[],
+      sbu_areas: number[],
+      raw_sbu_areas: string[],
+      images: string[]
+    }>();
 
     rawList.forEach((fp: any) => {
       const bhkType = (fp.bhk_type || '').trim();
       const key = bhkType.toLowerCase() || 'other';
       if (!groupedMap.has(key)) {
-        groupedMap.set(key, { bhk_type: bhkType || 'Floor Plan', carpet_areas: [], raw_areas: [], images: [] });
+        groupedMap.set(key, {
+          bhk_type: bhkType || 'Floor Plan',
+          carpet_areas: [],
+          raw_carpet_areas: [],
+          sbu_areas: [],
+          raw_sbu_areas: [],
+          images: []
+        });
       }
       const entry = groupedMap.get(key)!;
-      if (fp.carpet_area) {
+
+      if (fp.sbu !== undefined && fp.sbu !== null) {
+        const rawSbuStr = String(fp.sbu).trim();
+        if (rawSbuStr && !entry.raw_sbu_areas.includes(rawSbuStr)) {
+          entry.raw_sbu_areas.push(rawSbuStr);
+        }
+        const numSbu = parseFloat(rawSbuStr.replace(/[^\d.]/g, ''));
+        if (!isNaN(numSbu) && numSbu > 0 && !entry.sbu_areas.includes(numSbu)) {
+          entry.sbu_areas.push(numSbu);
+        }
+      }
+
+      if (fp.carpet_area !== undefined && fp.carpet_area !== null) {
         const rawAreaStr = String(fp.carpet_area).trim();
-        if (rawAreaStr && !entry.raw_areas.includes(rawAreaStr)) {
-          entry.raw_areas.push(rawAreaStr);
+        if (rawAreaStr && !entry.raw_carpet_areas.includes(rawAreaStr)) {
+          entry.raw_carpet_areas.push(rawAreaStr);
         }
         const num = parseFloat(rawAreaStr.replace(/[^\d.]/g, ''));
         if (!isNaN(num) && num > 0 && !entry.carpet_areas.includes(num)) {
           entry.carpet_areas.push(num);
         }
       }
-      const parsedImages = this.parseImagesArray(fp.image);
+
+      const rawImgs = fp.images !== undefined && fp.images !== null ? fp.images : fp.image;
+      const parsedImages = this.parseImagesArray(rawImgs);
       parsedImages.forEach((img: string) => {
         if (img && !entry.images.includes(img)) {
           entry.images.push(img);
@@ -1836,16 +1864,27 @@ this.googleMapUrl =
     });
 
     return Array.from(groupedMap.values()).map(entry => {
+      let sbuDisplay = '';
+      if (entry.sbu_areas.length > 0) {
+        const minArea = Math.min(...entry.sbu_areas);
+        const maxArea = Math.max(...entry.sbu_areas);
+        sbuDisplay = minArea === maxArea ? `${minArea}` : `${minArea} - ${maxArea}`;
+      } else if (entry.raw_sbu_areas.length > 0) {
+        sbuDisplay = entry.raw_sbu_areas.join(' - ');
+      }
+
       let areaDisplay = '';
       if (entry.carpet_areas.length > 0) {
         const minArea = Math.min(...entry.carpet_areas);
         const maxArea = Math.max(...entry.carpet_areas);
         areaDisplay = minArea === maxArea ? `${minArea}` : `${minArea} - ${maxArea}`;
-      } else if (entry.raw_areas.length > 0) {
-        areaDisplay = entry.raw_areas.join(' - ');
+      } else if (entry.raw_carpet_areas.length > 0) {
+        areaDisplay = entry.raw_carpet_areas.join(' - ');
       }
+
       return {
         bhk_type: entry.bhk_type,
+        sbu: sbuDisplay,
         carpet_area: areaDisplay,
         image: entry.images
       };
@@ -1963,7 +2002,7 @@ this.googleMapUrl =
               // Strip units/commas (e.g. "1,168 SqFt") before parsing so real
               // values don't get silently dropped as NaN.
               const carpetAreas = (this.floorPlanList || [])
-                .map(fp => parseFloat(String(fp.carpet_area ?? '').replace(/[^\d.]/g, '')))
+                .map(fp => parseFloat(String((fp.sbu || fp.carpet_area) ?? '').replace(/[^\d.]/g, '')))
                 .filter(n => !isNaN(n) && n > 0);
               const minCarpetArea = carpetAreas.length ? Math.min(...carpetAreas) : null;
               const maxCarpetArea = carpetAreas.length ? Math.max(...carpetAreas) : null;

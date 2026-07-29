@@ -421,7 +421,10 @@
           </div>
 
           <!-- Area -->
-          <p class="floor-area" *ngIf="selectedFloorPlan?.carpet_area">
+          <p class="floor-area" *ngIf="selectedFloorPlan?.sbu">
+            SBU {{ selectedFloorPlan!.sbu }} sqft
+          </p>
+          <p class="floor-area" *ngIf="!selectedFloorPlan?.sbu && selectedFloorPlan?.carpet_area">
             Carpet {{ selectedFloorPlan!.carpet_area }} SqFt
           </p>
 
@@ -434,7 +437,7 @@
                 <div ngxSlickItem *ngFor="let imgUrl of plan.image; let idx = index" class="slide">
                   <div class="floor-image-wrapper">
                     <a [href]="imgUrl" data-fancybox="floor-plans"
-                      [attr.data-caption]="plan.bhk_type + (plan.carpet_area ? ' - Carpet ' + plan.carpet_area + ' SqFt' : '') + ' (Image ' + (idx + 1) + ')'">
+                      [attr.data-caption]="plan.bhk_type + (plan.sbu ? ' - sbu ' + plan.sbu + ' sqft' : (plan.carpet_area ? ' - Carpet ' + plan.carpet_area + ' SqFt' : '')) + ' (Image ' + (idx + 1) + ')'">
                       <img [src]="imgUrl" class="floor-image" alt="Floor Plan {{ plan.bhk_type }} - {{ idx + 1 }}">
                     </a>
                   </div>
