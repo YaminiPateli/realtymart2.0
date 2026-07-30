@@ -8,6 +8,7 @@ import { catchError, map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { GeolocationService } from '../app/components/service/geolocation.service';
 import { CookieService } from 'ngx-cookie-service';
+import { SeoService } from './seo.service';
 
 interface City {
   cid: number;
@@ -19,7 +20,7 @@ interface City {
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
+export class AppComponent implements OnInit{
   isRegisterRoute = false;
   isRegisterThankyouRoute = false;
   isLoginRoute = false;
@@ -34,7 +35,8 @@ export class AppComponent {
     private cookieService: CookieService,
     private router: Router,
     public http: HttpClient,
-    private geolocationService: GeolocationService
+    private geolocationService: GeolocationService,
+    private seoService:SeoService
   ) {
     this.router.events.subscribe(() => {
       // Check if the current route is `/register`
@@ -52,6 +54,8 @@ export class AppComponent {
 
     ngOnInit(): void {
     this.loadCookies();
+    this.seoService.setLocalBusinessSchema();
+    this.seoService.setOrganizationSchema();
   }
 
     setCookie(): void {

@@ -25,78 +25,8 @@ export class TermsConditionsComponent implements OnInit {
   this.seoService.setCanonicalURL(
     'https://www.realtymart.com/terms-conditions'
   );
-    this.setTermsSchema()
   }
 
-  setTermsSchema() {
-
-  const schema = {
-
-    "@context": "https://schema.org",
-
-    "@graph": [
-
-      {
-
-        "@type": "TermsOfService",
-
-        "@id": "https://www.realtymart.com/terms-and-conditions",
-
-        "name": "Terms & Conditions",
-
-        "url": "https://www.realtymart.com/terms-and-conditions",
-
-        "description": "Read the Terms & Conditions governing the use of RealtyMart website and services.",
-
-        "publisher": {
-
-          "@type": "Organization",
-
-          "name": "Intelliworkz Business Solutions Pvt. Ltd.",
-
-          "brand": {
-
-            "@type": "Brand",
-
-            "name": "RealtyMart"
-
-          }
-
-        }
-
-      },
-
-      {
-
-        "@type": "WebPage",
-
-        "@id": "https://www.realtymart.com/terms-and-conditions#webpage",
-
-        "name": "Terms & Conditions | RealtyMart",
-
-        "url": "https://www.realtymart.com/terms-and-conditions",
-
-        "description": "Terms and Conditions for using RealtyMart and its services.",
-
-        "isPartOf": {
-
-          "@type": "WebSite",
-
-          "name": "RealtyMart",
-
-          "url": "https://www.realtymart.com"
-
-        }
-
-      }
-
-    ]
-
-  };
-
-  this.seoService.setSchema(schema);
-
-}
 
   // meta title
   setMetaTags(title: string, description: string) {

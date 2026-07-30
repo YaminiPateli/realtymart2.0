@@ -735,6 +735,9 @@ export class ServicesDetailComponent implements OnInit {
         : "",
 
       "serviceType": this.singlecompany.ps_id,
+      "telephone": "-",
+
+      "priceRange": "-",
 
       "address": {
 
@@ -766,14 +769,6 @@ export class ServicesDetailComponent implements OnInit {
       !this.singlecompany.company_email.includes('*')
     ) {
       schema.email = this.singlecompany.company_email;
-    }
-
-    // Add phone only if it isn't masked
-    if (
-      this.singlecompany.company_contactno &&
-      !this.singlecompany.company_contactno.includes('*')
-    ) {
-      schema.telephone = this.singlecompany.company_contactno;
     }
 
     this.seoService.setSchema(schema);

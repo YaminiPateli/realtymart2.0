@@ -1436,7 +1436,6 @@ export class PostPropertyFreeComponent {
     this.fetchLandZone();
     this.fetchBusinesssector();
     this.fetchCities();
-    this.setPostPropertySchema();
     this.flooroptions = this.flooroptions.concat(
       Array.from({ length: 185 }, (_, i) => (i + 16).toString())
     );
@@ -1674,49 +1673,4 @@ export class PostPropertyFreeComponent {
     }
   }
 
-  setPostPropertySchema() {
-
-  const schema = {
-
-    "@context": "https://schema.org",
-
-    "@graph": [
-
-      {
-        "@type": "WebPage",
-
-        "@id": "https://www.realtymart.com/post-property-free",
-
-        "name": "Sell and Rent Your Property For Free on RealtyMart",
-
-        "url": "https://www.realtymart.com/post-property-free",
-
-        "description": "Post your residential or commercial property for sale or rent on RealtyMart for free."
-      },
-
-      {
-        "@type": "RealEstateAgent",
-
-        "@id": "https://www.realtymart.com/#realestateagent",
-
-        "name": "RealtyMart",
-
-        "url": "https://www.realtymart.com",
-
-        "description": "RealtyMart is a real estate platform where owners, builders and agents can post properties for sale and rent.",
-
-        "parentOrganization": {
-          "@type": "Organization",
-          "name": "Intelliworkz Business Solutions Pvt. Ltd."
-        }
-
-      }
-
-    ]
-
-  };
-
-  this.seoService.setSchema(schema);
-
-}
 }

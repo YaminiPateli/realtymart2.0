@@ -26,22 +26,93 @@ export class SeoService {
     this.renderer.setAttribute(link, 'href', url);
   }
 
-  setSchema(schema: any): void {
+  setSchema(schema: any, id: string = 'structured-data'): void {
+  // Remove existing schema with same id
+  const existingSchema = this.document.getElementById(id);
 
-    // Remove existing schema
-    const existingSchema = this.document.getElementById('schema-script');
+  if (existingSchema) {
+    existingSchema.remove();
+  }
 
-    if (existingSchema) {
-      existingSchema.remove();
+  const script = this.document.createElement('script');
+  script.type = 'application/ld+json';
+  script.id = id;
+  script.text = JSON.stringify(schema);
+
+  this.document.head.appendChild(script);
+  }
+  setLocalBusinessSchema() {
+
+    const schema =
+    {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "realtymart",
+      "image": window.location.href + "assets/images/logo.svg",
+      "@id": "",
+      "url": window.location.href,
+      "telephone": "+91 8320864223",
+      "priceRange": "-",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "WTT, Makarba",
+        "addressLocality": "Ahmedabad",
+        "postalCode": "382210",
+        "addressCountry": "IN"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 22.9894657,
+        "longitude": 72.4970037
+      },
+      "openingHoursSpecification": {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday"
+        ],
+        "opens": "08:00",
+        "closes": "20:00"
+      }
     }
 
-    // Create new schema
     const script = this.document.createElement('script');
-
     script.type = 'application/ld+json';
-    script.id = 'schema-script';
+    script.id = "local-business-schema";
     script.text = JSON.stringify(schema);
 
+    this.document.head.appendChild(script);
+  }
+
+  setOrganizationSchema(){
+    const schema = {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "realtymart",
+      "url": window.location.href,
+      "logo": window.location.href + "assets/images/logo.svg",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+91 8320864223",
+        "contactType": "technical support",
+        "areaServed": "IN",
+        "availableLanguage": "en"
+      },
+      "sameAs": [
+        "https://www.instagram.com/realtymart.official/",
+        "https://www.facebook.com/realtymartcom",
+        "https://www.linkedin.com/company/realtymart-com"
+      ]
+    }
+
+    const script = this.document.createElement('script');
+    script.type = 'application/ld+json';
+    script.id = "organization-schema";
+    script.text = JSON.stringify(schema);
     this.document.head.appendChild(script);
   }
 }

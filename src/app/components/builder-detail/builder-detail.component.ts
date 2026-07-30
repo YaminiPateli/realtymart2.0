@@ -851,119 +851,26 @@ export class BuilderDetailComponent implements OnInit, AfterViewInit {
   }
 
   setBuilderSchema() {
-
-  const runningProjects = (this.builderDetail.runningproject || []).map(
-    (project: any, index: number) => ({
-
-      "@type": "ListItem",
-
-      "position": index + 1,
-
-      "item": {
-
-        "@type": "ApartmentComplex",
-
-        "name": project.project_name,
-
-        "url": `https://www.realtymart.com/${project.firstUrlPart}/${project.secondUrlPart}`,
-
-        "image": project.project_banner_image,
-
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": project.project_address,
-          "addressLocality": project.project_localities,
-          "postalCode": project.project_pincode,
-          "addressCountry": "IN"
-        },
-
-        "offers": {
-          "@type": "Offer",
-          "price": project.project_minimum_price,
-          "priceCurrency": "INR"
-        }
-
-      }
-
-    })
-  );
-
-  const schema = {
+  const schema: any = {
 
     "@context": "https://schema.org",
-
-    "@graph": [
-
-      {
-        "@type": "RealEstateAgent",
-
-        "@id": window.location.href + "#builder",
-
-        "name": this.builderDetail.name,
-
-        "url": window.location.href,
-
-        "logo": this.builderDetail.builder_logo,
-
-        "image": this.builderDetail.builder_logo,
-
-        "description": this.builderDetail.long_description
-          ? this.builderDetail.long_description.replace(/<[^>]*>/g, "")
-          : "",
-
-        "email": this.builderDetail.builder_email,
-
-        "telephone": this.builderDetail.builder_number,
-
-        "address": {
-
-          "@type": "PostalAddress",
-
-          "streetAddress": this.builderDetail.office_address,
-
-          "addressLocality": this.builderDetail.working_in_cities[0],
-
-          "addressRegion": this.builderDetail.working_in_states,
-
-          "addressCountry": "IN"
-
-        },
-
-        "sameAs": this.builderDetail.builder_website
-          ? [this.builderDetail.builder_website]
-          : []
-
-      },
-
-      {
-
-        "@type": "CollectionPage",
-
-        "@id": window.location.href,
-
-        "name": `${this.builderDetail.name} Projects`,
-
-        "url": window.location.href,
-
-        "description": `Explore all ongoing and completed projects developed by ${this.builderDetail.name}.`,
-
-        "mainEntity": {
-
-          "@type": "ItemList",
-
-          "numberOfItems": runningProjects.length,
-
-          "itemListElement": runningProjects
-
-        }
-
-      }
-
-    ]
+    "@type": "FAQPage",
+    "mainEntity":[]
 
   };
 
-  this.seoService.setSchema(schema);
+  if (Array.isArray(this.builderDetail?.builder_faq) && this.builderDetail.builder_faq.length > 0) {
+    schema.mainEntity = this.builderDetail.builder_faq.map((faq: any) => ({
+        "@type": "Question",
+        "name": faq.faq_que,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": faq.faq_ans ? faq.faq_ans.replace(/<[^>]*>/g, "").trim() : ""
+        }
+      }))
+  }
+
+  this.seoService.setSchema(schema, 'builder-schema');
 
 }
 

@@ -115,7 +115,6 @@ export class SellingGuideComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.autoOpenModal();
-    this.setSellingGuideSchema();
     this.seoService.setCanonicalURL(
     'https://www.realtymart.com/selling-guide'
   );
@@ -199,74 +198,5 @@ export class SellingGuideComponent implements OnInit, OnDestroy {
       this.contactStore.markAllAsTouched();
     }
   }
-
-setSellingGuideSchema() {
-
-  const schema = {
-
-    "@context": "https://schema.org",
-
-    "@graph": [
-
-      {
-        "@type": "WebPage",
-
-        "@id": "https://www.realtymart.com/selling-guide",
-
-        "name": "Post Free Property Ads | Rent & Sell Property Online",
-
-        "url": "https://www.realtymart.com/selling-guide",
-
-        "description": "Learn how to sell or rent your property online and post free property ads on RealtyMart."
-      },
-
-      {
-        "@type": "HowTo",
-
-        "name": "How to Post Your Property on RealtyMart",
-
-        "description": "Step-by-step guide to post your property for sale or rent on RealtyMart.",
-
-        "step": [
-
-          {
-            "@type": "HowToStep",
-            "position": 1,
-            "name": "Choose Your Role",
-            "text": "Select whether you are an Owner, Builder or Agent."
-          },
-
-          {
-            "@type": "HowToStep",
-            "position": 2,
-            "name": "Choose Property Type",
-            "text": "Select whether you want to Sell or Rent your property."
-          },
-
-          {
-            "@type": "HowToStep",
-            "position": 3,
-            "name": "Enter Mobile Number",
-            "text": "Provide your mobile number."
-          },
-
-          {
-            "@type": "HowToStep",
-            "position": 4,
-            "name": "Post Property",
-            "text": "Continue to complete your property listing."
-          }
-
-        ]
-
-      }
-
-    ]
-
-  };
-
-  this.seoService.setSchema(schema);
-
-}
 
 }

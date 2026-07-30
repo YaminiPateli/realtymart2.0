@@ -298,34 +298,27 @@ export class HomeComponent implements AfterViewInit, OnInit {
 
   ngAfterViewInit() {
     // this.loadHomeBanner();
-    this.seoService.setSchema({
-
-      "@context": "https://schema.org",
-
-      "@graph": [
-
-        {
-          "@type": "Organization",
-          "name": "Intelliworkz Business Solutions Pvt. Ltd.",
-          "url": window.location.href,
-          "logo": window.location.href + "assets/images/logo.svg"
-        },
-
-        {
-          "@type": "WebSite",
-          "name": "RealtyMart",
-          "url": window.location.href,
-        },
-
-        {
-          "@type": "WebPage",
-          "name": "Real Estate Property Portal | RealtyMart",
-          "url": window.location.href
-        }
-
-      ]
-
-    });
+    this.seoService.setSchema(
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "realtymart",
+  "url": window.location.href,
+  "logo": window.location.href + "assets/images/logo.svg",
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "telephone": "+91 8320864223",
+    "contactType": "technical support",
+    "areaServed": "IN",
+    "availableLanguage": "en"
+  },
+  "sameAs": [
+    "https://www.instagram.com/realtymart.official/",
+    "https://www.facebook.com/realtymartcom",
+    "https://www.linkedin.com/company/realtymart-com"
+  ]
+}, "organization-schema"
+    );
   }
 
 

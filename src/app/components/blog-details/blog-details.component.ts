@@ -69,57 +69,6 @@ export class BlogDetailsComponent implements OnInit{
   }
 
   setBlogDetailsSchema() {
-
-  const schema = {
-
-    "@context": "https://schema.org",
-
-    "@type": "BlogPosting",
-
-    "@id": window.location.href,
-
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id": window.location.href
-    },
-
-    "headline": this.blogdetails.title,
-
-    "description": this.blogdetails.short_description,
-
-    "articleBody": this.blogdetails.description
-      ? this.blogdetails.description.replace(/<[^>]*>/g, "")
-      : "",
-
-    "image": [
-      this.blogdetails.image
-    ],
-
-    "datePublished": this.blogdetails.publish_date,
-
-    "dateModified": this.blogdetails.updated_at || this.blogdetails.publish_date,
-
-    "author": {
-      "@type": "Organization",
-      "name": "RealtyMart"
-    },
-
-    "publisher": {
-      "@type": "Organization",
-      "name": "Intelliworkz Business Solutions Pvt. Ltd.",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://www.realtymart.com/assets/images/logo.png"
-      }
-    },
-
-    "url": window.location.href,
-
-    "inLanguage": "en-IN"
-
-  };
-
-  this.seoService.setSchema(schema);
-
-}
+    this.seoService.setLocalBusinessSchema();
+  }
 }

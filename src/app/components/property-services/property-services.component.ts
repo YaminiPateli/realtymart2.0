@@ -52,21 +52,7 @@ export class PropertyServicesComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.seoService.setSchema({
-      "@context": "https://schema.org",
-      "@type": "CollectionPage",
-      "name": "Property Services | RealtyMart",
-      "url": window.location.href,
-      "description": "Explore property-related services including Architects, Interior Designers, Home Loan, Legal Services, Vastu Consultants and more.",
-      "publisher": {
-        "@type": "Organization",
-        "name": "Intelliworkz Business Solutions Pvt. Ltd.",
-        "brand": {
-          "@type": "Brand",
-          "name": "RealtyMart"
-        }
-      }
-    });
+    
   }
 
   fetchSportsData() {
