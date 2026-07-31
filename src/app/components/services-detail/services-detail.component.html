@@ -34,13 +34,13 @@
                             class="img-fluid mb-2" />
                     </div>
 
-                    <h3 class="companies-names" *ngIf="singlecompany.company_name !== null">About {{singlecompany.company_name}}</h3>
+                    <h3 class="companies-names title-text" *ngIf="singlecompany.company_name !== null">About {{singlecompany.company_name}}</h3>
                     <p class="text-titles" *ngIf="singlecompany.description !== null"  [innerHTML]="singlecompany.description">
                     </p>
                     <input type="checkbox" class="text-btn" *ngIf="singlecompany?.description !== null && singlecompany?.description?.length > 300" />
 
                     <div class="gallery mt-3" id="gallery" *ngIf="singlecompany.PrtSrcGallerys?.length > 0">
-                        <h3 class="companies-names">Gallery</h3>
+                        <h3 class="companies-names title-text">Gallery</h3>
                         <ngx-slick-carousel class="carousel project_slider"
                             #slickModal="slick-carousel"
 
@@ -119,7 +119,7 @@
                     </div>
 
                     <div class="services_flow mt-3" id="services" *ngIf="singlecompany.PrtSrcSevices?.length > 0">
-                        <h3 class="companies-names">Services</h3>
+                        <h3 class="companies-names title-text">Services</h3>
                         <div class="row mt-3">
                             <div class="col-lg-3 col-md-4 col-6 mb-3 text-center" *ngFor="let service of singlecompany.PrtSrcSevices">
                                 <img class="img-fluid pb-2 serice_flow_img"
@@ -134,7 +134,7 @@
                     </div>
 
                     <div class="services_flow mt-3" id="products" *ngIf="singlecompany.PrtSrcProducts?.length > 0">
-                        <h3 class="companies-names">Products</h3>
+                        <h3 class="companies-names title-text">Products</h3>
                         <div class="row mt-3">
                             <div class="col-lg-3 col-md-4 col-6 mb-3 text-center" *ngFor="let product of singlecompany.PrtSrcProducts">
                                 <img class="img-fluid pb-2 serice_flow_img"
@@ -146,7 +146,7 @@
                     </div>
 
                     <div class="catalogues_flow mt-3" id="catalogues" *ngIf="singlecompany.PrtSrccatelogues?.length > 0">
-                        <h3 class="companies-names">Catalogues</h3>
+                        <h3 class="companies-names title-text">Catalogues</h3>
                         <ngx-slick-carousel class="carousel project_slider pt-3"
                             #slickModal="slick-carousel"
                             [config]="slideConfig3">
@@ -167,7 +167,7 @@
                     </div>
 
                     <div class="testimonials_flow mt-3" id="testimonials" *ngIf="singlecompany.PrtSrcTestimonials?.length > 0">
-                        <h3 class="companies-names">Testimonials</h3>
+                        <h3 class="companies-names title-text">Testimonials</h3>
                         <ngx-slick-carousel class="carousel project_slider pt-3"
 
                             #slickModal="slick-carousel"
@@ -281,7 +281,7 @@
             <div class="ft_box">
                 <div class="row">
                     <div class="col-lg-5">
-                        <h3 class="companies-names" *ngIf="singlecompany.company_name !== null">{{singlecompany.company_name}}</h3>
+                        <h3 class="companies-names title-text" *ngIf="singlecompany.company_name !== null">{{singlecompany.company_name}}</h3>
                     </div>
                     <div class="col-lg-7 d-flex align-items-center justify-content-between">
                         <a href="tel:7378373783"

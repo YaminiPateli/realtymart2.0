@@ -52,11 +52,7 @@ ngOnInit(): void {
     property: 'og:locale',
     content: 'en_IN'
   });
-  this.setAboutSchema();
-}
-
-setAboutSchema() {
-  this.seoService.setLocalBusinessSchema();
+ 
 }
 
 }

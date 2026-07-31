@@ -105,16 +105,16 @@ export class EmiCalculatorComponent implements OnInit {
       {
         "@type": "WebPage",
 
-        "@id": "https://www.realtymart.com/home-loan-emi-calculator",
+        "@id": window.location.href,
 
         "name": "Home Loan EMI Calculator | RealtyMart",
 
-        "url": "https://www.realtymart.com/home-loan-emi-calculator",
+        "url": window.location.href,
 
         "description": "Calculate your Home Loan EMI instantly using RealtyMart's free Home Loan EMI Calculator.",
 
         "mainEntity": {
-          "@id": "https://www.realtymart.com/home-loan-emi-calculator#calculator"
+          "@id": window.location.href + "#calculator"
         }
 
       },
@@ -123,7 +123,7 @@ export class EmiCalculatorComponent implements OnInit {
 
         "@type": "WebApplication",
 
-        "@id": "https://www.realtymart.com/home-loan-emi-calculator#calculator",
+        "@id": window.location.href + "#calculator",
 
         "name": "Home Loan EMI Calculator",
 
@@ -131,10 +131,21 @@ export class EmiCalculatorComponent implements OnInit {
 
         "operatingSystem": "Web",
 
-        "url": "https://www.realtymart.com/home-loan-emi-calculator",
+        "url": window.location.href,
 
-        "description": "A free online calculator to estimate monthly home loan EMI, total interest payable and total repayment amount."
+        "description": "A free online calculator to estimate monthly home loan EMI, total interest payable and total repayment amount.",
+         "offers": {
+    "@type": "Offer",
+    "price": "-",
+    "priceCurrency": "-",
+    "availability": "-"
+  },
 
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "-",
+    "reviewCount": "-"
+  }
       },
 
       {

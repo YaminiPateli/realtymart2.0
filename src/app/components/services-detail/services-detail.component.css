@@ -423,3 +423,8 @@ input.sub_phone {
 .country_code{
   width: 22%;
 }
+
+.title-text{
+  font-size: 24px;
+  font-weight: 700;
+}

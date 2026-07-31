@@ -49,7 +49,6 @@ export class TopbuildersComponent implements OnInit{
       this.topbuildersService.topbuilderget('Ahmedabad').subscribe((data) => {
         this.topbuilderData = data;
         this.topbuilders = this.topbuilderData?.responseData;
-        this.setTopBuildersSchema();
         this.keys = Object.keys(this.topbuilders);
         // Initialize the active locality with the first key
         if (this.keys.length > 0) {
@@ -67,7 +66,6 @@ export class TopbuildersComponent implements OnInit{
       this.topbuildersService.topbuilderget(locationCookie).subscribe((data) => {
         this.topbuilderData = data;
         this.topbuilders = this.topbuilderData?.responseData;
-        this.setTopBuildersSchema();
         this.topbuildersbase64 = console.log(btoa("stringAngular2"));
         this.keys = Object.keys(this.topbuilders);
         // Initialize the active locality with the first key
@@ -82,104 +80,6 @@ export class TopbuildersComponent implements OnInit{
     }
     }
 
-    setTopBuildersSchema() {
-
-  const builders: any[] = [];
-  let position = 1;
-
-  Object.keys(this.topbuilders).forEach(locality => {
-
-    this.topbuilders[locality].forEach((builder: any) => {
-
-      builders.push({
-
-        "@type": "ListItem",
-
-        "position": position++,
-
-        "item": {
-
-          "@type": "RealEstateAgent",
-
-          "name": builder.name,
-
-          "image": builder.builder_logo,
-
-          "url": `https://www.realtymart.com/builder-detail/${builder.builderUrl}`,
-
-          "address": {
-
-            "@type": "PostalAddress",
-
-            "addressLocality": locality,
-
-            "addressRegion": this.locationget,
-
-            "addressCountry": "IN"
-
-          },
-
-          "memberOf": {
-
-            "@type": "Organization",
-
-            "name": "Intelliworkz Business Solutions Pvt. Ltd.",
-
-            "brand": {
-
-              "@type": "Brand",
-
-              "name": "RealtyMart"
-
-            }
-
-          }
-
-        }
-
-      });
-
-    });
-
-  });
-
-  const schema = {
-
-    "@context": "https://schema.org",
-
-    "@graph": [
-
-      {
-
-        "@type": "CollectionPage",
-
-        "@id": window.location.href,
-
-        "name": `Top Builders in ${this.locationget}`,
-
-        "url": window.location.href,
-
-        "description": `Explore top real estate builders in ${this.locationget}, including ongoing and completed projects across different localities.`,
-
-        "mainEntity": {
-
-          "@type": "ItemList",
-
-          "numberOfItems": builders.length,
-
-          "itemListElement": builders
-
-        }
-
-      }
-
-    ]
-
-  };
-
-  this.seoService.setSchema(schema);
-
-}
 
     // meta title
   setMetaTags(title: string, description: string) {

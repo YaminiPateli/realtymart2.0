@@ -183,7 +183,6 @@ export class PropertyincitybuyComponent implements OnInit{
 
           this.ownerlauchedproperty =
             response.data?.data || [];
-            this.setPropertyListingSchema();
 
           this.ownerlauchedpropertycount =
             response.data?.total;
@@ -209,103 +208,6 @@ export class PropertyincitybuyComponent implements OnInit{
         }
       );
   }
-
-setPropertyListingSchema() {
-
-  const properties = this.ownerlauchedproperty.map((item: any, index: number) => ({
-
-    "@type": "ListItem",
-
-    "position": index + 1,
-
-    "item": {
-
-      "@type": "Residence",
-
-      "name": item.project_name,
-
-      "url": `https://www.realtymart.com/property-details/${item.propertyfirstUrlPart}/${item.propertysecondUrlPart}`,
-
-      "image": item.property_main_img,
-
-      "description": `${item.property_for} ${item.bedroom ? item.bedroom + ' BHK' : item.property_type} in ${item.project_name}`,
-
-      "address": {
-
-        "@type": "PostalAddress",
-
-        "addressLocality": item.property_locality,
-
-        "addressCountry": "IN"
-
-      },
-
-      "numberOfRooms": item.bedroom || undefined,
-
-      "floorSize": item.super_area
-        ? {
-            "@type": "QuantitativeValue",
-            "value": item.super_area,
-            "unitCode": "FTK"
-          }
-        : undefined,
-
-      "offers": {
-
-        "@type": "Offer",
-
-        "price": item.total_price || item.rent_amount,
-
-        "priceCurrency": "INR",
-
-        "availability": "https://schema.org/InStock",
-
-        "url": `https://www.realtymart.com/property-details/${item.propertyfirstUrlPart}/${item.propertysecondUrlPart}`
-
-      }
-
-    }
-
-  }));
-
-
-  const schema = {
-
-    "@context": "https://schema.org",
-
-    "@graph": [
-
-      {
-
-        "@type": "CollectionPage",
-
-        "@id": window.location.href,
-
-        "name": "Property Listing",
-
-        "url": window.location.href,
-
-        "description": "Browse residential and commercial properties available for sale and rent on RealtyMart.",
-
-        "mainEntity": {
-
-          "@type": "ItemList",
-
-          "numberOfItems": this.ownerlauchedproperty.length,
-
-          "itemListElement": properties
-
-        }
-
-      }
-
-    ]
-
-  };
-
-  this.seoService.setSchema(schema);
-
-}
 
   onPageChange(page: number) {
 

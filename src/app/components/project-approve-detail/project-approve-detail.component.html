@@ -311,6 +311,11 @@
             <h6 class="value">{{ singleproject?.project_launch_date | date:'MMM, yyyy' }}</h6>
           </div>
 
+          <div class="col-6" *ngIf="singleproject?.project_possession_date">
+            <p class="label">Possession Date</p>
+            <h6 class="value">{{ singleproject?.project_possession_date | date:'MMM, yyyy' }}</h6>
+          </div>
+
         </div>
 
         <hr class="mt-4">
@@ -401,11 +406,11 @@
         <h2 class="section-title">Plan</h2>
 
         <!-- Top-level Tab buttons: Floor Plans / Master Plan (styled like BUY / RENT tab row) -->
-        <div class="plan-toggle-tabs d-flex mb-4" *ngIf="floorPlanList.length > 0 && masterPlanList.length > 0">
-          <button class="plan-toggle-btn" [class.active]="activePlanTab === 'floorPlan'" (click)="activePlanTab = 'floorPlan'">
+        <div class="plan-toggle-tabs d-flex mb-4" *ngIf="floorPlanList.length > 0 || masterPlanList.length > 0">
+          <button *ngIf="floorPlanList.length > 0" class="plan-toggle-btn" [class.active]="activePlanTab === 'floorPlan'" (click)="activePlanTab = 'floorPlan'">
             Floor Plans
           </button>
-          <button class="plan-toggle-btn" [class.active]="activePlanTab === 'masterPlan'" (click)="activePlanTab = 'masterPlan'">
+          <button *ngIf="masterPlanList.length > 0" class="plan-toggle-btn" [class.active]="activePlanTab === 'masterPlan'" (click)="activePlanTab = 'masterPlan'">
             Master Plan
           </button>
         </div>

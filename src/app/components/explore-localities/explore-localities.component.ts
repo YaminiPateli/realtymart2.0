@@ -157,11 +157,9 @@ export class ExploreLocalitiesComponent implements OnInit{
             this.explorelocalitiesCount =
               response.data?.total;
 
-              this.setLocalitySchema();
-
             this.setMetaTags(
               response.meta.title,
-              response.meta.description,
+              response.meta.description
             );
             this.itemsPerPage = Number(response.data?.per_page);
 
@@ -179,111 +177,6 @@ export class ExploreLocalitiesComponent implements OnInit{
           }
         );
   }
-
-  setLocalitySchema() {
-
-  const localityList = this.explorelocalities.map((locality: any, index: number) => ({
-
-    "@type": "ListItem",
-
-    "position": index + 1,
-
-    "item": {
-
-      "@type": "Place",
-
-      "name": `${locality.locality.localities}, ${locality.locality.city}`,
-
-      "description": locality.locality.locality_introduction_and_neighbourhood
-        ? locality.locality.locality_introduction_and_neighbourhood.replace(/<[^>]*>/g, "")
-        : "",
-
-      "address": {
-
-        "@type": "PostalAddress",
-
-        "addressLocality": locality.locality.localities,
-
-        "addressRegion": locality.locality.city,
-
-        "addressCountry": "IN"
-
-      },
-
-      "containsPlace": locality.projects.map((project: any) => ({
-
-        "@type": "ApartmentComplex",
-
-        "name": project.project_name,
-
-        "image": project.project_banner_image,
-
-        "url": `https://www.realtymart.com/project-details/${project.firstUrlPart}/${project.secondUrlPart}`,
-
-        "address": {
-
-          "@type": "PostalAddress",
-
-          "streetAddress": project.project_address,
-
-          "addressLocality": project.project_localities,
-
-          "addressCountry": "IN"
-
-        },
-
-        "offers": project.project_price_show == '0'
-          ? {
-              "@type": "Offer",
-              "price": project.project_minimum_price,
-              "priceCurrency": "INR"
-            }
-          : undefined
-
-      }))
-
-    }
-
-  }));
-
-
-  const schema = {
-
-    "@context": "https://schema.org",
-
-    "@graph": [
-
-      {
-
-        "@type": "CollectionPage",
-
-        "@id": window.location.href,
-
-        "name": `Explore Localities in ${this.explorelocalities[0]?.locality.city}`,
-
-        "url": window.location.href,
-
-        "description": `Explore the best residential localities in ${this.explorelocalities[0]?.locality.city}, including available projects, property prices and locality information.`,
-
-        "mainEntity": {
-
-          "@type": "ItemList",
-
-          "numberOfItems": this.explorelocalities.length,
-
-          "itemListElement": localityList
-
-        }
-
-      }
-
-    ]
-
-  };
-
-  this.seoService.setSchema(schema);
-
-}
 
   // meta title
   setMetaTags(title: string, description: string) {

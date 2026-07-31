@@ -338,7 +338,6 @@ export class PropertytypesbuyComponent implements OnInit{
           this.propertytype =
           response.responseData?.propertytypesbuyin?.data  || [];
           this.original = [...this.propertytype, ...(response.responseData?.propertytypesbuyin?.data || []),];
-          this.setPropertyTypeSchema();
           
           console.log(this.propertytype, "proprty type")
           this.propertytypecount =
@@ -366,125 +365,6 @@ export class PropertytypesbuyComponent implements OnInit{
       );
     }
   }
-
-  setPropertyTypeSchema() {
-
-  const properties = this.propertytype.map((item: any, index: number) => ({
-
-    "@type": "ListItem",
-
-    "position": index + 1,
-
-    "item": {
-
-      "@type": "Residence",
-
-      "name": `${item.bedroom ? item.bedroom + ' BHK ' : ''}${item.property_typeName} in ${item.project.project_name}`,
-
-      "url": `https://www.realtymart.com/property-details/${item.propertyfirstUrlPart}/${item.propertysecondUrlPart}`,
-
-      "image": item.property_main_img,
-
-      "description": `For ${item.property_for} ${item.property_typeName} in ${item.project.project_name}, ${item.property_locality}`,
-
-      "address": {
-
-        "@type": "PostalAddress",
-
-        "addressLocality": item.property_locality,
-
-        "addressRegion": this.city,
-
-        "addressCountry": "IN"
-
-      },
-
-      "numberOfRooms": item.bedroom || undefined,
-
-      "numberOfBathroomsTotal": item.bathroom || undefined,
-
-      "floorSize": item.super_area
-        ? {
-            "@type": "QuantitativeValue",
-            "value": item.super_area,
-            "unitCode": "FTK"
-          }
-        : undefined,
-
-      "offers": {
-
-        "@type": "Offer",
-
-        "price": item.property_price_show == 0
-          ? (item.total_price || item.rent_amount)
-          : undefined,
-
-        "priceCurrency": "INR",
-
-        "availability": "https://schema.org/InStock",
-
-        "url": `https://www.realtymart.com/property-details/${item.propertyfirstUrlPart}/${item.propertysecondUrlPart}`
-
-      }
-
-    }
-
-  }));
-
-
-  const schema = {
-
-    "@context": "https://schema.org",
-
-    "@graph": [
-
-      {
-
-        "@type": "CollectionPage",
-
-        "@id": window.location.href,
-
-        "url": window.location.href,
-
-        "name": `${this.capitalizeFirstLetter(this.type)} in ${this.city}`,
-
-        "description": `Browse ${this.type} properties in ${this.city}. Compare prices, amenities, floor plans and contact property owners through RealtyMart.`,
-
-        "publisher": {
-
-          "@type": "Organization",
-
-          "name": "Intelliworkz Business Solutions Pvt. Ltd.",
-
-          "brand": {
-
-            "@type": "Brand",
-
-            "name": "RealtyMart"
-
-          }
-
-        },
-
-        "mainEntity": {
-
-          "@type": "ItemList",
-
-          "numberOfItems": this.propertytype.length,
-
-          "itemListElement": properties
-
-        }
-
-      }
-
-    ]
-
-  };
-
-  this.seoService.setSchema(schema);
-
-}
 
   // meta title
   setMetaTags(title: string, description: string) {
