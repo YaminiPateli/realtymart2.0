@@ -139,7 +139,7 @@ export class BuilderDetailComponent implements OnInit, AfterViewInit {
     this.isHeaderHidden = false;
 
     this.seoService.setCanonicalURL(
-      `https://www.realtymart.com/builder-detail/${id}`
+      window.location.href
     );
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: 'instant' });

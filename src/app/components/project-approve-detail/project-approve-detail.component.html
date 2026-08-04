@@ -1,12 +1,13 @@
 <section class="project-banner position-relative">
   <div class="p-0 col-12">
-    <img *ngIf="singleproject?.project_banner_image" alt="project-banner-image" [src]="singleproject?.project_banner_image"
-      class="img-fluid w-100 banner-image" />
+    <img *ngIf="singleproject?.project_banner_image" alt="project-banner-image"
+      [src]="singleproject?.project_banner_image" class="img-fluid w-100 banner-image" />
   </div>
 
   <!-- Logo Card -->
   <div class="logo-card shadow-sm">
-    <img *ngIf="singleproject?.project_logo" alt="project-logo" src="{{ singleproject.project_logo }}" class="img-fluid" />
+    <img *ngIf="singleproject?.project_logo" alt="project-logo" src="{{ singleproject.project_logo }}"
+      class="img-fluid" />
   </div>
 
   <!-- Photos/Videos Counts -->
@@ -43,7 +44,8 @@
               <div class="mb-search__property__data">
                 <span class="ms-2 builder-name-by text-muted small">
                   by
-                  <a routerLink="/builder-detail/{{singleproject?.aboutdeveloper.builderUrl}}" class="builder-link text-decoration-underline">
+                  <a routerLink="/builder-detail/{{singleproject?.aboutdeveloper.builderUrl}}"
+                    class="builder-link text-decoration-underline">
                     {{ singleproject?.builderName }}
                   </a>
                 </span>
@@ -160,8 +162,9 @@
         <!-- Left Section: Title and Price -->
         <div class="col-lg-6 col-md-5 d-flex flex-column justify-content-center">
           <h3 class="sticky-project-name mb-1">{{ singleproject?.project_name }}</h3>
-          <div *ngIf="singleproject?.project_minimum_price && singleproject?.project_maximum_price" class="sticky-project-price">
-            <span class="price-icon-sticky"><img  alt="tag" src="../../../assets/images/Tag.svg"></span>
+          <div *ngIf="singleproject?.project_minimum_price && singleproject?.project_maximum_price"
+            class="sticky-project-price">
+            <span class="price-icon-sticky"><img alt="tag" src="../../../assets/images/Tag.svg"></span>
             ₹ {{singleproject?.project_minimum_price}} - ₹{{ singleproject?.project_maximum_price }}
           </div>
         </div>
@@ -220,7 +223,8 @@
           <a style="cursor: pointer" (click)="scrollToSection('reels')"
             [ngClass]="{ active: activeSection === 'reels' }">Reels</a>
         </li>
-        <li *ngIf="floorPlanList.length > 0 || masterPlanList.length > 0" class="{'active': activeSection === 'floorPlan'}">
+        <li *ngIf="floorPlanList.length > 0 || masterPlanList.length > 0"
+          class="{'active': activeSection === 'floorPlan'}">
           <a style="cursor: pointer" (click)="scrollToSection('floorPlan')"
             [ngClass]="{ active: activeSection === 'floorPlan' }">Plan</a>
         </li>
@@ -373,7 +377,8 @@
             <div ngxSlickItem *ngFor="let reel of reels; let i = index" class="slide px-2">
               <div class="d-flex justify-content-center">
                 <div class="reel-card" (click)="openReelsView(i)">
-                  <img [src]="reel.proj_video_thumbnail" [alt]="reel.title" alt="reel-thumbnail" class="reel-thumbnail" />
+                  <img [src]="reel.proj_video_thumbnail" [alt]="reel.title" alt="reel-thumbnail"
+                    class="reel-thumbnail" />
                   <div class="play-btn">
                     <span>
                       <img src="../../../assets/images/play.svg" alt="Play">
@@ -401,16 +406,19 @@
 
         <hr class="mt-4">
       </section>
-      <section id="floorPlan" class="floor-plan-section mb-5" *ngIf="floorPlanList.length > 0 || masterPlanList.length > 0">
+      <section id="floorPlan" class="floor-plan-section mb-5"
+        *ngIf="floorPlanList.length > 0 || masterPlanList.length > 0">
 
         <h2 class="section-title">Plan</h2>
 
         <!-- Top-level Tab buttons: Floor Plans / Master Plan (styled like BUY / RENT tab row) -->
         <div class="plan-toggle-tabs d-flex mb-4" *ngIf="floorPlanList.length > 0 || masterPlanList.length > 0">
-          <button *ngIf="floorPlanList.length > 0" class="plan-toggle-btn" [class.active]="activePlanTab === 'floorPlan'" (click)="activePlanTab = 'floorPlan'">
+          <button *ngIf="floorPlanList.length > 0" class="plan-toggle-btn"
+            [class.active]="activePlanTab === 'floorPlan'" (click)="activePlanTab = 'floorPlan'">
             Floor Plans
           </button>
-          <button *ngIf="masterPlanList.length > 0" class="plan-toggle-btn" [class.active]="activePlanTab === 'masterPlan'" (click)="activePlanTab = 'masterPlan'">
+          <button *ngIf="masterPlanList.length > 0" class="plan-toggle-btn"
+            [class.active]="activePlanTab === 'masterPlan'" (click)="activePlanTab = 'masterPlan'">
             Master Plan
           </button>
         </div>
@@ -572,11 +580,11 @@
           </h2>
 
           <div class="slider-nav">
-            <button class="nav-btn" (click)="slideLeft()">
+            <button class="nav-btn" *ngIf="developerProjects.length > 1" (click)="slideLeft()">
               <img src="../../../assets/images/arrow-left.png" alt="arrow-left" srcset="">
             </button>
 
-            <button class="nav-btn" (click)="slideRight()">
+            <button class="nav-btn" *ngIf="developerProjects.length > 1" (click)="slideRight()">
               <img src="../../../assets/images/arrow-right.png" alt="arrow-right" srcset="">
             </button>
           </div>
@@ -604,7 +612,8 @@
                   </h3>
 
                   <p class="location-developer mb-3 d-flex align-items-end">
-                    <span class="pe-1"><img src="../../../assets/images/location-icon-2.svg" alt="location-icon" srcset=""></span>
+                    <span class="pe-1"><img src="../../../assets/images/location-icon-2.svg" alt="location-icon"
+                        srcset=""></span>
                     {{ item.developer_address }}
                   </p>
 
@@ -816,7 +825,7 @@
         </div>
       </ng-container>
       <ng-container *ngIf="!isVideo(item)">
-        <img [src]="item" alt="image"/>
+        <img [src]="item" alt="image" />
       </ng-container>
     </div>
   </div>
@@ -923,7 +932,7 @@
             <!-- Phone / OTP View -->
             <div *ngIf="!brochureRegisterVisible">
               <div [hidden]="brochureOtpVisible">
-                <label for="mobile_no" class="input-label">Enter Phone Number</label>
+                <label for="mobile_no" class="input-label">Enter Mobile Number</label>
                 <div class="form-field__wrap d-flex gap-2 justify-content-between">
                   <app-country-code-input class="country_code" [isInput]="true"></app-country-code-input>
                   <input type="tel" id="brochureMobile" name="brochureMobile" maxlength="10"
@@ -953,7 +962,7 @@
                 (click)="verifyContactOTP()" *ngIf="brochureOtpVisible">Submit</button>
               <button class="generate_otp_btn mt-3" *ngIf="!brochureOtpVisible" [disabled]="isBrochureSendingOtp"
                 (click)="sendBrochureOTP()">{{
-                isBrochureSendingOtp ? 'Sending OTP...' : 'Generate OTP' }}</button>
+                isBrochureSendingOtp ? 'Sending OTP...' : 'Send OTP' }}</button>
             </div>
           </div>
         </div>
@@ -1151,9 +1160,11 @@
             (click)="openContactModalFromReels('view-contact')">
             <i class="fa-solid fa-phone me-1"></i>View Contact
           </button>
-          <a *ngIf="is_token" [href]="'tel:' + (reels[activeReelIndex].project_about_developer.contact_no || singleproject?.project_contact_no)"
+          <a *ngIf="is_token"
+            [href]="'tel:' + (reels[activeReelIndex].project_about_developer.contact_no || singleproject?.project_contact_no)"
             class="reels-action-btn-outline text-decoration-none d-flex align-items-center justify-content-center">
-            <i class="fa-solid fa-phone me-1"></i>{{ reels[activeReelIndex].project_about_developer.contact_no || singleproject?.project_contact_no }}
+            <i class="fa-solid fa-phone me-1"></i>{{ reels[activeReelIndex].project_about_developer.contact_no ||
+            singleproject?.project_contact_no }}
           </a>
         </div>
       </div>
@@ -1224,8 +1235,7 @@
           [src]="reels[activeReelIndex].project_about_developer.image || singleproject?.project_banner_image"
           class="reels-prop-img" alt="Property banner">
         <img *ngIf="!reels[activeReelIndex].project_about_developer.image && !singleproject?.project_banner_image"
-          src="../../../assets/images/slider-img-1.png"
-          class="reels-prop-img" alt="Default banner">
+          src="../../../assets/images/slider-img-1.png" class="reels-prop-img" alt="Default banner">
       </div>
 
       <!-- Property Info -->
@@ -1248,7 +1258,10 @@
         <div class="reels-prop-specs">
           <div class="reels-prop-type">{{ reels[activeReelIndex].project_about_developer.type }}</div>
           <div class="reels-prop-size">{{ reels[activeReelIndex].project_about_developer.minSize }}{{
-            reels[activeReelIndex].project_about_developer.maxSize && reels[activeReelIndex].project_about_developer.maxSize !== reels[activeReelIndex].project_about_developer.minSize ? (' - ' + reels[activeReelIndex].project_about_developer.maxSize) : '' }}</div>
+            reels[activeReelIndex].project_about_developer.maxSize &&
+            reels[activeReelIndex].project_about_developer.maxSize !==
+            reels[activeReelIndex].project_about_developer.minSize ? (' - ' +
+            reels[activeReelIndex].project_about_developer.maxSize) : '' }}</div>
         </div>
 
         <!-- Buttons -->
@@ -1257,9 +1270,11 @@
           <button *ngIf="!is_token" class="reels-prop-btn-outline" (click)="openContactModalFromReels('view-contact')">
             <i class="fa-solid fa-phone-volume me-2"></i>View Contact
           </button>
-          <a *ngIf="is_token" [href]="'tel:' + (reels[activeReelIndex].project_about_developer.contact_no || singleproject?.project_contact_no)"
+          <a *ngIf="is_token"
+            [href]="'tel:' + (reels[activeReelIndex].project_about_developer.contact_no || singleproject?.project_contact_no)"
             class="reels-prop-btn-outline text-decoration-none d-flex align-items-center justify-content-center">
-            <i class="fa-solid fa-phone-volume me-2"></i>{{ reels[activeReelIndex].project_about_developer.contact_no || singleproject?.project_contact_no }}
+            <i class="fa-solid fa-phone-volume me-2"></i>{{ reels[activeReelIndex].project_about_developer.contact_no ||
+            singleproject?.project_contact_no }}
           </a>
         </div>
       </div>
@@ -1295,7 +1310,8 @@
 
       <!-- Search -->
       <div class="reels-filter-search-wrapper d-flex align-items-center mx-3 p-0">
-        <input type="text" class="gold-form-input " placeholder="Search Area, Project or Builder" [(ngModel)]="selectedReelSearch" (input)="onReelFilterChange()" (change)="onReelFilterChange()">
+        <input type="text" class="gold-form-input " placeholder="Search Area, Project or Builder"
+          [(ngModel)]="selectedReelSearch" (input)="onReelFilterChange()" (change)="onReelFilterChange()">
         <i class="text-danger fa-solid fa-magnifying-glass"></i>
       </div>
 

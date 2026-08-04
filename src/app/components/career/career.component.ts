@@ -56,7 +56,7 @@ export class CareerComponent implements OnInit{
 
     ngOnInit(): void {
      this.seoService.setCanonicalURL(
-    'https://www.realtymart.com/career'
+   window.location.href
   );
     }
 

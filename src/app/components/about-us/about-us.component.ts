@@ -13,7 +13,7 @@ export class AboutUsComponent implements OnInit {
 
 ngOnInit(): void {
   this.seoService.setCanonicalURL(
-    'https://www.realtymart.com/about-us'
+    window.location.href
   );
   this.metaService.updateTag({
     name: 'description',

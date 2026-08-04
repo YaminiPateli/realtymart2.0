@@ -159,9 +159,7 @@ originalPropertytype: any[] = [];
     const type = this.route.snapshot.paramMap.get('type');
   const city = this.route.snapshot.paramMap.get('city');
 
-  this.seoService.setCanonicalURL(
-    `https://www.realtymart.com/${type}-for-rent-in-${city}`
-  );
+  this.seoService.setCanonicalURL(window.location.href);
     const token = localStorage.getItem('myrealtylogintoken');
     if (token) {
       this.is_token = true;

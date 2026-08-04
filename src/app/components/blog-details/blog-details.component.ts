@@ -28,9 +28,7 @@ export class BlogDetailsComponent implements OnInit{
   ngOnInit(): void {
     const blogurl = this.route.snapshot.paramMap.get('blogurl');
 
-  this.seoService.setCanonicalURL(
-    `https://www.realtymart.com/blog-details/${blogurl}`
-  );
+  this.seoService.setCanonicalURL(window.location.href);
   }
 
   LoadBlogDetails() {

@@ -128,7 +128,7 @@ export class RegisterComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.seoService.setCanonicalURL('https://www.realtymart.com/registration');
+    this.seoService.setCanonicalURL(window.location.href);
   }
 
   ngAfterViewInit(): void {

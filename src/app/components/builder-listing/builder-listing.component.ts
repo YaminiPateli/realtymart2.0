@@ -92,7 +92,7 @@ export class BuilderListingComponent implements OnInit{
     const city = this.route.snapshot.paramMap.get('city');
     
       this.seoService.setCanonicalURL(
-        `https://www.realtymart.com/builder-listing-in-${city}`
+        window.location.href
       );
     this.loadAllBuilders();
   }

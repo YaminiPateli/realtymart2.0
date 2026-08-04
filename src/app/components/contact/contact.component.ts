@@ -19,7 +19,7 @@ export class ContactComponent implements OnInit {
     this.googleMapUrl =
       `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
     this.seoService.setCanonicalURL(
-    'https://www.realtymart.com/career'
+    window.location.href
   );
   this.metaService.updateTag({
   name: 'description',

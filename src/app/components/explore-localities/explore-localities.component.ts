@@ -101,9 +101,7 @@ export class ExploreLocalitiesComponent implements OnInit{
   ngOnInit(): void {
   const city = this.route.snapshot.paramMap.get('city');
 
-  this.seoService.setCanonicalURL(
-    `https://www.realtymart.com/explore-localities-in-${city}`
-  );
+  this.seoService.setCanonicalURL(window.location.href);
 }
     // @HostListener('window:scroll', [])
     // onScroll(): void {

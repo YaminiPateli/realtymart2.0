@@ -15,6 +15,8 @@ import { Fancybox } from '@fancyapps/ui';
 import { ActivityTrackerService } from '../service/activitytracker.service';
 import { GeolocationService } from '../service/geolocation.service';
 import { Meta } from '@angular/platform-browser';
+import { DatePipe } from '@angular/common';
+import { SeoService } from 'src/app/seo.service';
 declare var bootstrap: any;
 
 interface City {
@@ -26,8 +28,9 @@ interface City {
   selector: 'app-matching-properties',
   templateUrl: './matching-properties.component.html',
   styleUrls: ['./matching-properties.component.css'],
+  providers: [DatePipe]
 })
-export class MatchingPropertiesComponent implements OnInit{
+export class MatchingPropertiesComponent implements OnInit {
   tooltipVisible = false;
   tooltipPosition = { top: '0px', left: '0px' };
   @ViewChild('otpModel') otpModel!: ElementRef;
@@ -107,6 +110,7 @@ export class MatchingPropertiesComponent implements OnInit{
   city: any;
   city1: City[] = [];
   validcityforselected: any;
+  totalPages = 0;
 
   constructor(
     private router: Router,
@@ -116,7 +120,9 @@ export class MatchingPropertiesComponent implements OnInit{
     private activityTrackerService: ActivityTrackerService,
     private geolocationService: GeolocationService,
     private spinner: NgxSpinnerService,
-    private metaService:Meta
+    private metaService: Meta,
+    private datePipe: DatePipe,
+    private seoService:SeoService
   ) {
     const navigation = this.router.getCurrentNavigation();
 
@@ -190,10 +196,16 @@ export class MatchingPropertiesComponent implements OnInit{
       this.formDataphone.contactusername = localStorage.getItem('name') || '';
       this.formDataphone.contactuseremail = localStorage.getItem('email') || '';
       this.formDataphone.contactcontact_no =
-      localStorage.getItem('contact_no') || '';
+        localStorage.getItem('contact_no') || '';
       this.formDataphone.termsContactAccepted = true;
     }
     this.city = localStorage.getItem('location') || '';
+    this.totalPages = Math.ceil(
+      this.searchdata.length /
+      this.itemsPerPage
+    );
+    this.onPageChange(1);
+    this.seoService.setCanonicalURL(window.location.href)
   }
   checkLoggedIn() {
     this.checkToken = localStorage.getItem('myrealtylogintoken');
@@ -220,54 +232,54 @@ export class MatchingPropertiesComponent implements OnInit{
   applyFiltersAndSorting(): void {
     let data = [...this.original];
 
-      if (this.activeFilters['New Property']) {
-    data = data.filter(
-      (item: any) =>
-        item.transaction_type &&
-        item.transaction_type.toLowerCase() === 'new property'
-    );
-  }
+    if (this.activeFilters['New Property']) {
+      data = data.filter(
+        (item: any) =>
+          item.transaction_type &&
+          item.transaction_type.toLowerCase() === 'new property'
+      );
+    }
 
-  if (this.activeFilters['Ready to Move']) {
-    data = data.filter(
-      (item: any) =>
-        item.possession_status &&
-        item.possession_status.toLowerCase() === 'ready to move'
-    );
-  }
+    if (this.activeFilters['Ready to Move']) {
+      data = data.filter(
+        (item: any) =>
+          item.possession_status &&
+          item.possession_status.toLowerCase() === 'ready to move'
+      );
+    }
 
-  if (this.activeFilters['Featured']) {
-    data = data.filter(
-      (item: any) =>
-        (item.property_status &&
-          item.property_status.toLowerCase() === 'featured') ||
-        item.is_featured == 1
-    );
-  }
+    if (this.activeFilters['Featured']) {
+      data = data.filter(
+        (item: any) =>
+          (item.property_status &&
+            item.property_status.toLowerCase() === 'featured') ||
+          item.is_featured == 1
+      );
+    }
 
-  if (this.activeFilters['Farm House']) {
-    data = data.filter(
-      (item: any) =>
-        item.property_type &&
-        item.property_type.toLowerCase() === 'farm house'
-    );
-  }
+    if (this.activeFilters['Farm House']) {
+      data = data.filter(
+        (item: any) =>
+          item.property_type &&
+          item.property_type.toLowerCase() === 'farm house'
+      );
+    }
 
-  if (this.activeFilters['New Construction']) {
-    data = data.filter(
-      (item: any) =>
-        item.age_of_construction &&
-        item.age_of_construction.toLowerCase() === 'new construction'
-    );
-  }
+    if (this.activeFilters['New Construction']) {
+      data = data.filter(
+        (item: any) =>
+          item.age_of_construction &&
+          item.age_of_construction.toLowerCase() === 'new construction'
+      );
+    }
 
-  if (this.activeFilters['Furnished']) {
-    data = data.filter(
-      (item: any) =>
-        item.furnishing_status &&
-        item.furnishing_status.toLowerCase() === 'furnished'
-    );
-  }
+    if (this.activeFilters['Furnished']) {
+      data = data.filter(
+        (item: any) =>
+          item.furnishing_status &&
+          item.furnishing_status.toLowerCase() === 'furnished'
+      );
+    }
 
     switch (this.selectedSortOption) {
       case 'Price - Low to High':
@@ -938,6 +950,26 @@ export class MatchingPropertiesComponent implements OnInit{
         }
       );
   }
+
+  getFormattedDate(dateString: string) {
+    return this.datePipe.transform(dateString, 'MMMM, yyyy');
+  }
+
+  onPageChange(page: number) {
+
+  this.currentPage = page;
+
+    const start = (page - 1) * this.itemsPerPage;
+    const end = start + this.itemsPerPage;
+
+    this.paginatedData = this.searchdata.slice(start, end);
+
+
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+}
 
   verifyContactOTP() {
     if (this.formDataphone.contactotp == '') {

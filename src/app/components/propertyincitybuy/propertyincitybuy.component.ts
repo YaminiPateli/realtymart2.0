@@ -285,9 +285,7 @@ export class PropertyincitybuyComponent implements OnInit{
   ngOnInit() {
     const city = this.route.snapshot.paramMap.get('city');
 
-  this.seoService.setCanonicalURL(
-    `https://www.realtymart.com/property-for-buy-in-${city}`
-  );
+  this.seoService.setCanonicalURL(window.location.href);
     const token = localStorage.getItem('myrealtylogintoken');
     if (token) {
       this.is_token = true;

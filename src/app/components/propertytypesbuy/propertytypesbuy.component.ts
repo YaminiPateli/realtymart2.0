@@ -271,9 +271,7 @@ export class PropertytypesbuyComponent implements OnInit{
   this.type = this.route.snapshot.paramMap.get('type');
   this.city = this.route.snapshot.paramMap.get('city');
 
-  this.seoService.setCanonicalURL(
-    `https://www.realtymart.com/${this.type}-for-buy-in-${this.city}`
-  );
+  this.seoService.setCanonicalURL(window.location.href);
     const token = localStorage.getItem('myrealtylogintoken');
     if (token) {
       this.is_token = true;

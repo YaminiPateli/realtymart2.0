@@ -35,7 +35,7 @@ export class TopbuildersComponent implements OnInit{
     ngOnInit() {
       this.locationget = this.locationCookie = localStorage.getItem('location');
       this.seoService.setCanonicalURL(
-    'https://www.realtymart.com/top-builders'
+   window.location.href
   );
     }
 

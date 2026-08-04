@@ -1019,9 +1019,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   ngOnInit(): void {
     const slug = this.route.snapshot.paramMap.get('slug');
     const id = this.route.snapshot.paramMap.get('id');
-     this.seoService.setCanonicalURL(
-     `https://www.realtymart.com/${slug}-prijid-${id}`
-     );
+     this.seoService.setCanonicalURL(window.location.href);
     this.checkScreenSize();
     const token = localStorage.getItem('myrealtylogintoken');
     if (token) {
@@ -1901,7 +1899,6 @@ this.googleMapUrl =
           (projectData: any) => {
             this.singleprojectData = projectData;
             this.singleproject = this.singleprojectData?.data;
-            this.setProjectSchema();
 
             // Populate floor plans from API
             const rawFloorPlans = this.singleproject?.floor_plans;
@@ -2098,7 +2095,7 @@ this.googleMapUrl =
             this.fetchProjectReviews(this.singleproject.id);
 
             // Set meta tags and title
-            this.setMetaTags(this.singleproject.project_meta_title, this.singleproject.project_meta_description, this.singleproject.image);
+            this.setMetaTags(this.singleproject.project_meta_title, this.singleproject.project_meta_description, this.singleproject.project_banner_image);
           },
           (error: any) => {
             console.error('Error fetching project details:', error);
@@ -2106,99 +2103,6 @@ this.googleMapUrl =
         );
     }
   }
-
-  setProjectSchema() {
-
-  const schema = {
-    "@context": "https://schema.org",
-    "@graph": [
-
-      {
-        "@type": "WebPage",
-        "@id": window.location.href,
-        "url": window.location.href,
-        "name": this.singleproject.project_name,
-        "description": this.singleproject.project_about
-          ? this.singleproject.project_about.replace(/<[^>]+>/g, "")
-          : "",
-        "primaryImageOfPage": this.singleproject.project_banner_image
-      },
-
-      {
-        "@type": "ApartmentComplex",
-        "@id": window.location.href + "#project",
-
-        "name": this.singleproject.project_name,
-
-        "description": this.singleproject.project_about
-          ? this.singleproject.project_about.replace(/<[^>]+>/g, "")
-          : "",
-
-        "image": [
-          this.singleproject.project_banner_image,
-          this.singleproject.project_logo
-        ],
-
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": this.singleproject.project_address,
-          "addressLocality": this.singleproject.project_localities,
-          "addressRegion": this.singleproject.searchcity,
-          "addressCountry": "IN"
-        },
-
-        "geo": {
-          "@type": "GeoCoordinates",
-          "latitude": this.singleproject.latitude,
-          "longitude": this.singleproject.longitude
-        },
-
-        "numberOfAccommodationUnits": this.singleproject.project_total_units,
-
-        "floorSize": {
-          "@type": "QuantitativeValue",
-          "value": this.singleproject.project_size_in_sqft,
-          "unitCode": "FTK"
-        },
-
-        "amenityFeature": this.singleproject.amenitiess?.map((x:any)=>({
-          "@type":"LocationFeatureSpecification",
-          "name":x.name,
-          "value":true
-        })),
-
-        "offers":{
-          "@type":"Offer",
-          "price":this.singleproject.project_minimum_price,
-          "priceCurrency":"INR",
-          "availability":"https://schema.org/InStock"
-        },
-
-        "brand":{
-          "@type":"Organization",
-          "name":this.singleproject.builderName
-        }
-
-      },
-
-      {
-        "@type":"Organization",
-
-        "@id":window.location.href + "#builder",
-
-        "name":this.singleproject.builderName,
-
-        "logo":this.singleproject.aboutdeveloper?.builderLogo,
-
-        "description":this.singleproject.aboutdeveloper?.developerDescription
-      }
-
-    ]
-  };
-
-  this.seoService.setSchema(schema);
-
-}
 
   fetchProjectReviews(projectId: any) {
     this.http.get(`${this.apiUrl}getreview`).subscribe(

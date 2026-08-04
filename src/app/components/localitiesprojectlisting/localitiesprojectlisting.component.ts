@@ -83,9 +83,7 @@ export class LocalitiesprojectlistingComponent implements OnInit{
     this.fetchExploreLocalitiesProjectsList();
      const localities = this.route.snapshot.paramMap.get('localities');
 
-  this.seoService.setCanonicalURL(
-    `https://www.realtymart.com/localities-projects/${localities}`
-  );
+  this.seoService.setCanonicalURL(window.location.href);
   }
 
   fetchExploreLocalitiesProjectsList() {

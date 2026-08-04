@@ -269,7 +269,7 @@ export class HomeComponent implements AfterViewInit, OnInit {
   }
   ngOnInit() {
     this.locationCookie = localStorage.getItem('location');
-    this.seoService.setCanonicalURL('https://www.realtymart.com/');
+    this.seoService.setCanonicalURL(window.location.href);
     this.fetchCities();
     this.checkLoggedIn();
     this.propertyServicesHomePage()
@@ -1013,12 +1013,14 @@ export class HomeComponent implements AfterViewInit, OnInit {
       .set('Accept', 'application/json');
 
     this.http
-      .post(`${environment.apiUrl}searchproperty`, searchData, { headers })
+      .post(`${environment.apiUrl}searchproject`, searchData, { headers })
       .subscribe(
         (response: any) => {
           console.log('API Response:', response);
           if (redirect) {
             const dataToSend = { result: response };
+            console.log(response, "response");
+            
             this.router.navigate(['search-property'], { state: response });
           }
         },

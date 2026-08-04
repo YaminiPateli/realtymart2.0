@@ -89,7 +89,7 @@ export class EmiCalculatorComponent implements OnInit {
   ngOnInit(): void {
     this.setHomeLoanSchema();
      this.seoService.setCanonicalURL(
-    'https://www.realtymart.com/emi-calculator'
+    window.location.href
   );
   }
 

@@ -195,7 +195,7 @@ export class ServicesDetailComponent implements OnInit {
      const name = this.route.snapshot.paramMap.get('name');
   const id = this.route.snapshot.paramMap.get('id');
   this.seoService.setCanonicalURL(
-    `https://www.realtymart.com/company-detail/${name}/${id}`
+    window.location.href
   );
     this.is_token = !!localStorage.getItem('myrealtylogintoken');
     this.fetchCompanyServiceListing();

@@ -107,9 +107,7 @@ itemsPerPage = 20;
   ngOnInit(): void {
     const city1 = this.route.snapshot.paramMap.get('city');
 
-  this.seoService.setCanonicalURL(
-    `https://www.realtymart.com/new-projects-in-${city1}`
-  );
+  this.seoService.setCanonicalURL(window.location.href);
     const city = localStorage.getItem('location');
     this.loadAllBuilders();
   }
@@ -146,7 +144,6 @@ itemsPerPage = 20;
 
           this.projectincity =
             response.data?.data || [];
-            this.setProjectInCitySchema();  
 
           this.itemsPerPage = response.data.per_page;
 
@@ -169,147 +166,6 @@ itemsPerPage = 20;
 
 
   }
-
-  setProjectInCitySchema() {
-
-  const projects = this.projectincity.map((project: any, index: number) => ({
-
-    "@type": "ListItem",
-
-    "position": index + 1,
-
-    "item": {
-
-      "@type": "ApartmentComplex",
-
-      "name": project.project_name,
-
-      "url": `https://www.realtymart.com/project-details/${project.firstUrlPart}/${project.secondUrlPart}`,
-
-      "image": project.project_images,
-
-      "description": project.project_about
-        ? project.project_about.replace(/<[^>]*>/g, "")
-        : "",
-
-      "address": {
-
-        "@type": "PostalAddress",
-
-        "addressLocality": project.prjlocalities,
-
-        "addressRegion": project.searchcity,
-
-        "addressCountry": "IN"
-
-      },
-
-      "brand": {
-
-        "@type": "Organization",
-
-        "name": project.builder_name
-
-      },
-
-      "offers": project.project_price_show == "0"
-        ? {
-            "@type": "Offer",
-
-            "price": project.project_minimum_price,
-
-            "priceCurrency": "INR",
-
-            "availability": "https://schema.org/InStock"
-          }
-        : undefined,
-
-      "containsPlace": project.properties?.map((flat: any) => ({
-
-        "@type": "Apartment",
-
-        "name": flat.property_bhk,
-
-        "floorSize": {
-
-          "@type": "QuantitativeValue",
-
-          "value": flat.property_sqfoot,
-
-          "unitText": "sq ft"
-
-        },
-
-        "offers": {
-
-          "@type": "Offer",
-
-          "price": flat.price,
-
-          "priceCurrency": "INR"
-
-        }
-
-      })) || []
-
-    }
-
-  }));
-
-
-  const schema = {
-
-    "@context": "https://schema.org",
-
-    "@graph": [
-
-      {
-
-        "@type": "CollectionPage",
-
-        "@id": window.location.href,
-
-        "url": window.location.href,
-
-        "name": `New Projects in ${this.projectincity[0]?.searchcity}`,
-
-        "description": `Browse newly launched residential projects in ${this.projectincity[0]?.searchcity}. Compare builders, prices, floor plans, possession dates and amenities on RealtyMart.`,
-
-        "publisher": {
-
-          "@type": "Organization",
-
-          "name": "Intelliworkz Business Solutions Pvt. Ltd.",
-
-          "brand": {
-
-            "@type": "Brand",
-
-            "name": "RealtyMart"
-
-          }
-
-        },
-
-        "mainEntity": {
-
-          "@type": "ItemList",
-
-          "numberOfItems": this.projectincity.length,
-
-          "itemListElement": projects
-
-        }
-
-      }
-
-    ]
-
-  };
-
-  this.seoService.setSchema(schema);
-
-}
 
   // meta title
   setMetaTags(title: string, description: string) {

@@ -116,7 +116,7 @@ export class SellingGuideComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.autoOpenModal();
     this.seoService.setCanonicalURL(
-    'https://www.realtymart.com/selling-guide'
+    window.location.href
   );
   }
 
