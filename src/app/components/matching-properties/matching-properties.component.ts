@@ -122,7 +122,7 @@ export class MatchingPropertiesComponent implements OnInit {
     private spinner: NgxSpinnerService,
     private metaService: Meta,
     private datePipe: DatePipe,
-    private seoService:SeoService
+    private seoService: SeoService
   ) {
     const navigation = this.router.getCurrentNavigation();
 
@@ -138,7 +138,7 @@ export class MatchingPropertiesComponent implements OnInit {
         try {
           const saved = localStorage.getItem('selectedExtraChips');
           if (saved) keywords = JSON.parse(saved);
-        } catch (e) {}
+        } catch (e) { }
       }
 
       if (keywords && keywords.length > 0 && Array.isArray(rawData)) {
@@ -146,12 +146,12 @@ export class MatchingPropertiesComponent implements OnInit {
         if (lowerKeywords.length > 0) {
           rawData = rawData.filter((item: any) => {
             const locName = (
-              item.project_locality_name || 
-              item.project_localities || 
-              item.locality || 
-              item.location || 
-              item.area || 
-              item.project_location || 
+              item.project_locality_name ||
+              item.project_localities ||
+              item.locality ||
+              item.location ||
+              item.area ||
+              item.project_location ||
               ''
             ).toLowerCase();
             return lowerKeywords.some(kw => locName.includes(kw) || kw.includes(locName));

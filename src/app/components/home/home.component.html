@@ -45,12 +45,12 @@
                 Plots
               </button>
             </li>
-            <li class="nav-item" role="presentation">
+            <!-- <li class="nav-item" role="presentation">
               <button class="nav-link" id="pills-pg-tab" data-bs-toggle="pill" data-bs-target="#pills-pg" type="button"
                 role="tab" aria-controls="pills-pg" aria-selected="false" (click)="handleTabClick('pg')">
                 PG
               </button>
-            </li>
+            </li> -->
           </ul>
           <form (ngSubmit)="onSubmit()" [formGroup]="myForm">
             <div class="tab-content profile-content" id="pills-tabContent">
@@ -1427,24 +1427,11 @@
                 </div>
               </div>
 
-              <div class="tab-pane" id="pills-pg" role="tabpanel" aria-labelledby="pills-pg-tab">
+              <!-- <div class="tab-pane" id="pills-pg" role="tabpanel" aria-labelledby="pills-pg-tab">
                 <div class="search_wrapper">
                   <div class="location">
                     <img src="../../../assets/images/location-icon.svg" alt="location-icon" class="me-2" />
                     <div class="location_select">
-                      <!-- <ng-select
-                      placeholder="Enter Your City"
-                      bindLabel="name"
-                      [multiple]="true"
-                      [closeOnSelect]="true"
-                      bindValue="id"
-                      [searchable]="true"
-                      name="city"
-                      id="city"
-                      formControlName="selectcitysearch"
-                    >
-                    </ng-select> -->
-
                       <ng-select [multiple]="false" [items]="city1" bindLabel="cname" bindValue="cid"
                         placeholder="Enter Your City" formControlName="selectcitysearch">
                       </ng-select>
@@ -1478,7 +1465,6 @@
                           </div>
                         </div>
 
-                        <!-- Section for Commercial checkboxes -->
                         <div class="mb-search-commercial">
                           <div class="mb-search__property__title" (click)="commercial()">
                             <label for="Looking For">Looking For</label>
@@ -1635,7 +1621,7 @@
                     </button>
                   </div>
                 </div>
-              </div>
+              </div> -->
 
               <div class="tab-pane" id="pills-Hostel" role="tabpanel" aria-labelledby="pills-Hostel-tab">
                 <div class="search_wrapper">
@@ -1941,13 +1927,13 @@
                         <a target="_blank" routerLink="/{{ proj?.firstUrlPart }}" class="detail-head">
                           <h1 class="proj-Mhead">{{ proj?.project_name }}</h1>
 
-                          <p class="detail-pera">
+                          <!--<p class="detail-pera">
                             {{ proj?.builderName }}
-                          </p>
+                          </p>-->
                           <p class="ongoing-location">
                             <span class="locator-icon">
                               <i class="fa-sharp fa-solid fa-location-dot" style="color: #000000"></i> </span>{{
-                            proj?.prjlocalities }}
+                            proj?.locality }}
                           </p>
                           <div class="area-detail">
                             <div class="availabilty">

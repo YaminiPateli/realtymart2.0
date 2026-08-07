@@ -175,7 +175,7 @@ export class ProjectApproveDetailComponent implements OnInit, AfterViewInit, OnD
   floorPlanList: { bhk_type: string; carpet_area: string; sbu?: string; image: string[] }[] = [];
   selectedFloorPlanIndex: number = 0;
   masterPlanList: string[] = [];
-  activePlanTab: 'floorPlan' | 'masterPlan' = 'floorPlan';
+  activePlanTab: 'floorPlan' | 'masterPlan' | '' = 'floorPlan';
 
   get selectedFloorPlan() {
     return this.floorPlanList[this.selectedFloorPlanIndex] || null;
@@ -1136,16 +1136,25 @@ this.googleMapUrl =
 
   parseImagesArray(img: any): string[] {
     if (!img) return [];
-    if (Array.isArray(img)) return img;
+    const isValid = (s: any) => {
+      if (!s) return false;
+      const str = String(s).trim().toLowerCase();
+      return str.length > 0 && str !== 'null' && str !== 'undefined' && !str.endsWith('/null') && !str.endsWith('/undefined') && !str.endsWith('/');
+    };
+
+    if (Array.isArray(img)) {
+      return img.map(s => String(s).trim()).filter(isValid);
+    }
     if (typeof img === 'string') {
       const trimmed = img.trim();
+      if (!isValid(trimmed)) return [];
       if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
         try {
           const parsed = JSON.parse(trimmed);
-          if (Array.isArray(parsed)) return parsed;
+          if (Array.isArray(parsed)) return parsed.map(s => String(s).trim()).filter(isValid);
         } catch (e) { }
       }
-      return trimmed.split(',').map(s => s.trim()).filter(s => s.length > 0);
+      return trimmed.split(',').map(s => s.trim()).filter(isValid);
     }
     return [];
   }
@@ -1855,38 +1864,61 @@ this.googleMapUrl =
       const rawImgs = fp.images !== undefined && fp.images !== null ? fp.images : fp.image;
       const parsedImages = this.parseImagesArray(rawImgs);
       parsedImages.forEach((img: string) => {
-        if (img && !entry.images.includes(img)) {
-          entry.images.push(img);
+        if (!img) return;
+        let imgStr = String(img).trim();
+        const lower = imgStr.toLowerCase();
+        if (!imgStr || lower === 'null' || lower === 'undefined' || lower.endsWith('/null') || lower.endsWith('/undefined') || lower.endsWith('/')) {
+          return;
+        }
+        if (!imgStr.startsWith('http') && !imgStr.startsWith('data:') && !imgStr.startsWith('/assets')) {
+          if (imgStr.startsWith('backend/') || imgStr.includes('backend/public/images')) {
+            imgStr = imgStr.startsWith('/') ? `https://realtymart.com${imgStr}` : `https://realtymart.com/${imgStr}`;
+          } else if (imgStr.startsWith('/')) {
+            imgStr = `https://realtymart.com${imgStr}`;
+          } else {
+            imgStr = `https://realtymart.com/backend/public/images/floor_plan/${imgStr}`;
+          }
+        }
+        if (!entry.images.includes(imgStr)) {
+          entry.images.push(imgStr);
         }
       });
     });
 
-    return Array.from(groupedMap.values()).map(entry => {
-      let sbuDisplay = '';
-      if (entry.sbu_areas.length > 0) {
-        const minArea = Math.min(...entry.sbu_areas);
-        const maxArea = Math.max(...entry.sbu_areas);
-        sbuDisplay = minArea === maxArea ? `${minArea}` : `${minArea} - ${maxArea}`;
-      } else if (entry.raw_sbu_areas.length > 0) {
-        sbuDisplay = entry.raw_sbu_areas.join(' - ');
-      }
+    return Array.from(groupedMap.values())
+      .map(entry => {
+        let sbuDisplay = '';
+        if (entry.sbu_areas.length > 0) {
+          const minArea = Math.min(...entry.sbu_areas);
+          const maxArea = Math.max(...entry.sbu_areas);
+          sbuDisplay = minArea === maxArea ? `${minArea}` : `${minArea} - ${maxArea}`;
+        } else if (entry.raw_sbu_areas.length > 0) {
+          sbuDisplay = entry.raw_sbu_areas.join(' - ');
+        }
 
-      let areaDisplay = '';
-      if (entry.carpet_areas.length > 0) {
-        const minArea = Math.min(...entry.carpet_areas);
-        const maxArea = Math.max(...entry.carpet_areas);
-        areaDisplay = minArea === maxArea ? `${minArea}` : `${minArea} - ${maxArea}`;
-      } else if (entry.raw_carpet_areas.length > 0) {
-        areaDisplay = entry.raw_carpet_areas.join(' - ');
-      }
+        let areaDisplay = '';
+        if (entry.carpet_areas.length > 0) {
+          const minArea = Math.min(...entry.carpet_areas);
+          const maxArea = Math.max(...entry.carpet_areas);
+          areaDisplay = minArea === maxArea ? `${minArea}` : `${minArea} - ${maxArea}`;
+        } else if (entry.raw_carpet_areas.length > 0) {
+          areaDisplay = entry.raw_carpet_areas.join(' - ');
+        }
 
-      return {
-        bhk_type: entry.bhk_type,
-        sbu: sbuDisplay,
-        carpet_area: areaDisplay,
-        image: entry.images
-      };
-    });
+        const validImages = (entry.images || []).filter(img => {
+          if (!img) return false;
+          const lower = String(img).trim().toLowerCase();
+          return lower.length > 0 && lower !== 'null' && lower !== 'undefined' && !lower.endsWith('/null') && !lower.endsWith('/undefined') && !lower.endsWith('/');
+        });
+
+        return {
+          bhk_type: entry.bhk_type,
+          sbu: sbuDisplay,
+          carpet_area: areaDisplay,
+          image: validImages
+        };
+      })
+      .filter(plan => plan.image && plan.image.length > 0);
   }
 
   fetchProjectApproveDetails() {
@@ -1925,6 +1957,10 @@ this.googleMapUrl =
             this.masterPlanList = Array.from(new Set(rawMasterPlans.map(img => {
               if (!img) return '';
               let imgStr = String(img).trim();
+              const lower = imgStr.toLowerCase();
+              if (lower === 'null' || lower === 'undefined' || lower.endsWith('/null') || lower.endsWith('/undefined') || lower.endsWith('/')) {
+                return '';
+              }
               if (imgStr.startsWith('http') || imgStr.startsWith('data:') || imgStr.startsWith('/assets')) {
                 return imgStr;
               }
@@ -1935,12 +1971,18 @@ this.googleMapUrl =
                 return `https://realtymart.com${imgStr}`;
               }
               return `https://realtymart.com/backend/public/images/project_master_plan/${imgStr}`;
-            }).filter(Boolean)));
+            }).filter(url => {
+              if (!url) return false;
+              const lower = url.toLowerCase();
+              return lower.length > 0 && !lower.endsWith('/null') && !lower.endsWith('/undefined') && !lower.endsWith('/');
+            })));
 
             if (this.floorPlanList.length === 0 && this.masterPlanList.length > 0) {
               this.activePlanTab = 'masterPlan';
-            } else {
+            } else if (this.floorPlanList.length > 0) {
               this.activePlanTab = 'floorPlan';
+            } else {
+              this.activePlanTab = '';
             }
 
             // Populate FAQs from project_faq if available

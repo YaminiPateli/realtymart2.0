@@ -18,7 +18,7 @@ declare var bootstrap: any;
   styleUrls: ['./projectsincity.component.css'],
   providers: [DatePipe],
 })
-export class ProjectsincityComponent implements OnInit{
+export class ProjectsincityComponent implements OnInit {
   private apiUrl: string = environment.apiUrl;
   @ViewChild('otpModel') otpModel!: ElementRef;
   projectincityData: any;
@@ -36,7 +36,7 @@ export class ProjectsincityComponent implements OnInit{
   paginatedData: any[] = []; // Data for the current page
   currentPage = 1;
 
-itemsPerPage = 20;
+  itemsPerPage = 20;
   visiblePageStart: number = 1;
   visiblePageCount: number = 5;
   contactData: any;
@@ -91,7 +91,7 @@ itemsPerPage = 20;
     private spinner: NgxSpinnerService,
     private toastr: ToastrService,
     private datePipe: DatePipe,
-    private seoService:SeoService
+    private seoService: SeoService
   ) {
     this.city = this.route.snapshot.paramMap.get('city');
     const token = localStorage.getItem('myrealtylogintoken');
@@ -107,7 +107,7 @@ itemsPerPage = 20;
   ngOnInit(): void {
     const city1 = this.route.snapshot.paramMap.get('city');
 
-  this.seoService.setCanonicalURL(window.location.href);
+    this.seoService.setCanonicalURL(window.location.href);
     const city = localStorage.getItem('location');
     this.loadAllBuilders();
   }
@@ -144,6 +144,7 @@ itemsPerPage = 20;
 
           this.projectincity =
             response.data?.data || [];
+          this.original = [...this.projectincity];
 
           this.itemsPerPage = response.data.per_page;
 
@@ -154,8 +155,12 @@ itemsPerPage = 20;
             this.itemsPerPage
           );
 
+          if (this.selectedSortOption && this.selectedSortOption !== 'Relevance') {
+            this.applySort();
+          }
+
           this.setMetaTags(response.meta.title, response.meta.description);
-      
+
         },
         (error) => {
           console.error('Error fetching properties:', error);
@@ -193,14 +198,19 @@ itemsPerPage = 20;
   toggleDropdown(): void {
     this.isDropdownOpen = !this.isDropdownOpen;
   }
-  private convertToLac(priceString: string): number {
+  private convertToLac(priceString: any): number {
     if (!priceString) return 0;
-    let numericValue = parseFloat(priceString.replace(/[^0-9.]/g, '').trim());
+    const str = String(priceString).toLowerCase().trim();
+    if (str.includes('call for price')) return 0;
 
-    if (priceString.toLowerCase().includes('cr')) {
+    let numericValue = parseFloat(str.replace(/[^0-9.]/g, ''));
+    if (isNaN(numericValue)) return 0;
+
+    if (str.includes('cr')) {
       numericValue *= 100;
-    } else if (priceString.toLowerCase().includes('lac')) {
-    } else {
+    } else if (str.includes('lac') || str.includes('lakh') || str.includes('l')) {
+      // already in Lacs
+    } else if (numericValue >= 100000) {
       numericValue = numericValue / 100000;
     }
 
@@ -209,52 +219,89 @@ itemsPerPage = 20;
 
   onPageChange(page: number) {
 
-  this.currentPage = page;
+    this.currentPage = page;
 
-  this.loadAllBuilders();
+    this.loadAllBuilders();
 
-  window.scrollTo({
-    top: 0,
-    behavior: 'smooth'
-  });
-}
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  }
 
   changeSortOption(option: string): void {
     this.selectedSortOption = option;
     this.isDropdownOpen = false;
-    switch (option) {
+    this.applySort();
+  }
+
+  private applySort(): void {
+    let sorted = this.original.length ? [...this.original] : [...this.projectincity];
+    switch (this.selectedSortOption) {
       case 'Price - Low to High':
-        this.projectincity = [
-          ...this.projectincity.sort((a, b) => this.sortByPrice(a, b)),
-        ];
+        sorted.sort((a, b) => {
+          const minA = this.convertToLac(a.project_minimum_price);
+          const maxA = this.convertToLac(a.project_maximum_price);
+          const priceA = minA || maxA;
+
+          const minB = this.convertToLac(b.project_minimum_price);
+          const maxB = this.convertToLac(b.project_maximum_price);
+          const priceB = minB || maxB;
+
+          if (priceA === 0 && priceB !== 0) return 1;
+          if (priceB === 0 && priceA !== 0) return -1;
+
+          if (priceA !== priceB) {
+            return priceA - priceB;
+          }
+          return maxA - maxB;
+        });
         break;
+
       case 'Price - High to Low':
-        this.projectincity = [
-          ...this.projectincity.sort((a, b) => this.sortByPrice(b, a)),
-        ];
+        sorted.sort((a, b) => {
+          const minA = this.convertToLac(a.project_minimum_price);
+          const maxA = this.convertToLac(a.project_maximum_price);
+          const priceA = minA || maxA;
+
+          const minB = this.convertToLac(b.project_minimum_price);
+          const maxB = this.convertToLac(b.project_maximum_price);
+          const priceB = minB || maxB;
+
+          if (priceA === 0 && priceB !== 0) return 1;
+          if (priceB === 0 && priceA !== 0) return -1;
+
+          if (priceA !== priceB) {
+            return priceB - priceA;
+          }
+          return maxB - maxA;
+        });
         break;
+
       case 'Most Recent':
-        this.projectincity = [
-          ...this.projectincity.sort((a, b) => this.sortByRecent(a, b)),
-        ];
+        sorted.sort((a, b) => this.sortByRecent(a, b));
         break;
+
       case 'Relevance':
-        this.projectincity = [...this.original];
-        break;
       default:
-        this.projectincity = [...this.original];
+        sorted = [...this.original];
         break;
     }
-  }
-  private sortByPrice(a: any, b: any): number {
-    const priceA = this.convertToLac(a.project_maximum_price);
-    const priceB = this.convertToLac(b.project_minimum_price);
-    return priceA - priceB;
+    this.projectincity = sorted;
   }
 
   private sortByRecent(a: any, b: any): number {
-    const dateA = new Date(a.projectdetails.created_at).getTime();
-    const dateB = new Date(b.projectdetails.created_at).getTime();
+    const getTime = (item: any) => {
+      const dateStr = item?.created_at || item?.projectdetails?.created_at;
+      if (dateStr) {
+        const time = new Date(dateStr).getTime();
+        if (!isNaN(time) && time > 0) return time;
+      }
+      return 0;
+    };
+
+    const dateA = getTime(a);
+    const dateB = getTime(b);
     return dateB - dateA;
   }
 
@@ -294,30 +341,30 @@ itemsPerPage = 20;
 
     const payload = this.contact.property
       ? {
-          contact_no: this.formData.contact_no,
-          useremail: this.formData.useremail,
-          username: this.formData.username,
-          project_Id: this.contact?.property?.project_id,
-          property_id: this.contact?.property?.property_id,
-          builder_id: this.contact?.property?.builder_id,
-          agent_id: this.contact?.property?.agent_id,
-          receiver_user_id: this.contact?.property?.user_id,
-          leads_type: 'Call for Price',
-          leads_for: 'Property',
-          location: this.city,
-        }
+        contact_no: this.formData.contact_no,
+        useremail: this.formData.useremail,
+        username: this.formData.username,
+        project_Id: this.contact?.property?.project_id,
+        property_id: this.contact?.property?.property_id,
+        builder_id: this.contact?.property?.builder_id,
+        agent_id: this.contact?.property?.agent_id,
+        receiver_user_id: this.contact?.property?.user_id,
+        leads_type: 'Call for Price',
+        leads_for: 'Property',
+        location: this.city,
+      }
       : {
-          contact_no: this.formData.contact_no,
-          useremail: this.formData.useremail,
-          username: this.formData.username,
-          project_Id: this.contact?.project?.project_id,
-          builder_id: this.contact?.project?.builder_id,
-          agent_id: this.contact?.project?.agent_id,
-          receiver_user_id: this.contact?.project?.user_id,
-          leads_type: 'Call for Price',
-          leads_for: 'Project',
-          location: this.city,
-        };
+        contact_no: this.formData.contact_no,
+        useremail: this.formData.useremail,
+        username: this.formData.username,
+        project_Id: this.contact?.project?.project_id,
+        builder_id: this.contact?.project?.builder_id,
+        agent_id: this.contact?.project?.agent_id,
+        receiver_user_id: this.contact?.project?.user_id,
+        leads_type: 'Call for Price',
+        leads_for: 'Project',
+        location: this.city,
+      };
     const token = localStorage.getItem('myrealtylogintoken');
 
     const headers = new HttpHeaders()
@@ -330,8 +377,7 @@ itemsPerPage = 20;
         (response: any) => {
           if (response.status === true) {
             this.activityTrackerService.logActivity(
-              `Inquiry stored for ${
-                this.contact.property ? 'property' : 'project'
+              `Inquiry stored for ${this.contact.property ? 'property' : 'project'
               }`,
               ''
             );
