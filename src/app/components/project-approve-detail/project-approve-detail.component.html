@@ -85,7 +85,7 @@
               (click)="is_token ? handleContactClick('header') : openOtpModal('view-contact', 'header')"
               class="btn d-flex align-items-center gap-2 action-btn contact-btn text-light">
               <span><img src="../../../assets/images/phone.svg" alt="phone" srcset=""></span>
-              View Contact
+              Call
             </button>
             <div class="contact-popover-card" *ngIf="activeContactPopover === 'header' && !showStickyHeader">
               <p class="title-text">You can contact on:</p>
@@ -136,8 +136,8 @@
 
       <div class="col-6 col-md-6 col-lg-3">
         <div class="info-card">
-          <div class="label">Launch Date</div>
-          <div class="value">{{ singleproject?.project_launch_date | date:'MMM, yyyy' }}</div>
+          <div class="label">Possession Date</div>
+          <div class="value">{{ singleproject?.project_possession_date | date:'MMM, yyyy' }}</div>
         </div>
       </div>
 
@@ -176,7 +176,7 @@
               (click)="is_token ? handleContactClick('sticky') : openOtpModal('view-contact', 'sticky')"
               class="btn d-flex align-items-center gap-2 action-btn contact-btn text-light">
               <span><img src="../../../assets/images/phone.svg" alt="phone" srcset=""></span>
-              View Contact
+              Call
             </button>
             <div class="contact-popover-card" *ngIf="activeContactPopover === 'sticky' && showStickyHeader">
               <p class="title-text">You can contact on:</p>
@@ -269,53 +269,48 @@
 
         <div class="row g-2 mt-1">
 
-          <div class="col-6" *ngIf="singleproject?.project_minimum_price && singleproject?.project_maximum_price">
+          <div class="col-4" *ngIf="singleproject?.project_minimum_price && singleproject?.project_maximum_price">
             <p class="label">Price</p>
             <h6 class="value">₹ {{ singleproject?.project_minimum_price }} - ₹ {{ singleproject?.project_maximum_price
               }}</h6>
           </div>
 
-          <div class="col-6" *ngIf="singleproject?.project_type">
+          <div class="col-4" *ngIf="singleproject?.project_type">
             <p class="label">Type</p>
             <h6 class="value">{{ singleproject?.project_type.join(', ') }}</h6>
           </div>
 
-          <div class="col-6" *ngIf="singleproject?.land_size">
+          <div class="col-4" *ngIf="singleproject?.land_size">
             <p class="label">Area</p>
             <h6 class="value">{{singleproject.land_size}}</h6>
           </div>
 
-          <div class="col-6" *ngIf="singleproject?.project_size_in_sqft">
+          <div class="col-4" *ngIf="singleproject?.project_size_in_sqft">
             <p class="label">Size</p>
             <h6 class="value">{{ singleproject?.project_size_in_sqft }} SqFt</h6>
           </div>
 
-          <div class="col-6" *ngIf="singleproject?.project_status">
+          <div class="col-4" *ngIf="singleproject?.project_status">
             <p class="label">Status</p>
             <h6 class="value">{{ singleproject?.project_status }}</h6>
           </div>
 
-          <div class="col-6" *ngIf="singleproject?.project_total_tower">
+          <div class="col-4" *ngIf="singleproject?.project_total_tower">
             <p class="label">Towers</p>
             <h6 class="value">{{ singleproject?.project_total_tower }}</h6>
           </div>
 
-          <div class="col-6" *ngIf="singleproject?.project_total_floor">
+          <div class="col-4" *ngIf="singleproject?.project_total_floor">
             <p class="label">No. of Floors</p>
             <h6 class="value">{{ singleproject?.project_total_floor }}</h6>
           </div>
 
-          <div class="col-6" *ngIf="singleproject?.project_total_units">
+          <div class="col-4" *ngIf="singleproject?.project_total_units">
             <p class="label">Total Units</p>
             <h6 class="value">{{ singleproject?.project_total_units }}</h6>
           </div>
 
-          <div class="col-6" *ngIf="singleproject?.project_launch_date">
-            <p class="label">Launch Date</p>
-            <h6 class="value">{{ singleproject?.project_launch_date | date:'MMM, yyyy' }}</h6>
-          </div>
-
-          <div class="col-6" *ngIf="singleproject?.project_possession_date">
+          <div class="col-4" *ngIf="singleproject?.project_possession_date">
             <p class="label">Possession Date</p>
             <h6 class="value">{{ singleproject?.project_possession_date | date:'MMM, yyyy' }}</h6>
           </div>
@@ -694,7 +689,7 @@
               (click)="is_token ? handleContactClick('sidebar') : openOtpModal('view-contact', 'sidebar')"
               class="btn display-none contact-btn w-100 mb-0">
               <span><img src="../../../assets/images/phone.svg" alt="" srcset=""></span>
-              View Contact
+              Call
             </button>
             <div class="contact-popover-card" *ngIf="activeContactPopover === 'sidebar'">
               <p class="title-text">You can contact on:</p>
@@ -744,7 +739,7 @@
         (click)="is_token ? handleContactClick('mobile') : openOtpModal('view-contact', 'mobile')"
         class="btn w-100 contact-btn flex-grow-1 d-flex align-items-center justify-content-center gap-2">
         <span><img src="../../../assets/images/phone.svg" alt="phone" srcset=""></span>
-        View Contact
+        Call
       </button>
       <div class="contact-popover-card" *ngIf="activeContactPopover === 'mobile'">
         <p class="title-text">You can contact on:</p>
@@ -1158,7 +1153,7 @@
           <button class="reels-action-btn-red" (click)="toggleReelDetailCard()">View Details</button>
           <button *ngIf="!is_token" class="reels-action-btn-outline"
             (click)="openContactModalFromReels('view-contact')">
-            <i class="fa-solid fa-phone me-1"></i>View Contact
+            <i class="fa-solid fa-phone me-1"></i>Call
           </button>
           <a *ngIf="is_token"
             [href]="'tel:' + (reels[activeReelIndex].project_about_developer.contact_no || singleproject?.project_contact_no)"
@@ -1268,7 +1263,7 @@
         <div class="reels-prop-actions">
           <button class="reels-prop-btn-red" (click)="viewPropertyFromReel()">View Property</button>
           <button *ngIf="!is_token" class="reels-prop-btn-outline" (click)="openContactModalFromReels('view-contact')">
-            <i class="fa-solid fa-phone-volume me-2"></i>View Contact
+            <i class="fa-solid fa-phone-volume me-2"></i>Call
           </button>
           <a *ngIf="is_token"
             [href]="'tel:' + (reels[activeReelIndex].project_about_developer.contact_no || singleproject?.project_contact_no)"

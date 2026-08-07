@@ -128,8 +128,40 @@ export class MatchingPropertiesComponent implements OnInit {
 
     if (navigation && navigation.extras.state) {
       const data = navigation.extras.state as any;
-      this.searchdata = data.responseData || [];
+      let rawData = data.responseData || data.data || [];
+
+      let keywords: string[] = data.searchKeywords || [];
+      if ((!keywords || keywords.length === 0) && data.searchedLocality) {
+        keywords = data.searchedLocality.split(/\s+/).filter((k: string) => k.trim().length > 0);
+      }
+      if (!keywords || keywords.length === 0) {
+        try {
+          const saved = localStorage.getItem('selectedExtraChips');
+          if (saved) keywords = JSON.parse(saved);
+        } catch (e) {}
+      }
+
+      if (keywords && keywords.length > 0 && Array.isArray(rawData)) {
+        const lowerKeywords = keywords.map(k => k.toLowerCase().trim()).filter(k => k.length > 0);
+        if (lowerKeywords.length > 0) {
+          rawData = rawData.filter((item: any) => {
+            const locName = (
+              item.project_locality_name || 
+              item.project_localities || 
+              item.locality || 
+              item.location || 
+              item.area || 
+              item.project_location || 
+              ''
+            ).toLowerCase();
+            return lowerKeywords.some(kw => locName.includes(kw) || kw.includes(locName));
+          });
+        }
+      }
+
+      this.searchdata = rawData;
       this.original = [...this.searchdata];
+      this.onPageChange(1);
     }
   }
 
@@ -216,6 +248,10 @@ export class MatchingPropertiesComponent implements OnInit {
     }
   }
 
+  toggleDropdown(): void {
+    this.isDropdownOpen = !this.isDropdownOpen;
+  }
+
   changeSortOption(option: string): void {
     this.selectedSortOption = option;
     this.isDropdownOpen = false;
@@ -229,8 +265,45 @@ export class MatchingPropertiesComponent implements OnInit {
     }
   }
 
+  convertToLac(val: any): number {
+    if (val === null || val === undefined || val === '') return 0;
+    if (typeof val === 'number') return val;
+
+    let str = String(val).toLowerCase().trim().replace(/,/g, '');
+    const match = str.match(/([0-9]+(?:\.[0-9]+)?)/);
+    if (!match) return 0;
+
+    const num = parseFloat(match[1]);
+
+    if (str.includes('cr') || str.includes('crore')) {
+      return num * 100;
+    }
+    if (str.includes('lac') || str.includes('lakh') || str.includes('l')) {
+      return num;
+    }
+    if (str.includes('k')) {
+      return num / 100;
+    }
+    if (num > 1000) {
+      return num / 100000;
+    }
+    return num;
+  }
+
+  private getItemPrice(item: any): number {
+    const val =
+      item.project_minimum_price ??
+      item.minprice ??
+      item.total_price ??
+      item.rent_amount ??
+      item.price ??
+      item.expected_price ??
+      0;
+    return this.convertToLac(val);
+  }
+
   applyFiltersAndSorting(): void {
-    let data = [...this.original];
+    let data = [...(this.original || [])];
 
     if (this.activeFilters['New Property']) {
       data = data.filter(
@@ -283,43 +356,15 @@ export class MatchingPropertiesComponent implements OnInit {
 
     switch (this.selectedSortOption) {
       case 'Price - Low to High':
-        data = data
-          .filter((item: any) => {
-            const priceA =
-              item.total_price !== null && item.total_price !== undefined
-                ? item.total_price
-                : item.rent_amount;
-            return priceA !== null && priceA !== undefined;
-          })
-          .sort((a: any, b: any) => {
-            const priceA =
-              a.total_price !== null ? a.total_price : a.rent_amount;
-            const priceB =
-              b.total_price !== null ? b.total_price : b.rent_amount;
-            return this.convertToLac(priceA) - this.convertToLac(priceB);
-          });
+        data.sort((a: any, b: any) => this.getItemPrice(a) - this.getItemPrice(b));
         break;
 
       case 'Price - High to Low':
-        data = data
-          .filter((item: any) => {
-            const priceA =
-              item.total_price !== null && item.total_price !== undefined
-                ? item.total_price
-                : item.rent_amount;
-            return priceA !== null && priceA !== undefined;
-          })
-          .sort((a: any, b: any) => {
-            const priceA =
-              a.total_price !== null ? a.total_price : a.rent_amount;
-            const priceB =
-              b.total_price !== null ? b.total_price : b.rent_amount;
-            return this.convertToLac(priceB) - this.convertToLac(priceA);
-          });
+        data.sort((a: any, b: any) => this.getItemPrice(b) - this.getItemPrice(a));
         break;
 
       case 'Most Recent':
-        data = data.sort((a: any, b: any) => this.sortByRecent(a, b));
+        data.sort((a: any, b: any) => this.sortByRecent(a, b));
         break;
 
       case 'Relevance':
@@ -328,12 +373,14 @@ export class MatchingPropertiesComponent implements OnInit {
     }
 
     this.searchdata = data;
-    this.initialListCount = Math.max(5, Math.min(this.initialListCount, this.searchdata.length || 5));
+    this.totalItems = this.searchdata.length;
+    this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage) || 1;
+    this.onPageChange(1);
   }
 
   private sortByRecent(a: any, b: any): number {
-    const dateA = new Date(a.created_at).getTime();
-    const dateB = new Date(b.created_at).getTime();
+    const dateA = new Date(a.created_at || a.createddate || 0).getTime();
+    const dateB = new Date(b.created_at || b.createddate || 0).getTime();
     return dateB - dateA;
   }
 
@@ -379,33 +426,6 @@ export class MatchingPropertiesComponent implements OnInit {
     );
     const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&su=${subject}&body=${body}`;
     window.open(gmailUrl, '_blank');
-  }
-
-  private convertToLac(priceString: string): number {
-    if (!priceString) return 0;
-    let numericValue = parseFloat(priceString.replace(/[^0-9.]/g, '').trim());
-
-    if (priceString.toLowerCase().includes('cr')) {
-      numericValue *= 100;
-    } else if (priceString.toLowerCase().includes('lac')) {
-    } else {
-      numericValue = numericValue / 100000;
-    }
-    return numericValue;
-  }
-
-  private parsePrice(priceString: string): number {
-    if (!priceString) return 0;
-    let numericValue = parseFloat(priceString.replace(/[^0-9.]/g, '').trim());
-
-    if (priceString.includes('cr')) {
-      numericValue *= 100;
-    }
-    return numericValue;
-  }
-
-  toggleDropdown(): void {
-    this.isDropdownOpen = !this.isDropdownOpen;
   }
 
   contactowner(propertyid: any) {
@@ -955,21 +975,22 @@ export class MatchingPropertiesComponent implements OnInit {
     return this.datePipe.transform(dateString, 'MMMM, yyyy');
   }
 
-  onPageChange(page: number) {
-
-  this.currentPage = page;
-
+  onPageChange(page: number = 1) {
+    this.currentPage = page;
+    if (!this.searchdata || !Array.isArray(this.searchdata)) {
+      this.paginatedData = [];
+      return;
+    }
     const start = (page - 1) * this.itemsPerPage;
     const end = start + this.itemsPerPage;
 
     this.paginatedData = this.searchdata.slice(start, end);
 
-
     window.scrollTo({
       top: 0,
       behavior: 'smooth'
     });
-}
+  }
 
   verifyContactOTP() {
     if (this.formDataphone.contactotp == '') {

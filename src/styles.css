@@ -972,7 +972,7 @@ ul.footer-links {
   display: flex;
   align-items: center;
   margin: 0 10px;
-  min-width: 258px;
+  min-width: 226px;
 }
 
 .budget_dorp {
@@ -1096,6 +1096,7 @@ ul.footer-links {
   position: relative;
   font-weight: 400;
   font-size: 18px;
+  margin-top: 7px;
 }
 
 .property_inner {
@@ -1154,7 +1155,7 @@ ul.footer-links {
 
 .banner_bg {
   background-image: url(../src/assets/images/home_banner.jpg);
-  height: 720px;
+  height: 494px;
   position: relative;
 }
 
@@ -7923,8 +7924,8 @@ body.gallery-open .modal-backdrop {
   }
 }
 
-@media(max-width:991px){
-  .sort_by{
+@media(max-width:991px) {
+  .sort_by {
     flex-direction: column;
     align-items: start !important;
   }
@@ -7943,6 +7944,6 @@ body.gallery-open .modal-backdrop {
 }
 
 .flatpickr-calendar.static {
-    position: absolute;
-    top: calc(100% + (-59px)) !important;
+  position: absolute;
+  top: calc(100% + (-59px)) !important;
 }
