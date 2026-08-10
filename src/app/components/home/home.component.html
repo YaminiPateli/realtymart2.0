@@ -32,9 +32,9 @@
               </button>
             </li>
             <li class="nav-item" role="presentation">
-              <button class="nav-link" id="pills-Farmhouse-tab" data-bs-toggle="pill" data-bs-target="#pills-Farmhouse"
-                type="button" role="tab" aria-controls="pills-Farmhouse" (click)="handleTabClick('farm house')"
-                aria-selected="false">
+              <button class="nav-link" id="pills-Residential-tab" data-bs-toggle="pill"
+                data-bs-target="#pills-Residential" type="button" role="tab" aria-controls="pills-Residential"
+                (click)="handleTabClick('residential')" aria-selected="false">
                 Farm House
               </button>
             </li>
@@ -45,35 +45,110 @@
                 Plots
               </button>
             </li>
-            <!-- <li class="nav-item" role="presentation">
-              <button class="nav-link" id="pills-pg-tab" data-bs-toggle="pill" data-bs-target="#pills-pg" type="button"
-                role="tab" aria-controls="pills-pg" aria-selected="false" (click)="handleTabClick('pg')">
-                PG
-              </button>
-            </li> -->
           </ul>
           <form (ngSubmit)="onSubmit()" [formGroup]="myForm">
             <div class="tab-content profile-content" id="pills-tabContent">
               <div class="tab-pane show active" id="pills-buy" role="tabpanel" aria-labelledby="pills-buy-tab">
                 <div class="search_wrapper">
-                  <div class="location">
-                    <img src="../../../assets/images/location-icon.svg" alt="location-icon" class="me-2" />
-                    <div class="location_select">
-                      <ng-select [items]="city1" bindLabel="cname" bindValue="cid" placeholder="Enter Your City"
-                        [multiple]="false" formControlName="selectcitysearch">
-                      </ng-select>
+                  <div class="location location_chip_container">
+                    <div class="city_selector_wrapper">
+                      <div class="city_selector_trigger" (click)="toggleCitySelectorDropdown($event)" title="Select City">
+                        <img src="../../../assets/images/location-icon.svg" alt="location-icon" class="me-1 city_location_icon" style="width: 16px; height: 16px;" />
+                        <span class="city_name_text">{{ selectedCityChip || city || 'Ahmedabad' }}</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" class="city_chevron_icon" [class.rotated]="showCitySelectorDropdown">
+                          <path d="M6 9L12 15L18 9" stroke="#ff5444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </div>
 
+                      <div class="city_selector_dropdown" *ngIf="showCitySelectorDropdown" (click)="$event.stopPropagation()">
+                        <div class="city_dropdown_item" *ngFor="let c of city1"
+                          [class.active]="c.cname === (selectedCityChip || city)"
+                          (click)="selectCityFromSelector(c.cname)">
+                          <span>{{ c.cname }}</span>
+                          <svg *ngIf="c.cname === (selectedCityChip || city)" width="14" height="14" viewBox="0 0 24 24" fill="none">
+                            <path d="M20 6L9 17L4 12" stroke="#ff5444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="location_divider"></div>
+
+                    <div class="chips_box">
+                      <!-- Overloaded Count Badge (+N) -->
+                      <div class="chip_count_container" *ngIf="selectedExtraChips && selectedExtraChips.length > 0">
+                        <div class="chip_count_badge" [class.active]="showExtraChipsPopover"
+                          (click)="toggleExtraChipsPopover($event)" title="Click to view selected areas">
+                          <span>+{{ selectedExtraChips.length }}</span>
+                        </div>
+
+                        <!-- Popover showing selected extra chips -->
+                        <div class="extra_chips_popover" *ngIf="showExtraChipsPopover"
+                          (click)="$event.stopPropagation()">
+                          <div class="extra_chips_popover_header">
+                            <span class="popover_header_title">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                <path
+                                  d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2ZM12 11.5C10.62 11.5 9.5 10.38 9.5 9C9.5 7.62 10.62 6.5 12 6.5C13.38 6.5 14.5 7.62 14.5 9C14.5 10.38 13.38 11.5 12 11.5Z"
+                                  fill="#ff5444" />
+                              </svg>
+                              Selected Areas ({{ selectedExtraChips.length }})
+                            </span>
+                            <span class="clear_all_btn" (click)="removeAllExtraChips()">Clear all</span>
+                          </div>
+                          <div class="extra_chips_popover_list">
+                            <div class="location_chip_pill extra_pill"
+                              *ngFor="let chip of selectedExtraChips; let idx = index">
+                              <span>{{ chip }}</span>
+                              <span class="chip_x" (click)="removeExtraChip(idx)">&times;</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Inline Search Input -->
+                      <input type="text" class="chip_inline_input"
+                        placeholder="What are you looking for?"
+                        [(ngModel)]="locationInputText" [ngModelOptions]="{standalone: true}"
+                        (input)="onLocationInput($event)" (focus)="onLocationFocus()" (blur)="onLocationBlur()"
+                        (keydown.enter)="onLocationEnter($event)" />
+                    </div>
+
+                    <!-- Search Suggestions Dropdown -->
+                    <div class="search_suggestions_dropdown" *ngIf="showLocationDropdown && locationSuggestions && locationSuggestions.length > 0">
+                      <div class="suggestion_item" *ngFor="let item of locationSuggestions" (mousedown)="selectLocationSuggestion(item)">
+                        <div class="suggestion_icon_wrap {{ item.category.toLowerCase() }}">
+                          <svg *ngIf="item.category === 'Builder'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 21h18M3 7v14M21 7v14M6 10h4M6 14h4M6 18h4M14 10h4M14 14h4M14 18h4M9 3l3-2 3 2"/>
+                          </svg>
+                          <svg *ngIf="item.category === 'Project'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5"/>
+                          </svg>
+                          <svg *ngIf="item.category === 'Area'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+                            <circle cx="12" cy="9" r="2.5"/>
+                          </svg>
+                          <svg *ngIf="item.category === 'CITY'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                          </svg>
+                        </div>
+                        <div class="suggestion_content">
+                          <span class="suggestion_title">{{ item.name }}</span>
+                          <span class="suggestion_type_badge {{ item.category.toLowerCase() }}">{{ item.category }}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  <div class="property_drop">
+                  <div class="property_drop" (click)="toggleDisplayDiv()" style="cursor: pointer;">
                     <img src="../../../assets/images/property-icon.svg" class="me-2" alt="property-icon" />
 
-                    <div (click)="toggleDisplayDiv()" class="property_wrapper">
+                    <div class="property_wrapper">
                       <label class="property_tabs"> {{ propertyLabel }}</label>
                       <!-- Property Type -->
                     </div>
-                    <div *ngIf="visible" class="ccc property_inner">
+                    <div *ngIf="visible" class="ccc property_inner" (click)="$event.stopPropagation()">
                       <div class="serch-propert">
                         <div class="mb-search-residential">
                           <div class="mb-search__property__title" (click)="residencial()">
@@ -130,16 +205,15 @@
                     </div>
                   </div>
 
-                  <div class="budget_dorp">
+                  <div class="budget_dorp" (click)="toggleBudget()" style="cursor: pointer;">
                     <img src="../../../assets/images/budget-icon.svg" alt="budget-icon" class="me-2" />
 
-                    <div class="mb-search__property__title budget-inner" (click)="toggleBudget()">
-                      <label for="Budget">{{ togglebudget ? (minBudget !== null && minBudget !== "" ? minBudget : "Min
-                        Price") + " - " + (maxBudget !== null && maxBudget !== "" ? maxBudget : "Max Price") :
-                        (minBudget || "Min Price") + " - " + (maxBudget || "Max Price") }}</label>
+                    <div class="mb-search__property__title budget-inner">
+                      <label for="Budget">{{ getBudgetDisplayLabel() }}</label>
                     </div>
 
-                    <div class="mb-search__property__data property_inner" *ngIf="togglebudget">
+                    <div class="mb-search__property__data property_inner" *ngIf="togglebudget"
+                      (click)="$event.stopPropagation()">
                       <div class="serch-propert-price">
                         <div class="mb-search__relative">
                           <div class="mb-search__dropdown" onclick="event.stopPropagation();">
@@ -150,7 +224,8 @@
                                     data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home"
                                     aria-selected="true">
                                     <input type="text" class="mb-search__budget__fld-min-max" id="budgetMin"
-                                      maxlength="8" value="" placeholder="Min Price" />
+                                      [(ngModel)]="minBudget" [ngModelOptions]="{standalone: true}"
+                                      (input)="saveChipsToLocalStorage()" maxlength="15" placeholder="Min Price" />
                                   </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
@@ -158,7 +233,8 @@
                                     data-bs-target="#pills-profile" type="button" role="tab"
                                     aria-controls="pills-profile" aria-selected="false">
                                     <input type="text" class="mb-search__budget__fld-min-max" id="budgetMax"
-                                      maxlength="9" value="" placeholder="Max Price" />
+                                      [(ngModel)]="maxBudget" [ngModelOptions]="{standalone: true}"
+                                      (input)="saveChipsToLocalStorage()" maxlength="15" placeholder="Max Price" />
                                   </button>
                                 </li>
                               </ul>
@@ -167,7 +243,7 @@
                               <div class="tab-pane fade show active" id="pills-home" role="tabpanel"
                                 aria-labelledby="pills-home-tab">
                                 <div class="mb-search__min-max webkit__scroll-search left-budget" id="minBudjetbuy">
-                                  <div class="mb-search__min-max__item">Min</div>
+                                  <div class="mb-search__min-max__item" (click)="getvaluemin('Min', 'buy')">Min</div>
                                   <div class="mb-search__min-max__item" data-actualindex="0"
                                     (click)="getvaluemin('₹5 Lac', 'buy')">
                                     ₹5 Lac
@@ -273,7 +349,7 @@
                               <div class="tab-pane fade" id="pills-profile" role="tabpanel"
                                 aria-labelledby="pills-profile-tab">
                                 <div class="mb-search__min-max webkit__scroll-search right-budget" id="maxBudjetbuy">
-                                  <div class="mb-search__min-max__item">
+                                  <div class="mb-search__min-max__item" (click)="getvaluemax('Max', 'buy')">
                                     Max
                                   </div>
                                   <div class="mb-search__min-max__item" data-actualindex="0" id="maxBhkIndex_0"
@@ -396,23 +472,94 @@
 
               <div class="tab-pane" id="pills-rent" role="tabpanel" aria-labelledby="pills-rent-tab">
                 <div class="search_wrapper">
-                  <div class="location">
-                    <img src="../../../assets/images/location-icon.svg" alt="location-icon" class="me-2" />
-                    <div class="location_select">
-                      <!-- <ng-select
-                      placeholder="Enter Your City"
-                      bindLabel="name"
-                      [multiple]="true"
-                      bindValue="id"
-                      name="city"
-                      id="city"
-                      formControlName="selectcitysearch"
-                    >
-                    </ng-select> -->
+                  <div class="location location_chip_container">
+                    <div class="city_selector_wrapper">
+                      <div class="city_selector_trigger" (click)="toggleCitySelectorDropdown($event)" title="Select City">
+                        <img src="../../../assets/images/location-icon.svg" alt="location-icon" class="me-1 city_location_icon" style="width: 16px; height: 16px;" />
+                        <span class="city_name_text">{{ selectedCityChip || city || 'Ahmedabad' }}</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" class="city_chevron_icon" [class.rotated]="showCitySelectorDropdown">
+                          <path d="M6 9L12 15L18 9" stroke="#ff5444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </div>
 
-                      <ng-select [multiple]="false" [items]="city1" bindLabel="cname" bindValue="cid"
-                        placeholder="Enter Your City" formControlName="selectcitysearch">
-                      </ng-select>
+                      <div class="city_selector_dropdown" *ngIf="showCitySelectorDropdown" (click)="$event.stopPropagation()">
+                        <div class="city_dropdown_item" *ngFor="let c of city1"
+                          [class.active]="c.cname === (selectedCityChip || city)"
+                          (click)="selectCityFromSelector(c.cname)">
+                          <span>{{ c.cname }}</span>
+                          <svg *ngIf="c.cname === (selectedCityChip || city)" width="14" height="14" viewBox="0 0 24 24" fill="none">
+                            <path d="M20 6L9 17L4 12" stroke="#ff5444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="location_divider"></div>
+
+                    <div class="chips_box">
+                      <!-- Overloaded Count Badge (+N) -->
+                      <div class="chip_count_container" *ngIf="selectedExtraChips && selectedExtraChips.length > 0">
+                        <div class="chip_count_badge" [class.active]="showExtraChipsPopover"
+                          (click)="toggleExtraChipsPopover($event)" title="Click to view selected areas">
+                          <span>+{{ selectedExtraChips.length }}</span>
+                        </div>
+
+                        <!-- Popover showing selected extra chips -->
+                        <div class="extra_chips_popover" *ngIf="showExtraChipsPopover"
+                          (click)="$event.stopPropagation()">
+                          <div class="extra_chips_popover_header">
+                            <span class="popover_header_title">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                <path
+                                  d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2ZM12 11.5C10.62 11.5 9.5 10.38 9.5 9C9.5 7.62 10.62 6.5 12 6.5C13.38 6.5 14.5 7.62 14.5 9C14.5 10.38 13.38 11.5 12 11.5Z"
+                                  fill="#ff5444" />
+                              </svg>
+                              Selected Areas ({{ selectedExtraChips.length }})
+                            </span>
+                            <span class="clear_all_btn" (click)="removeAllExtraChips()">Clear all</span>
+                          </div>
+                          <div class="extra_chips_popover_list">
+                            <div class="location_chip_pill extra_pill"
+                              *ngFor="let chip of selectedExtraChips; let idx = index">
+                              <span>{{ chip }}</span>
+                              <span class="chip_x" (click)="removeExtraChip(idx)">&times;</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Inline Search Input -->
+                      <input type="text" class="chip_inline_input"
+                        placeholder="What are you looking for?"
+                        [(ngModel)]="locationInputText" [ngModelOptions]="{standalone: true}"
+                        (input)="onLocationInput($event)" (focus)="onLocationFocus()" (blur)="onLocationBlur()"
+                        (keydown.enter)="onLocationEnter($event)" />
+                    </div>
+
+                    <!-- Search Suggestions Dropdown -->
+                    <div class="search_suggestions_dropdown" *ngIf="showLocationDropdown && locationSuggestions && locationSuggestions.length > 0">
+                      <div class="suggestion_item" *ngFor="let item of locationSuggestions" (mousedown)="selectLocationSuggestion(item)">
+                        <div class="suggestion_icon_wrap {{ item.category.toLowerCase() }}">
+                          <svg *ngIf="item.category === 'Builder'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 21h18M3 7v14M21 7v14M6 10h4M6 14h4M6 18h4M14 10h4M14 14h4M14 18h4M9 3l3-2 3 2"/>
+                          </svg>
+                          <svg *ngIf="item.category === 'Project'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5"/>
+                          </svg>
+                          <svg *ngIf="item.category === 'Area'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+                            <circle cx="12" cy="9" r="2.5"/>
+                          </svg>
+                          <svg *ngIf="item.category === 'CITY'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                          </svg>
+                        </div>
+                        <div class="suggestion_content">
+                          <span class="suggestion_title">{{ item.name }}</span>
+                          <span class="suggestion_type_badge {{ item.category.toLowerCase() }}">{{ item.category }}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                   <!-- <div class="location_search">
@@ -421,15 +568,15 @@
                       aria-label="location" aria-describedby="basic-addon1" />
                   </div>
                 </div> -->
-                  <div class="property_drop">
+                  <div class="property_drop" (click)="renttoggleDisplayDiv()" style="cursor: pointer;">
                     <img src="../../../assets/images/property-icon.svg" class="me-2" alt="property-icon" />
 
-                    <div (click)="renttoggleDisplayDiv()" class="property_wrapper">
+                    <div class="property_wrapper">
                       <label class="property_tabs" id="property_tabs_rent">{{ propertyLabel }}</label>
 
                       <!-- <label class="property_check_rent">Property Type</label> -->
                     </div>
-                    <div *ngIf="visible" class="ccc property_inner">
+                    <div *ngIf="visible" class="ccc property_inner" (click)="$event.stopPropagation()">
                       <div class="serch-propert">
                         <div class="mb-search-residential">
                           <div class="mb-search__property__title" (click)="residencial()">
@@ -488,28 +635,15 @@
                     </div>
                   </div>
 
-                  <div class="budget_dorp">
+                  <div class="budget_dorp" (click)="toggleBudget()" style="cursor: pointer;">
                     <img src="../../../assets/images/budget-icon.svg" alt="budget-icon" class="me-2" />
 
-                    <div class="mb-search__property__title budget-inner" (click)="toggleBudget()">
-                      <label for="Budget">
-                        {{
-                        togglebudget
-                        ? (minBudget !== null && minBudget !== ""
-                        ? minBudget
-                        : "Min Price") +
-                        " - " +
-                        (maxBudget !== null && maxBudget !== ""
-                        ? maxBudget
-                        : "Max Price")
-                        : (minBudget || "Min Price") +
-                        " - " +
-                        (maxBudget || "Max Price")
-                        }}
-                      </label>
+                    <div class="mb-search__property__title budget-inner">
+                      <label for="Budget">{{ getBudgetDisplayLabel() }}</label>
                     </div>
 
-                    <div class="mb-search__property__data property_inner" *ngIf="togglebudget">
+                    <div class="mb-search__property__data property_inner" *ngIf="togglebudget"
+                      (click)="$event.stopPropagation()">
                       <div class="serch-propert-price">
                         <div class="mb-search__relative">
                           <div class="mb-search__dropdown" onclick="event.stopPropagation();">
@@ -520,7 +654,8 @@
                                     data-bs-target="#pills-homerent" type="button" role="tab" aria-controls="pills-home"
                                     aria-selected="true">
                                     <input type="text" class="mb-search__budget__fld-min-max" id="minBudjetrent"
-                                      maxlength="8" value="" placeholder="Min Price" />
+                                      [(ngModel)]="minBudget" [ngModelOptions]="{standalone: true}"
+                                      (input)="saveChipsToLocalStorage()" maxlength="15" placeholder="Min Price" />
                                   </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
@@ -528,7 +663,8 @@
                                     data-bs-target="#pills-profilerent" type="button" role="tab"
                                     aria-controls="pills-profile" aria-selected="false">
                                     <input type="text" class="mb-search__budget__fld-min-max" id="maxBudjetrent"
-                                      maxlength="9" value="" placeholder="Max Price" />
+                                      [(ngModel)]="maxBudget" [ngModelOptions]="{standalone: true}"
+                                      (input)="saveChipsToLocalStorage()" maxlength="15" placeholder="Max Price" />
                                   </button>
                                 </li>
                               </ul>
@@ -709,27 +845,96 @@
                 </div>
               </div>
 
-              <div class="tab-pane" id="pills-Farmhouse" role="tabpanel" aria-labelledby="pills-Farmhouse-tab">
+              <div class="tab-pane" id="pills-Residential" role="tabpanel" aria-labelledby="pills-Residential-tab">
                 <div class="search_wrapper">
-                  <div class="location">
-                    <img src="../../../assets/images/location-icon.svg" alt="location-icon" class="me-2" />
-                    <div class="location_select">
-                      <!-- <ng-select
-                      placeholder="Enter Your City"
-                      bindLabel="name"
-                      [multiple]="true"
-                      [closeOnSelect]="true"
-                      bindValue="id"
-                      [searchable]="true"
-                      name="city"
-                      id="city"
-                      formControlName="selectcitysearch"
-                    >
-                    </ng-select> -->
+                  <div class="location location_chip_container">
+                    <div class="city_selector_wrapper">
+                      <div class="city_selector_trigger" (click)="toggleCitySelectorDropdown($event)" title="Select City">
+                        <img src="../../../assets/images/location-icon.svg" alt="location-icon" class="me-1 city_location_icon" style="width: 16px; height: 16px;" />
+                        <span class="city_name_text">{{ selectedCityChip || city || 'Ahmedabad' }}</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" class="city_chevron_icon" [class.rotated]="showCitySelectorDropdown">
+                          <path d="M6 9L12 15L18 9" stroke="#ff5444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </div>
 
-                      <ng-select [multiple]="false" [items]="city1" bindLabel="cname" bindValue="cid"
-                        placeholder="Enter Your City" formControlName="selectcitysearch">
-                      </ng-select>
+                      <div class="city_selector_dropdown" *ngIf="showCitySelectorDropdown" (click)="$event.stopPropagation()">
+                        <div class="city_dropdown_item" *ngFor="let c of city1"
+                          [class.active]="c.cname === (selectedCityChip || city)"
+                          (click)="selectCityFromSelector(c.cname)">
+                          <span>{{ c.cname }}</span>
+                          <svg *ngIf="c.cname === (selectedCityChip || city)" width="14" height="14" viewBox="0 0 24 24" fill="none">
+                            <path d="M20 6L9 17L4 12" stroke="#ff5444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="location_divider"></div>
+
+                    <div class="chips_box">
+                      <!-- Overloaded Count Badge (+N) -->
+                      <div class="chip_count_container" *ngIf="selectedExtraChips && selectedExtraChips.length > 0">
+                        <div class="chip_count_badge" [class.active]="showExtraChipsPopover"
+                          (click)="toggleExtraChipsPopover($event)" title="Click to view selected areas">
+                          <span>+{{ selectedExtraChips.length }}</span>
+                        </div>
+
+                        <!-- Popover showing selected extra chips -->
+                        <div class="extra_chips_popover" *ngIf="showExtraChipsPopover"
+                          (click)="$event.stopPropagation()">
+                          <div class="extra_chips_popover_header">
+                            <span class="popover_header_title">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                <path
+                                  d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2ZM12 11.5C10.62 11.5 9.5 10.38 9.5 9C9.5 7.62 10.62 6.5 12 6.5C13.38 6.5 14.5 7.62 14.5 9C14.5 10.38 13.38 11.5 12 11.5Z"
+                                  fill="#ff5444" />
+                              </svg>
+                              Selected Areas ({{ selectedExtraChips.length }})
+                            </span>
+                            <span class="clear_all_btn" (click)="removeAllExtraChips()">Clear all</span>
+                          </div>
+                          <div class="extra_chips_popover_list">
+                            <div class="location_chip_pill extra_pill"
+                              *ngFor="let chip of selectedExtraChips; let idx = index">
+                              <span>{{ chip }}</span>
+                              <span class="chip_x" (click)="removeExtraChip(idx)">&times;</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Inline Search Input -->
+                      <input type="text" class="chip_inline_input"
+                        placeholder="What are you looking for?"
+                        [(ngModel)]="locationInputText" [ngModelOptions]="{standalone: true}"
+                        (input)="onLocationInput($event)" (focus)="onLocationFocus()" (blur)="onLocationBlur()"
+                        (keydown.enter)="onLocationEnter($event)" />
+                    </div>
+
+                    <!-- Search Suggestions Dropdown -->
+                    <div class="search_suggestions_dropdown" *ngIf="showLocationDropdown && locationSuggestions && locationSuggestions.length > 0">
+                      <div class="suggestion_item" *ngFor="let item of locationSuggestions" (mousedown)="selectLocationSuggestion(item)">
+                        <div class="suggestion_icon_wrap {{ item.category.toLowerCase() }}">
+                          <svg *ngIf="item.category === 'Builder'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 21h18M3 7v14M21 7v14M6 10h4M6 14h4M6 18h4M14 10h4M14 14h4M14 18h4M9 3l3-2 3 2"/>
+                          </svg>
+                          <svg *ngIf="item.category === 'Project'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5"/>
+                          </svg>
+                          <svg *ngIf="item.category === 'Area'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+                            <circle cx="12" cy="9" r="2.5"/>
+                          </svg>
+                          <svg *ngIf="item.category === 'CITY'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                          </svg>
+                        </div>
+                        <div class="suggestion_content">
+                          <span class="suggestion_title">{{ item.name }}</span>
+                          <span class="suggestion_type_badge {{ item.category.toLowerCase() }}">{{ item.category }}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                   <!-- <div class="location_search">
@@ -738,15 +943,15 @@
                       aria-label="location" aria-describedby="basic-addon1" />
                   </div>
                 </div> -->
-                  <div class="property_drop">
+                  <div class="property_drop" (click)="farmhousetoggleDisplayDiv()" style="cursor: pointer;">
                     <img src="../../../assets/images/property-icon.svg" class="me-2" alt="property-icon" />
 
-                    <div (click)="farmhousetoggleDisplayDiv()" class="property_wrapper">
+                    <div class="property_wrapper">
                       <label class="property_tabs" id="property_tabs_farmhouse"> {{ propertyLabel }}</label>
 
                       <!-- <label class="property_check_rent">Property Type</label> -->
                     </div>
-                    <div *ngIf="visible" class="ccc property_inner">
+                    <div *ngIf="visible" class="ccc property_inner" (click)="$event.stopPropagation()">
                       <div class="serch-propert">
                         <div class="mb-search-residential">
                           <div class="mb-search__property__title" (click)="residencial()">
@@ -806,28 +1011,15 @@
                     </div>
                   </div>
 
-                  <div class="budget_dorp">
+                  <div class="budget_dorp" (click)="toggleBudget()" style="cursor: pointer;">
                     <img src="../../../assets/images/budget-icon.svg" alt="budget-icon" class="me-2" />
 
-                    <div class="mb-search__property__title budget-inner" (click)="toggleBudget()">
-                      <label for="Budget">
-                        {{
-                        togglebudget
-                        ? (minBudget !== null && minBudget !== ""
-                        ? minBudget
-                        : "Min Price") +
-                        " - " +
-                        (maxBudget !== null && maxBudget !== ""
-                        ? maxBudget
-                        : "Max Price")
-                        : (minBudget || "Min Price") +
-                        " - " +
-                        (maxBudget || "Max Price")
-                        }}
-                      </label>
+                    <div class="mb-search__property__title budget-inner">
+                      <label for="Budget">{{ getBudgetDisplayLabel() }}</label>
                     </div>
 
-                    <div class="mb-search__property__data property_inner" *ngIf="togglebudget">
+                    <div class="mb-search__property__data property_inner" *ngIf="togglebudget"
+                      (click)="$event.stopPropagation()">
                       <div class="serch-propert-price">
                         <div class="mb-search__relative">
                           <div class="mb-search__dropdown" onclick="event.stopPropagation();">
@@ -838,7 +1030,8 @@
                                     data-bs-target="#pills-homefarm" type="button" role="tab" aria-controls="pills-home"
                                     aria-selected="true">
                                     <input type="text" class="mb-search__budget__fld-min-max" id="minBudjetfarm"
-                                      maxlength="8" value="" placeholder="Min Price" />
+                                      [(ngModel)]="minBudget" [ngModelOptions]="{standalone: true}"
+                                      (input)="saveChipsToLocalStorage()" maxlength="15" placeholder="Min Price" />
                                   </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
@@ -846,7 +1039,8 @@
                                     data-bs-target="#pills-profilefarm" type="button" role="tab"
                                     aria-controls="pills-profile" aria-selected="false">
                                     <input type="text" class="mb-search__budget__fld-min-max" id="maxBudjetfarm"
-                                      maxlength="9" value="" placeholder="Max Price" />
+                                      [(ngModel)]="maxBudget" [ngModelOptions]="{standalone: true}"
+                                      (input)="saveChipsToLocalStorage()" maxlength="15" placeholder="Max Price" />
                                   </button>
                                 </li>
                               </ul>
@@ -855,7 +1049,7 @@
                               <div class="tab-pane fade show active" id="pills-homefarm" role="tabpanel"
                                 aria-labelledby="pills-home-tab">
                                 <div class="mb-search__min-max webkit__scroll-search left-budget" id="minBudjetfarm">
-                                  <div class="mb-search__min-max__item">
+                                  <div class="mb-search__min-max__item" (click)="getvaluemin('Min', 'farm')">
                                     Min
                                   </div>
                                   <div class="mb-search__min-max__item" data-actualindex="0"
@@ -963,7 +1157,7 @@
                               <div class="tab-pane fade" id="pills-profilefarm" role="tabpanel"
                                 aria-labelledby="pills-profile-tab">
                                 <div class="mb-search__min-max webkit__scroll-search right-budget" id="maxBudjetfarm">
-                                  <div class="mb-search__min-max__item">
+                                  <div class="mb-search__min-max__item" (click)="getvaluemax('Max', 'farm')">
                                     Max
                                   </div>
                                   <div class="mb-search__min-max__item" data-actualindex="0" id="maxBhkIndex_0"
@@ -1085,25 +1279,94 @@
 
               <div class="tab-pane" id="pills-Plots" role="tabpanel" aria-labelledby="pills-Plots-tab">
                 <div class="search_wrapper">
-                  <div class="location">
-                    <img src="../../../assets/images/location-icon.svg" alt="location-icon" class="me-2" />
-                    <div class="location_select">
-                      <!-- <ng-select
-                      placeholder="Enter Your City"
-                      bindLabel="name"
-                      [multiple]="true"
-                      [closeOnSelect]="true"
-                      bindValue="id"
-                      [searchable]="true"
-                      name="city"
-                      id="city"
-                      formControlName="selectcitysearch"
-                    >
-                    </ng-select> -->
+                  <div class="location location_chip_container">
+                    <div class="city_selector_wrapper">
+                      <div class="city_selector_trigger" (click)="toggleCitySelectorDropdown($event)" title="Select City">
+                        <img src="../../../assets/images/location-icon.svg" alt="location-icon" class="me-1 city_location_icon" style="width: 16px; height: 16px;" />
+                        <span class="city_name_text">{{ selectedCityChip || city || 'Ahmedabad' }}</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" class="city_chevron_icon" [class.rotated]="showCitySelectorDropdown">
+                          <path d="M6 9L12 15L18 9" stroke="#ff5444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </div>
 
-                      <ng-select [multiple]="false" [items]="city1" bindLabel="cname" bindValue="cid"
-                        placeholder="Enter Your City" formControlName="selectcitysearch">
-                      </ng-select>
+                      <div class="city_selector_dropdown" *ngIf="showCitySelectorDropdown" (click)="$event.stopPropagation()">
+                        <div class="city_dropdown_item" *ngFor="let c of city1"
+                          [class.active]="c.cname === (selectedCityChip || city)"
+                          (click)="selectCityFromSelector(c.cname)">
+                          <span>{{ c.cname }}</span>
+                          <svg *ngIf="c.cname === (selectedCityChip || city)" width="14" height="14" viewBox="0 0 24 24" fill="none">
+                            <path d="M20 6L9 17L4 12" stroke="#ff5444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="location_divider"></div>
+
+                    <div class="chips_box">
+                      <!-- Overloaded Count Badge (+N) -->
+                      <div class="chip_count_container" *ngIf="selectedExtraChips && selectedExtraChips.length > 0">
+                        <div class="chip_count_badge" [class.active]="showExtraChipsPopover"
+                          (click)="toggleExtraChipsPopover($event)" title="Click to view selected areas">
+                          <span>+{{ selectedExtraChips.length }}</span>
+                        </div>
+
+                        <!-- Popover showing selected extra chips -->
+                        <div class="extra_chips_popover" *ngIf="showExtraChipsPopover"
+                          (click)="$event.stopPropagation()">
+                          <div class="extra_chips_popover_header">
+                            <span class="popover_header_title">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                <path
+                                  d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2ZM12 11.5C10.62 11.5 9.5 10.38 9.5 9C9.5 7.62 10.62 6.5 12 6.5C13.38 6.5 14.5 7.62 14.5 9C14.5 10.38 13.38 11.5 12 11.5Z"
+                                  fill="#ff5444" />
+                              </svg>
+                              Selected Areas ({{ selectedExtraChips.length }})
+                            </span>
+                            <span class="clear_all_btn" (click)="removeAllExtraChips()">Clear all</span>
+                          </div>
+                          <div class="extra_chips_popover_list">
+                            <div class="location_chip_pill extra_pill"
+                              *ngFor="let chip of selectedExtraChips; let idx = index">
+                              <span>{{ chip }}</span>
+                              <span class="chip_x" (click)="removeExtraChip(idx)">&times;</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Inline Search Input -->
+                      <input type="text" class="chip_inline_input"
+                        placeholder="What are you looking for?"
+                        [(ngModel)]="locationInputText" [ngModelOptions]="{standalone: true}"
+                        (input)="onLocationInput($event)" (focus)="onLocationFocus()" (blur)="onLocationBlur()"
+                        (keydown.enter)="onLocationEnter($event)" />
+                    </div>
+
+                    <!-- Search Suggestions Dropdown -->
+                    <div class="search_suggestions_dropdown" *ngIf="showLocationDropdown && locationSuggestions && locationSuggestions.length > 0">
+                      <div class="suggestion_item" *ngFor="let item of locationSuggestions" (mousedown)="selectLocationSuggestion(item)">
+                        <div class="suggestion_icon_wrap {{ item.category.toLowerCase() }}">
+                          <svg *ngIf="item.category === 'Builder'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 21h18M3 7v14M21 7v14M6 10h4M6 14h4M6 18h4M14 10h4M14 14h4M14 18h4M9 3l3-2 3 2"/>
+                          </svg>
+                          <svg *ngIf="item.category === 'Project'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5"/>
+                          </svg>
+                          <svg *ngIf="item.category === 'Area'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+                            <circle cx="12" cy="9" r="2.5"/>
+                          </svg>
+                          <svg *ngIf="item.category === 'CITY'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                          </svg>
+                        </div>
+                        <div class="suggestion_content">
+                          <span class="suggestion_title">{{ item.name }}</span>
+                          <span class="suggestion_type_badge {{ item.category.toLowerCase() }}">{{ item.category }}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                   <!-- <div class="location_search">
@@ -1113,18 +1376,18 @@
                   </div>
                 </div> -->
 
-                  <div class="property_drop">
+                  <div class="property_drop" (click)="plotstoggleDisplayDiv()" style="cursor: pointer;">
                     <img src="../../../assets/images/property-icon.svg" class="me-2" alt="property-icon" />
 
-                    <div (click)="plotstoggleDisplayDiv()" class="property_wrapper">
+                    <div class="property_wrapper">
                       <label class="property_tabs" id="property_tabs_plots"> {{ propertyLabel }}</label>
 
                       <!-- <label class="property_check_rent">Property Type</label> -->
                     </div>
-                    <div *ngIf="visible" class="ccc property_inner">
+                    <div *ngIf="visible" class="ccc property_inner" (click)="$event.stopPropagation()">
                       <div class="serch-propert">
                         <div class="mb-search-residential">
-                          <div class="mb-search__property__data" *ngIf="Residencialvisible">
+                          <div class="mb-search__property__data">
                             <div class="data-overflow">
                               <div class="mb-search__property__item" *ngFor="
                                   let propertyplots of propertyplot">
@@ -1150,28 +1413,15 @@
                     </div>
                   </div>
 
-                  <div class="budget_dorp">
+                  <div class="budget_dorp" (click)="toggleBudget()" style="cursor: pointer;">
                     <img src="../../../assets/images/budget-icon.svg" alt="budget-icon" class="me-2" />
 
-                    <div class="mb-search__property__title budget-inner" (click)="toggleBudget()">
-                      <label for="Budget">
-                        {{
-                        togglebudget
-                        ? (minBudget !== null && minBudget !== ""
-                        ? minBudget
-                        : "Min Price") +
-                        " - " +
-                        (maxBudget !== null && maxBudget !== ""
-                        ? maxBudget
-                        : "Max Price")
-                        : (minBudget || "Min Price") +
-                        " - " +
-                        (maxBudget || "Max Price")
-                        }}
-                      </label>
+                    <div class="mb-search__property__title budget-inner">
+                      <label for="Budget">{{ getBudgetDisplayLabel() }}</label>
                     </div>
 
-                    <div class="mb-search__property__data property_inner" *ngIf="togglebudget">
+                    <div class="mb-search__property__data property_inner" *ngIf="togglebudget"
+                      (click)="$event.stopPropagation()">
                       <div class="serch-propert-price">
                         <div class="mb-search__relative">
                           <div class="mb-search__dropdown" onclick="event.stopPropagation();">
@@ -1182,7 +1432,8 @@
                                     data-bs-target="#pills-homeplot" type="button" role="tab" aria-controls="pills-home"
                                     aria-selected="true">
                                     <input type="text" class="mb-search__budget__fld-min-max" id="minBudjetplot"
-                                      maxlength="8" value="" placeholder="Min Price" />
+                                      [(ngModel)]="minBudget" [ngModelOptions]="{standalone: true}"
+                                      (input)="saveChipsToLocalStorage()" maxlength="15" placeholder="Min Price" />
                                   </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
@@ -1190,7 +1441,8 @@
                                     data-bs-target="#pills-profileplot" type="button" role="tab"
                                     aria-controls="pills-profile" aria-selected="false">
                                     <input type="text" class="mb-search__budget__fld-min-max" id="maxBudjetplot"
-                                      maxlength="9" value="" placeholder="Max Price" />
+                                      [(ngModel)]="maxBudget" [ngModelOptions]="{standalone: true}"
+                                      (input)="saveChipsToLocalStorage()" maxlength="15" placeholder="Max Price" />
                                   </button>
                                 </li>
                               </ul>
@@ -1199,7 +1451,7 @@
                               <div class="tab-pane fade show active" id="pills-homeplot" role="tabpanel"
                                 aria-labelledby="pills-home-tab">
                                 <div class="mb-search__min-max webkit__scroll-search left-budget" id="minBudjetplot">
-                                  <div class="mb-search__min-max__item">
+                                  <div class="mb-search__min-max__item" (click)="getvaluemin('Min', 'plot')">
                                     Min
                                   </div>
                                   <div class="mb-search__min-max__item" data-actualindex="0"
@@ -1307,7 +1559,7 @@
                               <div class="tab-pane fade" id="pills-profileplot" role="tabpanel"
                                 aria-labelledby="pills-profile-tab">
                                 <div class="mb-search__min-max webkit__scroll-search right-budget" id="maxBudjetplot">
-                                  <div class="mb-search__min-max__item">
+                                  <div class="mb-search__min-max__item" (click)="getvaluemax('Max', 'plot')">
                                     Max
                                   </div>
                                   <div class="mb-search__min-max__item" data-actualindex="0" id="maxBhkIndex_0"
@@ -1427,11 +1679,24 @@
                 </div>
               </div>
 
-              <!-- <div class="tab-pane" id="pills-pg" role="tabpanel" aria-labelledby="pills-pg-tab">
+              <div class="tab-pane" id="pills-pg" role="tabpanel" aria-labelledby="pills-pg-tab">
                 <div class="search_wrapper">
                   <div class="location">
                     <img src="../../../assets/images/location-icon.svg" alt="location-icon" class="me-2" />
                     <div class="location_select">
+                      <!-- <ng-select
+                      placeholder="Enter Your City"
+                      bindLabel="name"
+                      [multiple]="true"
+                      [closeOnSelect]="true"
+                      bindValue="id"
+                      [searchable]="true"
+                      name="city"
+                      id="city"
+                      formControlName="selectcitysearch"
+                    >
+                    </ng-select> -->
+
                       <ng-select [multiple]="false" [items]="city1" bindLabel="cname" bindValue="cid"
                         placeholder="Enter Your City" formControlName="selectcitysearch">
                       </ng-select>
@@ -1465,6 +1730,7 @@
                           </div>
                         </div>
 
+                        <!-- Section for Commercial checkboxes -->
                         <div class="mb-search-commercial">
                           <div class="mb-search__property__title" (click)="commercial()">
                             <label for="Looking For">Looking For</label>
@@ -1621,27 +1887,107 @@
                     </button>
                   </div>
                 </div>
-              </div> -->
+              </div>
 
               <div class="tab-pane" id="pills-Hostel" role="tabpanel" aria-labelledby="pills-Hostel-tab">
                 <div class="search_wrapper">
-                  <div class="location">
-                    <img src="../../../assets/images/location-icon.svg" alt="location-icon" class="me-2" />
-                    <div class="location_select">
-                      <ng-select [multiple]="false" [items]="city1" bindLabel="cname" bindValue="cid"
-                        placeholder="Enter Your City" formControlName="selectcitysearch">
-                      </ng-select>
+                  <div class="location location_chip_container">
+                    <div class="city_selector_wrapper">
+                      <div class="city_selector_trigger" (click)="toggleCitySelectorDropdown($event)" title="Select City">
+                        <img src="../../../assets/images/location-icon.svg" alt="location-icon" class="me-1 city_location_icon" style="width: 16px; height: 16px;" />
+                        <span class="city_name_text">{{ selectedCityChip || city || 'Ahmedabad' }}</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" class="city_chevron_icon" [class.rotated]="showCitySelectorDropdown">
+                          <path d="M6 9L12 15L18 9" stroke="#ff5444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </div>
+
+                      <div class="city_selector_dropdown" *ngIf="showCitySelectorDropdown" (click)="$event.stopPropagation()">
+                        <div class="city_dropdown_item" *ngFor="let c of city1"
+                          [class.active]="c.cname === (selectedCityChip || city)"
+                          (click)="selectCityFromSelector(c.cname)">
+                          <span>{{ c.cname }}</span>
+                          <svg *ngIf="c.cname === (selectedCityChip || city)" width="14" height="14" viewBox="0 0 24 24" fill="none">
+                            <path d="M20 6L9 17L4 12" stroke="#ff5444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="location_divider"></div>
+
+                    <div class="chips_box">
+                      <!-- Overloaded Count Badge (+N) -->
+                      <div class="chip_count_container" *ngIf="selectedExtraChips && selectedExtraChips.length > 0">
+                        <div class="chip_count_badge" [class.active]="showExtraChipsPopover"
+                          (click)="toggleExtraChipsPopover($event)" title="Click to view selected areas">
+                          <span>+{{ selectedExtraChips.length }}</span>
+                        </div>
+
+                        <!-- Popover showing selected extra chips -->
+                        <div class="extra_chips_popover" *ngIf="showExtraChipsPopover"
+                          (click)="$event.stopPropagation()">
+                          <div class="extra_chips_popover_header">
+                            <span class="popover_header_title">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                <path
+                                  d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2ZM12 11.5C10.62 11.5 9.5 10.38 9.5 9C9.5 7.62 10.62 6.5 12 6.5C13.38 6.5 14.5 7.62 14.5 9C14.5 10.38 13.38 11.5 12 11.5Z"
+                                  fill="#ff5444" />
+                              </svg>
+                              Selected Areas ({{ selectedExtraChips.length }})
+                            </span>
+                            <span class="clear_all_btn" (click)="removeAllExtraChips()">Clear all</span>
+                          </div>
+                          <div class="extra_chips_popover_list">
+                            <div class="location_chip_pill extra_pill"
+                              *ngFor="let chip of selectedExtraChips; let idx = index">
+                              <span>{{ chip }}</span>
+                              <span class="chip_x" (click)="removeExtraChip(idx)">&times;</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <input type="text" class="chip_inline_input"
+                        placeholder="What are you looking for?"
+                        [(ngModel)]="locationInputText" [ngModelOptions]="{standalone: true}"
+                        (input)="onLocationInput($event)" (focus)="onLocationFocus()" (blur)="onLocationBlur()"
+                        (keydown.enter)="onLocationEnter($event)" />
+                    </div>
+
+                    <!-- Search Suggestions Dropdown -->
+                    <div class="search_suggestions_dropdown" *ngIf="showLocationDropdown && locationSuggestions && locationSuggestions.length > 0">
+                      <div class="suggestion_item" *ngFor="let item of locationSuggestions" (mousedown)="selectLocationSuggestion(item)">
+                        <div class="suggestion_icon_wrap {{ item.category.toLowerCase() }}">
+                          <svg *ngIf="item.category === 'Builder'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 21h18M3 7v14M21 7v14M6 10h4M6 14h4M6 18h4M14 10h4M14 14h4M14 18h4M9 3l3-2 3 2"/>
+                          </svg>
+                          <svg *ngIf="item.category === 'Project'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5"/>
+                          </svg>
+                          <svg *ngIf="item.category === 'Area'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+                            <circle cx="12" cy="9" r="2.5"/>
+                          </svg>
+                          <svg *ngIf="item.category === 'CITY'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                          </svg>
+                        </div>
+                        <div class="suggestion_content">
+                          <span class="suggestion_title">{{ item.name }}</span>
+                          <span class="suggestion_type_badge {{ item.category.toLowerCase() }}">{{ item.category }}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div class="property_drop">
+                  <div class="property_drop" (click)="toggleDisplayDivcom()" style="cursor: pointer;">
                     <img src="../../../assets/images/property-icon.svg" class="me-2" alt="property-icon" />
 
-                    <div (click)="toggleDisplayDivcom()" class="property_wrapper">
+                    <div class="property_wrapper">
                       <p class="property_tabs" id="property_tabs_hostel">
                         {{propertyLabel}}
                       </p>
                     </div>
-                    <div *ngIf="visible" class="ccc property_inner">
+                    <div *ngIf="visible" class="ccc property_inner" (click)="$event.stopPropagation()">
                       <div class="serch-propert">
                         <div class="mb-search-commercial">
                           <div class="mb-search-commercial">
@@ -1650,8 +1996,7 @@
                                 <div class="mb-search__property__item" *ngFor="
                                   let propertycommercial of propertycommercial
                                 ">
-                                  <input class="mb-search__property__item__input" type="checkbox"
-                                    *ngIf="propertycommercial.id != 17" [checked]="
+                                  <input class="mb-search__property__item__input" type="checkbox" [checked]="
                                     selectedCommercialItems.includes(
                                       propertycommercial.id
                                     )
@@ -1662,8 +2007,8 @@
                                       propertycommercial.id
                                     )
                                   " />
-                                  <label class="mb-search__property__item__label" *ngIf="propertycommercial.id != 17"
-                                    for="{{ propertycommercial.id }}" id="{{ propertycommercial.id }}">{{
+                                  <label class="mb-search__property__item__label" for="{{ propertycommercial.id }}"
+                                    id="{{ propertycommercial.id }}">{{
                                     propertycommercial.name }}</label>
                                 </div>
                               </div>
@@ -1674,32 +2019,15 @@
                     </div>
                   </div>
 
-                  <div class="budget_dorp">
+                  <div class="budget_dorp" (click)="toggleBudget()" style="cursor: pointer;">
                     <img src="../../../assets/images/budget-icon.svg" alt="budget-icon" class="me-2" />
 
-                    <div class="mb-search__property__title budget-inner" (click)="toggleBudget()">
-                      <label for="Budget">
-                        {{
-                        togglebudget
-                        ? (minBudget !== null
-                        ? minBudget == ""
-                        ? "Min Price"
-                        : minBudget
-                        : "Min Price") +
-                        " - " +
-                        (maxBudget !== null
-                        ? maxBudget == ""
-                        ? "Max Price"
-                        : maxBudget
-                        : "Max Price")
-                        : (minBudget || "Min Price") +
-                        " - " +
-                        (maxBudget || "Max Price")
-                        }}
-                      </label>
+                    <div class="mb-search__property__title budget-inner">
+                      <label for="Budget">{{ getBudgetDisplayLabel() }}</label>
                     </div>
 
-                    <div class="mb-search__property__data property_inner" *ngIf="togglebudget">
+                    <div class="mb-search__property__data property_inner" *ngIf="togglebudget"
+                      (click)="$event.stopPropagation()">
                       <div class="serch-propert-price">
                         <div class="mb-search__relative">
                           <div class="mb-search__dropdown" onclick="event.stopPropagation();">
@@ -1710,7 +2038,8 @@
                                     data-bs-target="#pills-homehostel" type="button" role="tab"
                                     aria-controls="pills-home" aria-selected="true">
                                     <input type="text" class="mb-search__budget__fld-min-max" id="minBudjetpg"
-                                      maxlength="8" value="" placeholder="Min Price" />
+                                      [(ngModel)]="minBudget" [ngModelOptions]="{standalone: true}"
+                                      (input)="saveChipsToLocalStorage()" maxlength="15" placeholder="Min Price" />
                                   </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
@@ -1718,7 +2047,8 @@
                                     data-bs-target="#pills-profilehostel" type="button" role="tab"
                                     aria-controls="pills-profile" aria-selected="false">
                                     <input type="text" class="mb-search__budget__fld-min-max" id="maxBudjethostel"
-                                      maxlength="9" value="" placeholder="Max Price" />
+                                      [(ngModel)]="maxBudget" [ngModelOptions]="{standalone: true}"
+                                      (input)="saveChipsToLocalStorage()" maxlength="15" placeholder="Max Price" />
                                   </button>
                                 </li>
                               </ul>
@@ -1727,7 +2057,7 @@
                               <div class="tab-pane fade show active" id="pills-homehostel" role="tabpanel"
                                 aria-labelledby="pills-home-tab">
                                 <div class="mb-search__min-max webkit__scroll-search left-budget" id="minBudjethostel">
-                                  <div class="mb-search__min-max__item">
+                                  <div class="mb-search__min-max__item" (click)="getvaluemin('Min', 'hostel')">
                                     Min
                                   </div>
                                   <div class="mb-search__min-max__item" data-actualindex="0"
@@ -1763,7 +2093,7 @@
                               <div class="tab-pane fade" id="pills-profilehostel" role="tabpanel"
                                 aria-labelledby="pills-profile-tab">
                                 <div class="mb-search__min-max webkit__scroll-search right-budget" id="maxBudjethostel">
-                                  <div class="mb-search__min-max__item">
+                                  <div class="mb-search__min-max__item" (click)="getvaluemax('Max', 'hostel')">
                                     Max
                                   </div>
                                   <div class="mb-search__min-max__item" data-actualindex="0" id="maxBhkIndex_0"
@@ -1833,7 +2163,7 @@
 
               </ngx-slick-carousel>
             </div>
-            <div class="property-services mt-5 mt-md-2">
+            <div class="property-services mt-5 mt-md-0">
               <a target="_blank" routerLink="/property-services">All Property Services</a>
             </div>
           </div> -->
@@ -2416,7 +2746,7 @@
                   <img src="{{ topbuilders.builder_logo }}" alt="builder_logo" class="img-fluid" />
                 </div>
                 <div class="builder-details">
-                  <h4 class="builder-head" style="text-wrap-mode: nowrap;max-width: 200px;">{{ topbuilders.name }}</h4>
+                  <h4 class="builder-head">{{ topbuilders.name }}</h4>
                   <p class="build-sells">
                     Ongoing
                     <span class="items-building">{{

@@ -1,6 +1,7 @@
 .swiper-container {
   width: 100%;
-  height: 300px; /* Adjust the height as needed */
+  height: 300px;
+  /* Adjust the height as needed */
 }
 
 .swiper-slide {
@@ -12,36 +13,42 @@
 
 /* budget price */
 
-.property_inner-bugget{
+.property_inner-bugget {
   position: absolute;
   background: white;
   top: 115%;
   z-index: 1;
 }
+
 .mb-search__budget .mb-search__dropdown-budget {
-left: -38px;
-max-height: none;
-width: 235px;
+  left: -38px;
+  max-height: none;
+  width: 235px;
 }
-.wrap-budget{
+
+.wrap-budget {
   padding: 12px 16px 0px 12px;
 }
+
 .budget-mm {
   display: flex;
   list-style: none;
   gap: 20px;
   padding: 0;
 }
+
 .left-budget {
   text-align: start;
 }
-.right-budget{
+
+.right-budget {
   text-align: end;
 }
 
 .mgs_error {
   color: red;
 }
+
 .reg_sub {
   width: 100%;
   margin: 0 auto;
@@ -60,19 +67,476 @@ width: 235px;
   border-bottom: 1px solid #666666;
   margin-top: 12px;
 }
+
 #otpInput:focus {
   outline: none;
 }
+
 .img_slider_serviceprovider {
-    transition: all 0.3s ease;
-    position: relative;
-    display: inline-block;
+  transition: all 0.3s ease;
+  position: relative;
+  display: inline-block;
 }
 
 .img_slider_serviceprovider:hover {
-    filter: sepia(1) saturate(35) hue-rotate(-15deg) brightness(0.85) contrast(1.1);
-    transition: filter 0.3s ease;
+  filter: sepia(1) saturate(35) hue-rotate(-15deg) brightness(0.85) contrast(1.1);
+  transition: filter 0.3s ease;
 }
+
 @media only screen and (max-width: 480px) {
-  .budget-mm{gap: 0 }
+  .budget-mm {
+    gap: 0
+  }
+}
+
+/* Location Chip Container & Inline Search Input */
+.location_chip_container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 280px;
+  background: #ffffff;
+  border-radius: 0px;
+  padding: 4px 0px;
+}
+
+/* City Selector Dropdown (e.g. "Ahmedabad ∨") */
+.city_selector_wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.city_selector_trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+  user-select: none;
+  border-radius: 8px;
+  transition: background-color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.city_selector_trigger:hover {
+  background-color: #f8fafc;
+}
+
+.city_name_text {
+  font-size: 18px;
+  font-weight: 500;
+  color: #000000;
+  white-space: nowrap;
+}
+
+.city_chevron_icon {
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.city_chevron_icon.rotated {
+  transform: rotate(180deg);
+}
+
+.location_divider {
+  width: 1px;
+  height: 24px;
+  background-color: #cbd5e1;
+  margin: 0 12px 0 6px;
+  flex-shrink: 0;
+}
+
+.city_selector_dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  width: 210px;
+  max-height: 280px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.14), 0 3px 10px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+  z-index: 1200;
+  overflow-y: auto;
+  padding: 6px;
+  animation: popIn 0.15s ease-out;
+}
+
+.city_dropdown_item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 14px;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: #334155;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.city_dropdown_item:hover {
+  background-color: #fff0ef;
+  color: #ff5444;
+}
+
+.city_dropdown_item.active {
+  font-weight: 700;
+  color: #ff5444;
+  background-color: #fff0ef;
+}
+
+.location_pin_svg {
+  flex-shrink: 0;
+}
+
+.chips_box {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.location_chip_pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #fff0ef;
+  color: #1e293b;
+  border: 1px solid #ffd6d3;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  animation: popIn 0.15s ease-out;
+}
+
+/* Overloaded Count Badge & Popover */
+.chip_count_container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.chip_count_badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: #ffffff;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+  border-radius: 50%;
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.chip_count_badge:hover,
+.chip_count_badge.active {
+  border-color: #ff5444;
+  color: #ff5444;
+  background-color: #fff0ef;
+}
+
+.extra_chips_popover {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  width: 320px;
+  max-height: 260px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.14), 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 14px 16px;
+  z-index: 1100;
+  border: 1px solid #e2e8f0;
+  overflow-y: auto;
+  animation: popIn 0.15s ease-out;
+}
+
+.extra_chips_popover_header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.popover_header_title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.clear_all_btn {
+  color: #ff5444;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  background: #fff0ef;
+  transition: all 0.15s ease;
+}
+
+.clear_all_btn:hover {
+  background: #ffe4e1;
+  color: #e11d48;
+}
+
+.extra_chips_popover_list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.chip_x {
+  font-size: 16px;
+  font-weight: 700;
+  color: #64748b;
+  cursor: pointer;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  transition: all 0.15s ease;
+}
+
+.chip_x:hover {
+  color: #ff5444;
+  background: #ffe4e1;
+}
+
+.chip_inline_input {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent;
+  font-size: 18px;
+  font-weight: 400;
+  color: #000000;
+  padding: 4px 8px;
+  flex: 1;
+  min-width: 110px;
+}
+
+.chip_inline_input::placeholder {
+  color: #000000;
+  font-size: 18px;
+}
+
+/* Autocomplete Dropdown Card for Chips */
+.chip_dropdown_card {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 320px;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04);
+  padding: 14px 16px;
+  z-index: 1050;
+  border: 1px solid #e2e8f0;
+  text-align: left;
+  animation: fadeInDown 0.18s ease-out;
+}
+
+.chip_dropdown_header {
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+  margin-bottom: 10px;
+  letter-spacing: 0.2px;
+}
+
+.chip_dropdown_list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.chip_dropdown_item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.chip_dropdown_item:hover {
+  background-color: #fff0ef;
+}
+
+.chip_item_icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #fff0ef;
+  flex-shrink: 0;
+}
+
+.chip_item_text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.chip_item_title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+.chip_item_category {
+  font-size: 10px;
+  font-weight: 700;
+  color: #ff5444;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* Search City API Suggestions Dropdown */
+.location_chip_container {
+  position: relative;
+}
+
+.search_suggestions_dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  min-width: 320px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e2e8f0;
+  max-height: 360px;
+  overflow-y: auto;
+  z-index: 1050;
+  padding: 6px 0;
+}
+
+.suggestion_item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.suggestion_item:hover {
+  background-color: #f8fafc;
+}
+
+.suggestion_icon_wrap {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.suggestion_icon_wrap.builder {
+  background: #fff7ed;
+  color: #ea580c;
+}
+
+.suggestion_icon_wrap.project {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.suggestion_icon_wrap.area {
+  background: #fef2f2;
+  color: #ff5444;
+}
+
+.suggestion_icon_wrap.city {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+.suggestion_content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.suggestion_title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1e293b;
+}
+
+.suggestion_type_badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.suggestion_type_badge.builder {
+  background: #fff7ed;
+  color: #ea580c;
+}
+
+.suggestion_type_badge.project {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.suggestion_type_badge.area {
+  background: #fef2f2;
+  color: #ff5444;
+}
+
+.suggestion_type_badge.city {
+  background: #f0fdf4;
+  color: #16a34a;
 }

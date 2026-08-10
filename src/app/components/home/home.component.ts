@@ -105,7 +105,12 @@ export class HomeComponent implements AfterViewInit, OnInit {
   propertyotherData: any;
   propertyother: any;
   propertyplotData: any;
-  propertyplot: any;
+  propertyplot: any[] = [
+    { id: 1, name: 'Agriculture Land' },
+    { id: 2, name: 'Residential Land & Plot' },
+    { id: 3, name: 'Commercial Land' },
+    { id: 4, name: 'Industrial Land' }
+  ];
   propertypgData: any;
   propertypg: any;
   propertyhostelData: any;
@@ -152,17 +157,10 @@ export class HomeComponent implements AfterViewInit, OnInit {
 
   validCities: string[] = [
     'Ahmedabad',
+    'Gandhinagar',
     'Rajkot',
     'Surat',
     'Vadodara',
-    'Mumbai',
-    'Navi Mumbai',
-    'Pune',
-    'Bangalore',
-    'NCR',
-    'Delhi',
-    'Gurgaon',
-    'Hyderabad',
   ];
 
   nameError: boolean = false;
@@ -180,6 +178,58 @@ export class HomeComponent implements AfterViewInit, OnInit {
   singleProp: any;
   checkToken: any;
   is_token: boolean = false;
+
+  selectedCityChip: string = 'Ahmedabad';
+  selectedExtraChips: string[] = [];
+  locationInputText: string = '';
+  showLocationDropdown: boolean = false;
+  showExtraChipsPopover: boolean = false;
+  locationSuggestions: Array<{ name: string; category: string; subtext?: string; slug?: string; rawData?: any }> = [];
+  cityLocalities: any[] = [];
+  minBudget: string = '';
+  maxBudget: string = '';
+
+  showCitySelectorDropdown: boolean = false;
+
+  toggleCitySelectorDropdown(event?: Event) {
+    if (event) event.stopPropagation();
+    this.showCitySelectorDropdown = !this.showCitySelectorDropdown;
+  }
+
+  selectCityFromSelector(cityName: string) {
+    this.selectedCityChip = cityName;
+    this.selectedExtraChips = [];
+    this.saveChipsToLocalStorage();
+    this.loadCityLocalities(cityName);
+    this.updateCity(cityName);
+    this.loadHotDeals();
+    this.loadFeaturedResidentalProjects();
+    this.loadFeaturedCommercialProjects();
+    this.loadFeaturedBunglowsProjects();
+    this.loadFarmHouseProjects();
+    this.loadFeaturedPlotsProjects();
+    this.loadTopBuilders();
+    this.loadHomeBanner();
+    this.loadAhmedabadProjects();
+    this.showCitySelectorDropdown = false;
+  }
+
+  getBudgetDisplayLabel(): string {
+    const minStr = this.minBudget ? String(this.minBudget).trim() : '';
+    const maxStr = this.maxBudget ? String(this.maxBudget).trim() : '';
+    if (!minStr && !maxStr) {
+      return 'Min Price - Max Price';
+    }
+    const minFormatted = minStr || 'Min Price';
+    const maxFormatted = maxStr || 'Max Price';
+    return `${minFormatted} - ${maxFormatted}`;
+  }
+
+  toggleExtraChipsPopover(event?: Event) {
+    if (event) event.stopPropagation();
+    this.showExtraChipsPopover = !this.showExtraChipsPopover;
+  }
+
 
   constructor(
     public http: HttpClient,
@@ -209,7 +259,7 @@ export class HomeComponent implements AfterViewInit, OnInit {
     private el: ElementRef,
     private geolocationService: GeolocationService,
     private headerService: HeaderService,
-    private seoService:SeoService
+    private seoService: SeoService
   ) {
     this.getLocation();
     this.loadHotDeals();
@@ -269,22 +319,33 @@ export class HomeComponent implements AfterViewInit, OnInit {
   }
   ngOnInit() {
     this.locationCookie = localStorage.getItem('location');
+    this.selectedCityChip = localStorage.getItem('selectedCityChip') || this.locationCookie || 'Ahmedabad';
+    try {
+      const savedExtra = localStorage.getItem('selectedExtraChips');
+      if (savedExtra) {
+        this.selectedExtraChips = JSON.parse(savedExtra);
+      }
+    } catch (e) { }
+    this.minBudget = localStorage.getItem('minBudget') || '';
+    this.maxBudget = localStorage.getItem('maxBudget') || '';
+
     this.seoService.setCanonicalURL(window.location.href);
     this.fetchCities();
     this.checkLoggedIn();
     this.propertyServicesHomePage()
     this.loadpropertyresidential();
     this.loadAhmedabadProjects();
+    this.loadCityLocalities(this.selectedCityChip);
     this.titleService.setTitle('Real Estate Property Portal | Real Estate Services | Buy, Sell, Rent Properties | realtymart.com');
     this.metaService.addTag({
       name: 'description',
       content: 'Find the best real estate services. Buy, sell, and rent properties with ease at realtymart.com. Your one-stop property portal!'
     });
     this.metaService.updateTag({
-      property:'og:title', content:'Real Estate Property Portal | Real Estate Services | Buy, Sell, Rent Properties | realtymart.com'
+      property: 'og:title', content: 'Real Estate Property Portal | Real Estate Services | Buy, Sell, Rent Properties | realtymart.com'
     });
     this.metaService.updateTag({
-      property:'og:description',content:'Find the best real estate services. Buy, sell, and rent properties with ease at realtymart.com. Your one-stop property portal!'
+      property: 'og:description', content: 'Find the best real estate services. Buy, sell, and rent properties with ease at realtymart.com. Your one-stop property portal!'
     });
     const token = localStorage.getItem('myrealtylogintoken');
     if (token) {
@@ -299,25 +360,25 @@ export class HomeComponent implements AfterViewInit, OnInit {
   ngAfterViewInit() {
     // this.loadHomeBanner();
     this.seoService.setSchema(
-{
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "realtymart",
-  "url": window.location.href,
-  "logo": window.location.href + "assets/images/logo.svg",
-  "contactPoint": {
-    "@type": "ContactPoint",
-    "telephone": "+91 8320864223",
-    "contactType": "technical support",
-    "areaServed": "IN",
-    "availableLanguage": "en"
-  },
-  "sameAs": [
-    "https://www.instagram.com/realtymart.official/",
-    "https://www.facebook.com/realtymartcom",
-    "https://www.linkedin.com/company/realtymart-com"
-  ]
-}, "organization-schema"
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "realtymart",
+        "url": window.location.href,
+        "logo": window.location.href + "assets/images/logo.svg",
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "telephone": "+91 8320864223",
+          "contactType": "technical support",
+          "areaServed": "IN",
+          "availableLanguage": "en"
+        },
+        "sameAs": [
+          "https://www.instagram.com/realtymart.official/",
+          "https://www.facebook.com/realtymartcom",
+          "https://www.linkedin.com/company/realtymart-com"
+        ]
+      }, "organization-schema"
     );
   }
 
@@ -413,6 +474,8 @@ export class HomeComponent implements AfterViewInit, OnInit {
 
   updateCity(city: string) {
     this.city = city;
+    this.selectedCityChip = city;
+    this.searchError = false;
     localStorage.setItem('location', city);
     if (this.city1 && this.myForm) {
       const defaultCity = this.city1.find((c: any) => c.cname === city);
@@ -420,6 +483,15 @@ export class HomeComponent implements AfterViewInit, OnInit {
         this.myForm.get('selectcitysearch')?.setValue(defaultCity.cid, { emitEvent: false });
       }
     }
+    this.loadHotDeals();
+    this.loadFeaturedResidentalProjects();
+    this.loadFeaturedCommercialProjects();
+    this.loadFeaturedBunglowsProjects();
+    this.loadFarmHouseProjects();
+    this.loadFeaturedPlotsProjects();
+    this.loadTopBuilders();
+    this.loadHomeBanner();
+    this.loadAhmedabadProjects();
   }
 
   loadHomeBanner(): void {
@@ -528,55 +600,16 @@ export class HomeComponent implements AfterViewInit, OnInit {
   loadpropertyresidential(): void {
     this.propertyresidentialservice.getpropertytyperesidential()?.subscribe((propertyresidentialData: any) => {
       this.propertyresidentialData = propertyresidentialData;
-      this.propertyresidential =
-        this.propertyresidentialData?.data;
+      this.propertyresidential = this.propertyresidentialData?.data;
 
-      if (this.activeTab != 'pg' && this.activeTab != 'hostel') {
+      this.selectedResidentialItems = [];
+      this.selectedCommercialItems = [];
+      this.selectedPlotItems = [];
+      this.selectedOtherItems = [];
+      this.selectedItemsOrder = [];
+      this.Residencialvisible = false;
 
-        const defaultSelections = ['Flat', 'Villa'];
-        this.selectedResidentialItems = this.propertyresidential
-          ?.filter((item: any) => defaultSelections.includes(item.name))
-          .map((item: any) => item.id);
-        this.selectedItemsOrder = this.propertyresidential?.filter(
-          (item: any) => defaultSelections.includes(item.name)
-        );
-        if (this.activeTab == 'plots') {
-          console.log('Active Tab:', this.activeTab);
-
-          const defaultSelections = ['Residential Land & Plot', 'Commercial Land'];
-          this.selectedPlotItems = this.propertyplot
-            ?.filter((item: any) => defaultSelections.includes(item.name))
-            .map((item: any) => item.id);
-          this.selectedItemsOrder = this.propertyplot?.filter(
-            (item: any) => defaultSelections.includes(item.name)
-          );
-
-        }
-        if (this.activeTab == 'commercial') {
-          console.log('Active Tab:', this.activeTab);
-
-          const defaultSelections = ['Office Space', 'Commercial Land'];
-          this.selectedCommercialItems = this.propertycommercial
-            ?.filter((item: any) => defaultSelections.includes(item.name))
-            .map((item: any) => item.id);
-          this.selectedItemsOrder = this.propertycommercial?.filter(
-            (item: any) => defaultSelections.includes(item.name)
-          );
-
-        }
-      }
-      else {
-        this.selectedResidentialItems = [];
-        this.selectedItemsOrder = [];
-      }
-
-      if (this.selectedResidentialItems.length > 0) {
-        this.Residencialvisible = true;
-      } else {
-        this.Residencialvisible = false;
-      }
-
-      // Update the label with default selected items
+      // Update the label with no items selected
       this.updatePropertyLabel();
     });
   }
@@ -593,9 +626,21 @@ export class HomeComponent implements AfterViewInit, OnInit {
     });
   }
   loadPropertyPlot(): void {
-    this.propertyplotservice.getpropertytypeplot()?.subscribe((propertyplotData: any) => {
-      this.propertyplotData = propertyplotData;
-      this.propertyplot = this.propertyplotData?.data;
+    const defaultPlots = [
+      { id: 1, name: 'Agriculture Land' },
+      { id: 2, name: 'Residential Land & Plot' },
+      { id: 3, name: 'Commercial Land' },
+      { id: 4, name: 'Industrial Land' }
+    ];
+    this.propertyplotservice.getpropertytypeplot()?.subscribe({
+      next: (propertyplotData: any) => {
+        this.propertyplotData = propertyplotData;
+        const apiData = Array.isArray(this.propertyplotData?.data) ? this.propertyplotData.data : [];
+        this.propertyplot = apiData.length > 0 ? apiData : defaultPlots;
+      },
+      error: () => {
+        this.propertyplot = defaultPlots;
+      }
     });
   }
   loadPropertyPg(): void {
@@ -618,10 +663,9 @@ export class HomeComponent implements AfterViewInit, OnInit {
   togglebudget: boolean = false;
   gender: boolean = false;
   Lookingfor: boolean = false;
-  minBudget: string = '';
-  maxBudget: string = '';
   searchcityname: any;
   type: any;
+  searchCityApiSubscription: any;
 
   toggleDisplayDiv() {
     this.visible = !this.visible;
@@ -629,14 +673,17 @@ export class HomeComponent implements AfterViewInit, OnInit {
 
   renttoggleDisplayDiv() {
     this.visible = !this.visible;
+    this.Residencialvisible = true;
   }
 
   farmhousetoggleDisplayDiv() {
     this.visible = !this.visible;
+    this.Residencialvisible = true;
   }
 
   plotstoggleDisplayDiv() {
     this.visible = !this.visible;
+    this.Residencialvisible = true;
   }
   toggleDisplayDivcom() {
     this.visible = !this.visible;
@@ -646,15 +693,24 @@ export class HomeComponent implements AfterViewInit, OnInit {
   onDocumentClick(event: MouseEvent): void {
     const clickedElement = event.target as HTMLElement;
 
+    if (!clickedElement.closest('.chip_count_container')) {
+      this.showExtraChipsPopover = false;
+    }
+
+    if (!clickedElement.closest('.city_selector_trigger') && !clickedElement.closest('.city_selector_dropdown')) {
+      this.showCitySelectorDropdown = false;
+    }
+
     // Check if the clicked element is inside the toggle area or the visible div
     if (
+      !clickedElement.closest('.property_drop') &&
       !clickedElement.closest('.property_wrapper') &&
       !clickedElement.closest('.property_inner')
     ) {
       this.visible = false;
     }
 
-    if (!clickedElement.closest('.budget-inner')) {
+    if (!clickedElement.closest('.budget_dorp') && !clickedElement.closest('.budget-inner')) {
       this.togglebudget = false;
     }
   }
@@ -944,10 +1000,6 @@ export class HomeComponent implements AfterViewInit, OnInit {
         }));
         this.citySearch = response.responseData;
 
-        const defaultCity = this.city1.find(city => city.cname === this.city);
-        if (defaultCity) {
-          this.myForm.get('selectcitysearch')?.setValue(defaultCity.cid, { emitEvent: false });
-        }
       },
       (error: any) => {
         console.error('API Error:', error);
@@ -955,8 +1007,215 @@ export class HomeComponent implements AfterViewInit, OnInit {
     );
   }
 
+  extractLocalityName(loc: any): string {
+    if (!loc) return '';
+    if (typeof loc === 'string') return loc;
+    if (loc.locality && loc.locality.localities) return loc.locality.localities;
+    if (loc.localities) return loc.localities;
+    if (loc.locality_name) return loc.locality_name;
+    if (loc.name) return loc.name;
+    if (loc.project_localities) return loc.project_localities;
+    if (loc.location) return loc.location;
+    return '';
+  }
+
+  loadCityLocalities(city?: string) {
+    const currentCity = city || this.selectedCityChip || this.city || 'Ahmedabad';
+    this.http.get<any>(`${environment.apiUrl}propertieslocalities/${currentCity}`).subscribe(
+      (res: any) => {
+        const rawList = res?.data?.data || res?.data || res?.responseData || res || [];
+        const arr = Array.isArray(rawList) ? rawList : (typeof rawList === 'object' ? Object.values(rawList) : []);
+        this.cityLocalities = arr.map((item: any) => this.extractLocalityName(item)).filter((name: string) => name && name.trim() !== '');
+      },
+      (err) => {
+        this.http.get<any>(`${environment.apiUrl}toplocalities/${currentCity}`).subscribe((res2: any) => {
+          const rawList2 = res2?.data?.data || res2?.data || res2?.responseData || res2 || [];
+          const arr2 = Array.isArray(rawList2) ? rawList2 : (typeof rawList2 === 'object' ? Object.values(rawList2) : []);
+          this.cityLocalities = arr2.map((item: any) => this.extractLocalityName(item)).filter((name: string) => name && name.trim() !== '');
+        });
+      }
+    );
+  }
+
+  private getCityDefaultLocalities(cityName: string): string[] {
+    const city = (cityName || '').toLowerCase().trim();
+    if (city.includes('gandhinagar')) {
+      return ['Kudasan', 'Raysan', 'Sargasan', 'Infocity', 'Sector 1', 'Sector 6', 'Sector 11', 'Sector 16', 'Sector 21', 'Vavol', 'Adalaj', 'PDPU Road', 'Bhaijipura', 'Pethapur', 'Randheja', 'Koba', 'GIFT City'];
+    } else if (city.includes('surat')) {
+      return ['Vesu', 'Adajan', 'Piplod', 'Palanpur', 'City Light', 'Varachha', 'Katargam', 'Althan', 'Bhatar', 'Dumas'];
+    } else if (city.includes('baroda') || city.includes('vadodara')) {
+      return ['Alkapuri', 'Gotri', 'Vasna', 'Manjalpur', 'Bhayli', 'Karelibaug', 'Fatehgunj', 'Subhanpura', 'Atladra', 'Akota'];
+    } else if (city.includes('rajkot')) {
+      return ['Kalawad Road', '150 Feet Ring Road', 'University Road', 'Yagnik Road', 'Mota Mava', 'Kotharia', 'Raiya Road'];
+    } else if (city.includes('ahmedabad') || city.includes('ahmedbad')) {
+      return ['Gota', 'Naranpura', 'Bodakdev', 'Ambli', 'Ghuma', 'Bopal', 'Satellite', 'Prahlad Nagar', 'Thaltej', 'Science City', 'Shela', 'Vaishnodevi', 'SG Highway', 'Chandkheda', 'Motera', 'Vastrapur'];
+    }
+    return [];
+  }
+
+  onLocationInput(event?: any) {
+    const query = (this.locationInputText || '').trim();
+    const city = (this.selectedCityChip || this.city || '').trim();
+
+    if (this.searchCityApiSubscription) {
+      this.searchCityApiSubscription.unsubscribe();
+    }
+
+    if (!query) {
+      this.locationSuggestions = [];
+      this.showLocationDropdown = false;
+      return;
+    }
+
+    const apiUrl = `${environment.apiUrl}searchcity?searchstring=${encodeURIComponent(query)}&city=${encodeURIComponent(city)}`;
+
+    this.searchCityApiSubscription = this.http.get(apiUrl).subscribe(
+      (res: any) => {
+        if (res && res.isSuccess && Array.isArray(res.responseData)) {
+          const apiSuggestions: Array<{ name: string; category: string; slug?: string; rawData?: any }> = [];
+
+          res.responseData.forEach((item: any) => {
+            let category = 'Area';
+            const itemType = (item.type || '').toLowerCase();
+            if (itemType === 'builder') category = 'Builder';
+            else if (itemType === 'project') category = 'Project';
+            else if (itemType === 'area') category = 'Area';
+            else if (itemType === 'city') category = 'CITY';
+
+            apiSuggestions.push({
+              name: item.name,
+              category: category,
+              slug: item.slug || '',
+              rawData: item
+            });
+          });
+
+          this.locationSuggestions = apiSuggestions;
+          this.showLocationDropdown = this.locationSuggestions.length > 0;
+        } else {
+          this.locationSuggestions = [];
+          this.showLocationDropdown = false;
+        }
+      },
+      (error) => {
+        console.error('Error fetching searchcity suggestions:', error);
+        this.locationSuggestions = [];
+        this.showLocationDropdown = false;
+      }
+    );
+  }
+
+  saveChipsToLocalStorage() {
+    if (this.selectedCityChip) {
+      localStorage.setItem('selectedCityChip', this.selectedCityChip);
+      localStorage.setItem('location', this.selectedCityChip);
+    } else {
+      localStorage.removeItem('selectedCityChip');
+    }
+    if (this.selectedExtraChips && this.selectedExtraChips.length > 0) {
+      localStorage.setItem('selectedExtraChips', JSON.stringify(this.selectedExtraChips));
+    } else {
+      localStorage.removeItem('selectedExtraChips');
+    }
+    if (this.minBudget) {
+      localStorage.setItem('minBudget', this.minBudget);
+    } else {
+      localStorage.removeItem('minBudget');
+    }
+    if (this.maxBudget) {
+      localStorage.setItem('maxBudget', this.maxBudget);
+    } else {
+      localStorage.removeItem('maxBudget');
+    }
+  }
+
+  onLocationEnter(event?: Event) {
+    if (event) event.preventDefault();
+    const query = (this.locationInputText || '').trim();
+    if (query) {
+      const formatted = query.charAt(0).toUpperCase() + query.slice(1);
+      if (!this.selectedExtraChips.includes(formatted)) {
+        this.selectedExtraChips.push(formatted);
+        this.saveChipsToLocalStorage();
+      }
+      this.locationInputText = '';
+      this.showLocationDropdown = false;
+    }
+  }
+
+  onLocationFocus() {
+    this.onLocationInput();
+  }
+
+  onLocationBlur() {
+    setTimeout(() => {
+      this.showLocationDropdown = false;
+    }, 250);
+  }
+
+  selectLocationSuggestion(item: { name: string; category: string; slug?: string; rawData?: any }) {
+    if (item.category === 'CITY') {
+      this.selectedCityChip = item.name;
+      this.selectedExtraChips = [];
+      this.saveChipsToLocalStorage();
+      this.loadCityLocalities(item.name);
+      this.updateCity(item.name);
+      this.loadHotDeals();
+      this.loadFeaturedResidentalProjects();
+      this.loadFeaturedCommercialProjects();
+      this.loadFeaturedBunglowsProjects();
+      this.loadFarmHouseProjects();
+      this.loadFeaturedPlotsProjects();
+      this.loadTopBuilders();
+      this.loadHomeBanner();
+      this.loadAhmedabadProjects();
+    } else if (item.category === 'Project') {
+      const slug = item.slug || (item.name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      if (slug) {
+        this.router.navigate(['/' + slug]);
+      }
+      this.locationInputText = '';
+      this.showLocationDropdown = false;
+      return;
+    } else if (item.category === 'Builder') {
+      const slug = item.slug || (item.name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      if (slug) {
+        this.router.navigate(['/builder-detail', slug]);
+      }
+      this.locationInputText = '';
+      this.showLocationDropdown = false;
+      return;
+    } else if (item.category === 'Area') {
+      if (!this.selectedExtraChips.includes(item.name)) {
+        this.selectedExtraChips.push(item.name);
+        this.saveChipsToLocalStorage();
+      }
+    }
+
+    this.locationInputText = '';
+    this.showLocationDropdown = false;
+  }
+
+  removeCityChip() {
+    this.selectedCityChip = '';
+    this.selectedExtraChips = [];
+    this.saveChipsToLocalStorage();
+    this.showLocationDropdown = false;
+    this.onLocationInput();
+  }
+
+  removeExtraChip(index: number) {
+    this.selectedExtraChips.splice(index, 1);
+    this.saveChipsToLocalStorage();
+  }
+
+  removeAllExtraChips() {
+    this.selectedExtraChips = [];
+    this.saveChipsToLocalStorage();
+  }
+
   onSubmit(redirect: boolean = true) {
-    if (this.myForm.invalid) {
+    if (!this.selectedCityChip && !this.myForm.get('selectcitysearch')?.value) {
       this.searchError = true;
       return;
     }
@@ -988,10 +1247,25 @@ export class HomeComponent implements AfterViewInit, OnInit {
 
     const selectedCityId = this.myForm.get('selectcitysearch')?.value;
     const selectedCity = this.city1.find(city => city.cid === selectedCityId);
-    const location = selectedCity?.cname || this.city;
+    const location = this.selectedCityChip || selectedCity?.cname || this.city;
+
+    const extraChips = [...this.selectedExtraChips];
+    if (this.locationInputText && this.locationInputText.trim()) {
+      const typed = this.locationInputText.trim();
+      if (!extraChips.includes(typed)) {
+        extraChips.push(typed);
+      }
+    }
+    const apiLocality = extraChips.length === 1 ? extraChips[0] : '';
+    const extraKeywords = extraChips.join(' ');
+    this.saveChipsToLocalStorage();
 
     let searchData: any = {
       location: location,
+      city: location,
+      locality: apiLocality,
+      area: apiLocality,
+      search_keyword: extraKeywords,
       minPrice: this.minBudget,
       maxPrice: this.maxBudget,
       propertyfor: this.activeTab,
@@ -1018,10 +1292,12 @@ export class HomeComponent implements AfterViewInit, OnInit {
         (response: any) => {
           console.log('API Response:', response);
           if (redirect) {
-            const dataToSend = { result: response };
-            console.log(response, "response");
-            
-            this.router.navigate(['search-property'], { state: response });
+            const extraState = {
+              ...(response || {}),
+              searchKeywords: extraChips,
+              searchedLocality: extraKeywords
+            };
+            this.router.navigate(['search-property'], { state: extraState });
           }
         },
         (error: any) => {
@@ -1234,31 +1510,16 @@ export class HomeComponent implements AfterViewInit, OnInit {
 
   }
 
-  getvaluemin(minval: any, type: any) {
-    if (type == 'rent') {
-      this.minBudget = minval;
-      $('#maxBudjetrent').click();
-    } else if (type == 'buy') {
-      this.minBudget = minval;
-      $('#budgetMax').click();
-    } else if (type == 'farm') {
-      this.minBudget = minval;
-      $('#maxBudjetfarm').click();
-    } else if (type == 'plot') {
-      this.minBudget = minval;
-      $('#maxBudjetplot').click();
-    } else if (type == 'pg') {
-      this.minBudget = minval;
-      $('#maxBudjetpg').click();
-    } else if (type == 'hostel') {
-      this.minBudget = minval;
-      $('#maxBudjethostel').click();
-    }
+  getvaluemin(minval: any, type?: any) {
+    const val = String(minval || '').trim();
+    this.minBudget = (val === 'Min' || !val) ? '' : val;
+    this.saveChipsToLocalStorage();
   }
 
-  getvaluemax(maxval: any, type: any) {
-    this.maxBudget = maxval;
-    this.toggleBudget();
+  getvaluemax(maxval: any, type?: any) {
+    const val = String(maxval || '').trim();
+    this.maxBudget = (val === 'Max' || !val) ? '' : val;
+    this.saveChipsToLocalStorage();
   }
 
   submitForm() {

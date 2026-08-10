@@ -152,6 +152,10 @@ export class MatchingPropertiesComponent implements OnInit {
               item.location ||
               item.area ||
               item.project_location ||
+              item.project_address ||
+              item.address ||
+              item.name ||
+              item.title ||
               ''
             ).toLowerCase();
             return lowerKeywords.some(kw => locName.includes(kw) || kw.includes(locName));

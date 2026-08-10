@@ -101,12 +101,12 @@
                     <label class="pp-form__elem-radio__label" for="Rent">Rent</label>
                   </div>
 
-                  <div class="pp-form__elem-radio" style="width: 100px; height: 44px">
+                  <!-- <div class="pp-form__elem-radio" style="width: 100px; height: 44px">
                     <input class="pp-form__elem-radio__input" formControlName="property_for" type="radio" id="PGHostel"
                       autocomplete="off" [value]="'PG/Hostel'" (change)="onPropertyFor($event)" />
-                    <label class="pp-form__elem-radio__label" for="PGHostel">PG</label>
+                    <label class="pp-form__elem-radio__label" for="PGHostel">PG</label> -->
                     <!-- <label class="pp-form__elem-radio__label" for="PGHostel">PG/Hostel</label> -->
-                  </div>
+                  <!-- </div> -->
                 </div>
 
                 <div
@@ -604,7 +604,7 @@
                 </div>
 
                 <div id="forcommercialandresidentialplot"
-                  [style.display]="['5', '9', '17', '21'].includes(selectedPropertyType) ? 'block' : 'none'">
+                  *ngIf="['5', '9', '17', '21'].includes(selectedPropertyType)">
                   <div class="col-md-4">
                     <label _ngcontent-ng-c2223104581="" for="floors_allowed_for_construction">Floors Allowed for
                       construction</label>
@@ -1418,9 +1418,9 @@
                     </div>
                   </div>
 
-                  <div id="rentavlbldate2">
+                  <div id="rentavlbldate2" *ngIf="selectedAvailabaleDate === 'SelectDate'">
                     <div class="col-md-6">
-                      <input *ngIf="selectedAvailabaleDate === 'SelectDate'" type="date" id="date"
+                      <input type="date" id="date"
                         formControlName="available_from" class="gold-form-input post_fm mt-2" />
                       <div
                         *ngIf="submitForm.get('available_from')?.invalid && (submitForm.get('available_from')?.dirty || submitForm.get('available_from')?.touched)"
@@ -1928,37 +1928,94 @@
                     Please Enter Property Facilities
                   </div>
                   <div class="col-6 formCom">
-                    <div>
-                      <label>Property Main Image</label>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <label class="fw-bold m-0">Property Main Image</label>
+                      <span *ngIf="mainImagePreview" class="badge bg-success">Main Cover</span>
                     </div>
-                    <label for="fileInput" class="custom-file-input">
-                      Upload
-                      <i class="fa-solid fa-upload custom-file-input"></i>
-                    </label>
-                    <input type="file" formControlName="property_main_img" id="fileInput" accept="image/*" multiple />
-                    <div>
-                      <img />
+
+                    <!-- Drop Box when no image -->
+                    <div *ngIf="!mainImagePreview" class="dropbox-container"
+                         [ngClass]="{'drag-over': isMainDragOver}"
+                         (dragover)="onMainDragOver($event)"
+                         (dragleave)="onMainDragLeave($event)"
+                         (drop)="onMainImageDrop($event)">
+                      <label for="mainFileInput" class="dropbox-label cursor-pointer w-100 h-100 m-0 d-flex align-items-center justify-content-center">
+                        <div class="dropbox-content text-center py-3 px-2">
+                          <i class="fa-solid fa-cloud-arrow-up dropbox-icon text-danger fs-2 mb-2"></i>
+                          <div class="fw-bold text-dark mb-1">Drag & Drop Main Cover Image</div>
+                          <div class="small text-muted mb-2">or <span class="text-danger text-decoration-underline">Browse File</span></div>
+                          <span class="badge bg-light text-secondary border">JPG, PNG, WEBP</span>
+                        </div>
+                      </label>
+                      <input type="file" id="mainFileInput" (change)="onMainImageChange($event)" accept="image/*" />
                     </div>
+
+                    <!-- Main Image Preview & Controls (CRUD) -->
+                    <div *ngIf="mainImagePreview" class="image-crud-card main-img-card position-relative mt-2">
+                      <img [src]="mainImagePreview" alt="Main Property Image" class="img-fluid rounded border shadow-sm main-preview-img" />
+                      <button type="button" class="btn btn-danger btn-sm main-delete-btn position-absolute top-0 end-0 m-1 rounded-circle p-0"
+                              (click)="removeMainImage()" title="Remove Main Image">
+                        <i class="fa-solid fa-xmark"></i>
+                      </button>
+                      <div class="image-actions-bar d-flex gap-2 mt-2">
+                        <!-- <label for="mainFileInput" class="btn btn-sm btn-outline-primary py-1 px-2 m-0 cursor-pointer">
+                          <i class="fa-solid fa-pen-to-square"></i> Change
+                        </label> -->
+                        <input type="file" id="mainFileInput" (change)="onMainImageChange($event)" accept="image/*" />
+                      </div>
+                    </div>
+
                     <div
                       *ngIf="submitForm.get('property_main_img')?.invalid && (submitForm.get('property_main_img')?.dirty || submitForm.get('property_main_img')?.touched)"
-                      class="mgs_error">
-                      Please Upload Property Main Images
+                      class="mgs_error mt-1">
+                      Please Upload Property Main Image
                     </div>
                   </div>
+
                   <div class="col-6 formCom">
-                    <div>
-                      <label>Property Images</label>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <label class="fw-bold m-0">Property Images (Gallery)</label>
+                      <span *ngIf="galleryImagePreviews.length > 0" class="badge bg-secondary">
+                        {{ galleryImagePreviews.length }} {{ galleryImagePreviews.length === 1 ? 'Image' : 'Images' }}
+                      </span>
                     </div>
-                    <label for="fileInput" class="custom-file-input">
-                      Upload<i class="fa-solid fa-upload custom-file-input"></i>
-                    </label>
-                    <input type="file" formControlName="property_img" id="fileInput" accept="image/*" multiple />
-                    <div>
-                      <img />
+
+                    <!-- Drop Box for Gallery Images -->
+                    <div class="dropbox-container"
+                         [ngClass]="{'drag-over': isGalleryDragOver}"
+                         (dragover)="onGalleryDragOver($event)"
+                         (dragleave)="onGalleryDragLeave($event)"
+                         (drop)="onGalleryImagesDrop($event)">
+                      <label for="galleryFileInput" class="dropbox-label cursor-pointer w-100 h-100 m-0 d-flex align-items-center justify-content-center">
+                        <div class="dropbox-content text-center py-3 px-2">
+                          <i class="fa-solid fa-images dropbox-icon text-danger fs-2 mb-2"></i>
+                          <div class="fw-bold text-dark mb-1">
+                            {{ galleryImagePreviews.length > 0 ? 'Drag & Drop + Add More Images' : 'Drag & Drop Gallery Images' }}
+                          </div>
+                          <div class="small text-muted mb-2">or <span class="text-danger text-decoration-underline">Browse Files</span></div>
+                          <span class="badge bg-light text-secondary border">Multiple Images Allowed</span>
+                        </div>
+                      </label>
+                      <input type="file" id="galleryFileInput" (change)="onGalleryImagesChange($event)" accept="image/*" multiple />
                     </div>
+
+                    <!-- Gallery Image Previews Grid (CRUD) -->
+                    <div *ngIf="galleryImagePreviews.length > 0" class="gallery-crud-grid d-flex flex-wrap gap-2 mt-2">
+                      <div *ngFor="let item of galleryImagePreviews; let i = index" class="gallery-preview-item position-relative border rounded p-1 bg-light">
+                        <img [src]="item.url" [alt]="item.name" class="img-thumbnail rounded gallery-thumb-img" />
+                        <button type="button" class="btn btn-danger btn-sm gallery-delete-btn position-absolute top-0 end-0 m-1 rounded-circle p-0"
+                                (click)="removeGalleryImage(i)" title="Remove Image">
+                          <i class="fa-solid fa-xmark"></i>
+                        </button>
+                        <div class="small text-truncate mt-1 px-1 text-muted" style="max-width: 90px;" [title]="item.name">
+                          {{ item.name }}
+                        </div>
+                      </div>
+                    </div>
+
                     <div
                       *ngIf="submitForm.get('property_img')?.invalid && (submitForm.get('property_img')?.dirty || submitForm.get('property_img')?.touched)"
-                      class="mgs_error">
+                      class="mgs_error mt-1">
                       Please Upload Property Images
                     </div>
                   </div>

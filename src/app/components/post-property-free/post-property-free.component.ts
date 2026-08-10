@@ -28,8 +28,8 @@ export class PostPropertyFreeComponent {
     property_price_show: new FormControl(null, []),
     property_description: new FormControl(null, [Validators.required]),
     property_facilities: new FormControl(null, [Validators.required]),
-    property_main_img: new FormControl(null, [Validators.required]),
-    property_img: new FormControl(null, []),
+    property_main_img: new FormControl<any>(null, [Validators.required]),
+    property_img: new FormControl<any>(null, []),
     current_business_sector: new FormControl('', []),
     overlooking: new FormControl(null, [Validators.required]),
     lift: new FormControl('', []),
@@ -1361,14 +1361,6 @@ export class PostPropertyFreeComponent {
     this.selectedPropertyFor = this.submitForm.value?.property_for;
 
     if(this.selectedPropertyFor == 'Rent'){
-      // avbldate
-      this.submitForm.get('avbldate')?.setValidators([Validators.required]);
-      this.submitForm.get('avbldate')?.updateValueAndValidity();
-
-      // available_from
-      this.submitForm.get('available_from')?.setValidators([Validators.required]);
-      this.submitForm.get('available_from')?.updateValueAndValidity();
-
       // rent_amount
       this.submitForm.get('rent_amount')?.setValidators([Validators.required]);
       this.submitForm.get('rent_amount')?.updateValueAndValidity();
@@ -1394,21 +1386,193 @@ export class PostPropertyFreeComponent {
       this.submitForm.get('thousand_lac_or_cr')?.setValidators([Validators.required]);
       this.submitForm.get('thousand_lac_or_cr')?.updateValueAndValidity();
     }
+
+    this.cleanupHiddenControlValidators();
   }
 
   showpossessionstatus(){
     this.selectedPossessionStatus = this.submitForm.value?.possession_status;
     console.log(this.selectedPossessionStatus);
 
-    if(this.selectedPropertyFor !== 'Rent' || this.selectedPossessionStatus == 'Under Construction'){
-      // available_from_month
+    if (this.selectedPossessionStatus == 'Under Construction') {
+      this.submitForm.get('avbldate')?.setValidators([Validators.required]);
+      this.submitForm.get('avbldate')?.updateValueAndValidity();
+
       this.submitForm.get('available_from_month')?.setValidators([Validators.required]);
       this.submitForm.get('available_from_month')?.updateValueAndValidity();
 
-      // available_from_year
       this.submitForm.get('available_from_year')?.setValidators([Validators.required]);
       this.submitForm.get('available_from_year')?.updateValueAndValidity();
+    }
 
+    this.cleanupHiddenControlValidators();
+  }
+
+  cleanupHiddenControlValidators(): void {
+    const pFor = String(this.submitForm.value?.property_for || '');
+    const pType = String(this.submitForm.value?.property_type || '');
+    const pStatus = String(this.submitForm.value?.possession_status || '');
+    const avblDateOpt = String(this.submitForm.value?.avbldate || '');
+
+    // 1. possession_status: Only visible when ['1', '3', '4', '8', '10', '11', '12', '16', '18', '19', '20'].includes(pType)
+    if (!['1', '3', '4', '8', '10', '11', '12', '16', '18', '19', '20'].includes(pType)) {
+      this.submitForm.get('possession_status')?.clearValidators();
+      this.submitForm.get('possession_status')?.setValue(null);
+      this.submitForm.get('possession_status')?.updateValueAndValidity();
+    }
+
+    // 2. lift, total_units, total_towers, water_availability, status_of_electricity, floor_no, total_floor, furnishing_status
+    if (!['1', '3', '4', '8', '10', '11', '12', '16', '18', '19', '20'].includes(pType)) {
+      ['lift', 'total_units', 'total_towers', 'water_availability', 'status_of_electricity', 'floor_no', 'total_floor', 'furnishing_status'].forEach(field => {
+        this.submitForm.get(field)?.clearValidators();
+        this.submitForm.get(field)?.setValue('');
+        this.submitForm.get(field)?.updateValueAndValidity();
+      });
+    }
+
+    // 3. bedroom, bathroom: Only visible when ['1', '3', '4', '10', '11', '12'].includes(pType)
+    if (!['1', '3', '4', '10', '11', '12'].includes(pType)) {
+      ['bedroom', 'bathroom'].forEach(field => {
+        this.submitForm.get(field)?.clearValidators();
+        this.submitForm.get(field)?.setValue('');
+        this.submitForm.get(field)?.updateValueAndValidity();
+      });
+    }
+
+    // 4. balconies: Only visible when ['1', '10', '12'].includes(pType)
+    if (!['1', '10', '12'].includes(pType)) {
+      this.submitForm.get('balconies')?.clearValidators();
+      this.submitForm.get('balconies')?.setValue('');
+      this.submitForm.get('balconies')?.updateValueAndValidity();
+    }
+
+    // 5. no_of_open_sides: Only visible when ['3', '4', '5', '9', '17', '21'].includes(pType)
+    if (!['3', '4', '5', '9', '17', '21'].includes(pType)) {
+      this.submitForm.get('no_of_open_sides')?.clearValidators();
+      this.submitForm.get('no_of_open_sides')?.setValue('');
+      this.submitForm.get('no_of_open_sides')?.updateValueAndValidity();
+    }
+
+    // 6. width_of_road_facing_the_plot: Only visible when ['4', '5', '8', '9', '16', '17', '18', '19', '20', '21'].includes(pType)
+    if (!['4', '5', '8', '9', '16', '17', '18', '19', '20', '21'].includes(pType)) {
+      this.submitForm.get('width_of_road_facing_the_plot')?.clearValidators();
+      this.submitForm.get('width_of_road_facing_the_plot')?.setValue(null);
+      this.submitForm.get('width_of_road_facing_the_plot')?.updateValueAndValidity();
+    }
+
+    // 7. Commercial washroom/pantry fields: washroom, personal_washroom, pantry_cafeteria
+    if (!['8', '16', '18', '19', '20'].includes(pType)) {
+      ['washroom', 'personal_washroom', 'pantry_cafeteria'].forEach(field => {
+        this.submitForm.get(field)?.clearValidators();
+        this.submitForm.get(field)?.setValue('');
+        this.submitForm.get(field)?.updateValueAndValidity();
+      });
+    }
+
+    // 8. avbldate: Only visible when possession_status === 'Under Construction'
+    if (pStatus === 'Under Construction') {
+      this.submitForm.get('avbldate')?.setValidators([Validators.required]);
+      this.submitForm.get('avbldate')?.updateValueAndValidity();
+    } else {
+      this.submitForm.get('avbldate')?.clearValidators();
+      this.submitForm.get('avbldate')?.setValue(null);
+      this.submitForm.get('avbldate')?.updateValueAndValidity();
+    }
+
+    // 9. available_from: Only visible & required when possession_status === 'Under Construction' AND avbldate === 'SelectDate'
+    if (pStatus === 'Under Construction' && avblDateOpt === 'SelectDate') {
+      this.submitForm.get('available_from')?.setValidators([Validators.required]);
+      this.submitForm.get('available_from')?.updateValueAndValidity();
+    } else {
+      this.submitForm.get('available_from')?.clearValidators();
+      this.submitForm.get('available_from')?.setValue(null);
+      this.submitForm.get('available_from')?.updateValueAndValidity();
+    }
+
+    // 10. available_from_month & available_from_year: Only visible when (property_for === 'Sell' || possession_status === 'Under Construction')
+    if (pFor === 'Sell' || pStatus === 'Under Construction') {
+      this.submitForm.get('available_from_month')?.setValidators([Validators.required]);
+      this.submitForm.get('available_from_month')?.updateValueAndValidity();
+
+      this.submitForm.get('available_from_year')?.setValidators([Validators.required]);
+      this.submitForm.get('available_from_year')?.updateValueAndValidity();
+    } else {
+      this.submitForm.get('available_from_month')?.clearValidators();
+      this.submitForm.get('available_from_month')?.setValue(null);
+      this.submitForm.get('available_from_month')?.updateValueAndValidity();
+
+      this.submitForm.get('available_from_year')?.clearValidators();
+      this.submitForm.get('available_from_year')?.setValue(null);
+      this.submitForm.get('available_from_year')?.updateValueAndValidity();
+    }
+
+    // 11. Rent vs Sell fields
+    if (pFor === 'Rent') {
+      ['total_price', 'lac_or_cr', 'booking_or_token_ammount', 'thousand_lac_or_cr'].forEach(field => {
+        this.submitForm.get(field)?.clearValidators();
+        this.submitForm.get(field)?.setValue(null);
+        this.submitForm.get(field)?.updateValueAndValidity();
+      });
+    } else if (pFor === 'Sell') {
+      ['rent_amount', 'security_amount'].forEach(field => {
+        this.submitForm.get(field)?.clearValidators();
+        this.submitForm.get(field)?.setValue(null);
+        this.submitForm.get(field)?.updateValueAndValidity();
+      });
+    }
+
+    // 12. Plot fields: floors_allowed_for_construction, boundary_wall_made, any_construction_done, is_in_gated_colony
+    if (!['5', '9', '17', '21'].includes(pType)) {
+      ['floors_allowed_for_construction', 'boundary_wall_made', 'any_construction_done', 'is_in_gated_colony'].forEach(field => {
+        this.submitForm.get(field)?.clearValidators();
+        this.submitForm.get(field)?.setValue('');
+        this.submitForm.get(field)?.updateValueAndValidity();
+      });
+    }
+
+    // 13. Plot Area & Length/Width: Only visible when ['3', '4', '5', '9', '12', '17', '21'].includes(pType)
+    if (!['3', '4', '5', '9', '12', '17', '21'].includes(pType)) {
+      ['ploat_area', 'ploat_area_in', 'plot_length', 'plot_width'].forEach(field => {
+        this.submitForm.get(field)?.clearValidators();
+        this.submitForm.get(field)?.setValue(null);
+        this.submitForm.get(field)?.updateValueAndValidity();
+      });
+    }
+
+    // 14. Carpet Area: Only visible when ['1', '3', '4', '8', '10', '11', '12', '18', '19'].includes(pType)
+    if (!['1', '3', '4', '8', '10', '11', '12', '18', '19'].includes(pType)) {
+      ['carpet_area', 'carpet_area_in'].forEach(field => {
+        this.submitForm.get(field)?.clearValidators();
+        this.submitForm.get(field)?.setValue(null);
+        this.submitForm.get(field)?.updateValueAndValidity();
+      });
+    }
+
+    // 15. Covered Area: Only visible when ['3', '4', '8', '10', '11', '12', '16', '18', '19', '20'].includes(pType)
+    if (!['3', '4', '8', '10', '11', '12', '16', '18', '19', '20'].includes(pType)) {
+      ['covered_area', 'covered_area_in'].forEach(field => {
+        this.submitForm.get(field)?.clearValidators();
+        this.submitForm.get(field)?.setValue(null);
+        this.submitForm.get(field)?.updateValueAndValidity();
+      });
+    }
+
+    // 16. Built-up Area & Super Area: Only visible when ['1', '3', '4', '8', '9', '10', '11', '12', '16', '17', '18', '19', '20', '21'].includes(pType)
+    if (!['1', '3', '4', '8', '9', '10', '11', '12', '16', '17', '18', '19', '20', '21'].includes(pType)) {
+      ['built_up_area', 'built_up_area_in', 'super_area', 'super_area_in'].forEach(field => {
+        this.submitForm.get(field)?.clearValidators();
+        this.submitForm.get(field)?.setValue(null);
+        this.submitForm.get(field)?.updateValueAndValidity();
+      });
+    }
+
+    // 17. Apartment/Flat specific fields: total_no_of_flats
+    if (pType !== '1') {
+      ['total_no_of_flats'].forEach(field => {
+        this.submitForm.get(field)?.clearValidators();
+        this.submitForm.get(field)?.setValue('');
+        this.submitForm.get(field)?.updateValueAndValidity();
+      });
     }
   }
 
@@ -1475,6 +1639,7 @@ export class PostPropertyFreeComponent {
 
   onSelectionChange(): void {
     this.selectedAvailabaleDate = this.submitForm.value?.avbldate;
+    this.cleanupHiddenControlValidators();
   }
 
   onLeased(){
@@ -1631,6 +1796,9 @@ export class PostPropertyFreeComponent {
   propertyForm() {
     const userId = localStorage.getItem('userId');
     this.submitForm.patchValue({ user_id: userId });
+
+    this.cleanupHiddenControlValidators();
+
     console.log(this.submitForm.invalid);
     console.log(this.submitForm.value);
 
@@ -1643,18 +1811,71 @@ export class PostPropertyFreeComponent {
           console.log(`Invalid field: ${key}`, control.errors);
         }
       });
+      this.toastr.error('Please fill all required fields.');
       return;
     }
 
-    let payload = this.submitForm.value;
+    let payload = { ...this.submitForm.value };
+    const pFor = String(payload.property_for || '');
+    const pType = String(payload.property_type || '');
+    const pStatus = String(payload.possession_status || '');
+    const avblDateOpt = String(payload.avbldate || '');
+
+    if (pStatus !== 'Under Construction') {
+      delete payload.avbldate;
+    }
+    if (pStatus !== 'Under Construction' || avblDateOpt !== 'SelectDate') {
+      delete payload.available_from;
+    }
+    if (pFor !== 'Sell' && pStatus !== 'Under Construction') {
+      delete payload.available_from_month;
+      delete payload.available_from_year;
+    }
+    if (pFor === 'Rent') {
+      delete payload.total_price;
+      delete payload.lac_or_cr;
+      delete payload.booking_or_token_ammount;
+      delete payload.thousand_lac_or_cr;
+    } else if (pFor === 'Sell') {
+      delete payload.rent_amount;
+      delete payload.security_amount;
+    }
+    if (!['5', '9', '17', '21'].includes(pType)) {
+      delete payload.floors_allowed_for_construction;
+      delete payload.boundary_wall_made;
+      delete payload.any_construction_done;
+      delete payload.is_in_gated_colony;
+    }
+    if (!['3', '4', '5', '9', '12', '17', '21'].includes(pType)) {
+      delete payload.ploat_area;
+      delete payload.ploat_area_in;
+      delete payload.plot_length;
+      delete payload.plot_width;
+    }
+    if (!['1', '3', '4', '8', '10', '11', '12', '18', '19'].includes(pType)) {
+      delete payload.carpet_area;
+      delete payload.carpet_area_in;
+    }
+    if (!['3', '4', '8', '10', '11', '12', '16', '18', '19', '20'].includes(pType)) {
+      delete payload.covered_area;
+      delete payload.covered_area_in;
+    }
+    if (!['1', '3', '4', '8', '9', '10', '11', '12', '16', '17', '18', '19', '20', '21'].includes(pType)) {
+      delete payload.built_up_area;
+      delete payload.built_up_area_in;
+      delete payload.super_area;
+      delete payload.super_area_in;
+    }
     this.http.post(`${environment.apiUrl}addproperty`, payload).subscribe(
       (res: any) => {
-      window.location.reload();
-
         this.toastr.success('Your Property Post successfully.');
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
       },
       (error) => {
         console.error('Error sending data', error);
+        this.toastr.error('Failed to post property. Please try again.');
       }
     );
   }
@@ -1670,6 +1891,131 @@ export class PostPropertyFreeComponent {
     const invalidChars = [' ', ',', ';', '"', `'`, '`'];
     if (invalidChars.includes(event.key)) {
       event.preventDefault();
+    }
+  }
+
+  // Image CRUD logic
+  mainImagePreview: string | null = null;
+  galleryImagePreviews: { id: number; url: string; file: File; name: string }[] = [];
+
+  onMainImageChange(event: any): void {
+    const file = event.target.files && event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.mainImagePreview = e.target.result;
+        this.submitForm.patchValue({ property_main_img: this.mainImagePreview as any });
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  removeMainImage(): void {
+    this.mainImagePreview = null;
+    this.submitForm.patchValue({ property_main_img: null as any });
+    const fileInput = document.getElementById('mainFileInput') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
+  }
+
+  onGalleryImagesChange(event: any): void {
+    const files: FileList = event.target.files;
+    if (files && files.length > 0) {
+      Array.from(files).forEach((file: File) => {
+        const reader = new FileReader();
+        reader.onload = (e: any) => {
+          this.galleryImagePreviews.push({
+            id: Date.now() + Math.random(),
+            url: e.target.result,
+            file: file,
+            name: file.name
+          });
+          const urls = this.galleryImagePreviews.map(img => img.url);
+          this.submitForm.patchValue({ property_img: urls as any });
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+  }
+
+  removeGalleryImage(index: number): void {
+    if (index >= 0 && index < this.galleryImagePreviews.length) {
+      this.galleryImagePreviews.splice(index, 1);
+      const urls = this.galleryImagePreviews.map(img => img.url);
+      this.submitForm.patchValue({ property_img: urls.length > 0 ? (urls as any) : null });
+    }
+  }
+
+  // Drag & Drop flags and handlers
+  isMainDragOver: boolean = false;
+  isGalleryDragOver: boolean = false;
+
+  onMainDragOver(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isMainDragOver = true;
+  }
+
+  onMainDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isMainDragOver = false;
+  }
+
+  onMainImageDrop(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isMainDragOver = false;
+
+    if (event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files.length > 0) {
+      const file = event.dataTransfer.files[0];
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (e: any) => {
+          this.mainImagePreview = e.target.result;
+          this.submitForm.patchValue({ property_main_img: this.mainImagePreview as any });
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+  }
+
+  onGalleryDragOver(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isGalleryDragOver = true;
+  }
+
+  onGalleryDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isGalleryDragOver = false;
+  }
+
+  onGalleryImagesDrop(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isGalleryDragOver = false;
+
+    if (event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files.length > 0) {
+      const files: FileList = event.dataTransfer.files;
+      Array.from(files).forEach((file: File) => {
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = (e: any) => {
+            this.galleryImagePreviews.push({
+              id: Date.now() + Math.random(),
+              url: e.target.result,
+              file: file,
+              name: file.name
+            });
+            const urls = this.galleryImagePreviews.map(img => img.url);
+            this.submitForm.patchValue({ property_img: urls as any });
+          };
+          reader.readAsDataURL(file);
+        }
+      });
     }
   }
 

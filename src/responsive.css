@@ -198,7 +198,7 @@
   }
 }
 
-@media only screen and (max-width: 1199px) {
+@media only screen and (max-width: 1400px) {
   .feature-img img {
     max-width: 300px;
   }
@@ -219,80 +219,78 @@
     margin: 20px 0 20px;
   }
 
-  .nav, .nav-pills, .custom_pill {
-    width: 95% !important;
-    max-width: 520px !important;
-    margin: 0 auto !important;
-    border-radius: 16px 16px 0 0 !important;
-    box-sizing: border-box !important;
-  }
-
+  /* Search wrapper stays horizontal at ALL widths including 1400px */
   .search_wrapper {
     display: flex !important;
-    flex-direction: column !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
     width: 95% !important;
-    max-width: 520px !important;
-    height: auto !important;
-    padding: 4px 18px 12px 18px !important;
-    border-radius: 0 0 16px 16px !important;
+    max-width: 1200px !important;
+    height: 64px !important;
+    padding: 0 10px 0 18px !important;
+    border-radius: 12px !important;
     background: #ffffff !important;
-    border: 1px solid #d0d5dd !important;
+    border: 1px solid #d1d5db !important;
     margin: 0 auto !important;
     box-sizing: border-box !important;
-    row-gap: 0 !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06) !important;
   }
 
-  .location, .location_chip_container {
-    width: 100% !important;
-    min-width: 100% !important;
-    flex: 1 1 100% !important;
-    padding: 6px 0 !important;
-    border-bottom: 1px solid !important;
-    border-left: none !important;
-    border-right: none !important;
+  .location,
+  .location_chip_container {
+    flex: 1 1 auto !important;
+    width: auto !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    border: none !important;
     margin: 0 !important;
   }
 
   .property_drop {
-    width: 100% !important;
-    min-width: 100% !important;
-    flex: 1 1 100% !important;
-    padding: 8px 0 !important;
-    border-bottom: 1px solid !important;
-    border-left: none !important;
-    border-right: none !important;
+    flex: 0 0 auto !important;
+    width: auto !important;
+    min-width: 160px !important;
+    padding: 0 16px !important;
+    border-left: 1px solid #e5e7eb !important;
+    border-right: 1px solid #e5e7eb !important;
+    border-top: none !important;
+    border-bottom: none !important;
     margin: 0 !important;
+    height: 40px !important;
     justify-content: flex-start !important;
   }
 
   .budget_dorp {
-    width: 100% !important;
-    min-width: 100% !important;
-    flex: 1 1 100% !important;
-    padding: 8px 0 !important;
-    border-bottom: 1px solid !important;
-    border-left: none !important;
-    border-right: none !important;
+    flex: 0 0 auto !important;
+    width: auto !important;
+    min-width: 160px !important;
+    padding: 0 16px !important;
+    border: none !important;
     margin: 0 !important;
+    height: 40px !important;
     justify-content: flex-start !important;
   }
 
   .search_btn {
-    width: 100% !important;
-    margin-top: 10px !important;
+    flex-shrink: 0 !important;
+    width: auto !important;
+    margin-top: 0 !important;
     display: flex !important;
-    justify-content: flex-start !important;
+    justify-content: center !important;
   }
 
   .main_search_btn {
-    width: 125px !important;
-    height: 38px !important;
-    border-radius: 6px !important;
+    height: 44px !important;
+    padding: 0 22px !important;
+    border-radius: 8px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    font-size: 14px !important;
+    font-size: 15px !important;
     font-weight: 600 !important;
+    white-space: nowrap !important;
   }
 
   .proj-gallery-image img,
@@ -536,7 +534,7 @@
 
   .banner_bg {
     height: auto !important;
-    min-height: 659px !important;
+    height: 494px !important;
     padding-bottom: 40px !important;
   }
 
@@ -1376,37 +1374,34 @@
   }
 
   .search_wrapper {
-    width: 100%;
-    justify-content: start;
-    border-radius: 0 0 20px 20px;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 56px !important;
+    border-radius: 12px !important;
+    padding: 6px 10px !important;
+    gap: 6px !important;
   }
 
   .location,
   .property_drop,
   .budget_dorp {
-    width: 100%;
-    border-bottom: 1px solid !important;
-    padding: 7px 0;
+    padding: 4px 8px !important;
+    border: none !important;
   }
 
   .property_drop {
-    border-left: none;
-    border-right: none;
-    padding: 0;
-  }
-
-  .serch-propert {
-    transform: translateY(-20px);
-    left: 10px;
-  }
-
-  .serch-propert-price {
-    transform: translateY(-13px);
-    left: 10px;
+    border-left: 1px solid #e5e7eb !important;
+    border-right: 1px solid #e5e7eb !important;
+    border-top: none !important;
+    border-bottom: none !important;
   }
 
   .main_search_btn {
-    margin-left: 12px;
+    margin-left: 0 !important;
   }
 
   .banner_bg::before {
@@ -1753,9 +1748,9 @@
   }
 
   .search_wrapper {
-    flex-direction: column;
-    height: auto;
-    padding: 5px;
+    flex-direction: row !important;
+    height: 64px !important;
+    padding: 0 10px 0 18px !important;
   }
 
   .explore-builders,

@@ -896,16 +896,21 @@ ul.footer-links {
 
 .search_wrapper {
   display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 18px;
   align-items: center;
   background-color: white;
-  width: auto;
-  height: 80px;
-  padding: 0 30px;
+  width: 95%;
+  max-width: 1200px;
+  height: 64px;
+  padding: 0 10px 0 18px;
   justify-content: space-between;
-  border: 1px solid #040707;
-  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
   margin: 0 auto;
   position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
 }
 
 .error-message {
@@ -971,8 +976,8 @@ ul.footer-links {
 .budget_dorp {
   display: flex;
   align-items: center;
-  margin: 0 10px;
-  min-width: 226px;
+  margin: 0;
+  min-width: 0;
 }
 
 .budget_dorp {
@@ -980,11 +985,11 @@ ul.footer-links {
 }
 
 .property_drop {
-  border-left: 1px solid #999999;
-  border-right: 1px solid #999999;
-  padding: 0 50px;
+  border-left: 1px solid #e5e7eb;
+  border-right: 1px solid #e5e7eb;
+  padding: 0 24px;
   position: relative;
-  min-width: 340px;
+  min-width: 220px;
 }
 
 /* brijes  css */
@@ -1584,6 +1589,7 @@ ul.footer-links {
   background-color: var(--white);
   text-decoration: none;
   gap: 30px;
+  height: 170px;
 }
 
 .builder-logos img {
