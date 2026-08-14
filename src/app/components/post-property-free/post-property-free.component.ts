@@ -22,7 +22,7 @@ export class PostPropertyFreeComponent {
     property_city: new FormControl('', [Validators.required]),
     property_locality: new FormControl('', [Validators.required]),
     property_address: new FormControl(null, [Validators.required]),
-    project_id: new FormControl('', [Validators.required]),
+    project_id: new FormControl('', []),
     landmarks: new FormControl(null, []),
     land_zone: new FormControl('', []),
     property_price_show: new FormControl(null, []),
@@ -165,6 +165,7 @@ export class PostPropertyFreeComponent {
   floorselectedValue: any = '15+';
   totalFloorselectedValue: any = '15+';
   floorNoselectedValue: any = '5+';
+  propertyImagePreviews: string[] = [];
   // selectedDate: any = '';
 
   options = ['5', '6', '7', '8', '9', '10', ' > 10'];
@@ -1815,6 +1816,7 @@ export class PostPropertyFreeComponent {
       return;
     }
 
+    const formData = new FormData();
     let payload = { ...this.submitForm.value };
     const pFor = String(payload.property_for || '');
     const pType = String(payload.property_type || '');
@@ -1866,9 +1868,111 @@ export class PostPropertyFreeComponent {
       delete payload.super_area;
       delete payload.super_area_in;
     }
-    this.http.post(`${environment.apiUrl}addproperty`, payload).subscribe(
+
+
+    Object.keys(this.submitForm.value).forEach((key: string) => {
+ 
+    // IMPORTANT:
+    // Don't send these two as normal text fields.
+    // We will send the actual File objects below.
+    if (
+      key === 'property_main_img' ||
+      key === 'property_img'
+    ) {
+      return;
+    }
+ 
+    const value = (this.submitForm.value as any)[key];
+ 
+    if (value !== null && value !== undefined) {
+ 
+      if (Array.isArray(value)) {
+ 
+        value.forEach((item: any) => {
+          formData.append(key + '[]', item);
+        });
+ 
+      } else {
+ 
+        formData.append(key, value.toString());
+ 
+      }
+    }
+  });
+ 
+ 
+  /*
+  |--------------------------------------------------------------------------
+  | MAIN PROPERTY IMAGE
+  |--------------------------------------------------------------------------
+  */
+ 
+  if (this.mainImageFile) {
+ 
+    formData.append(
+      'property_main_img',
+      this.mainImageFile,
+      this.mainImageFile.name
+    );
+ 
+  }
+ 
+ 
+  /*
+  |--------------------------------------------------------------------------
+  | PROPERTY MULTIPLE IMAGES
+  |--------------------------------------------------------------------------
+  */
+ 
+  if (this.propertyImageFiles.length > 0) {
+ 
+    this.propertyImageFiles.forEach((file: File) => {
+ 
+      formData.append(
+        'property_img[]',
+        file,
+        file.name
+      );
+ 
+    });
+ 
+  }
+ 
+ 
+  /*
+  |--------------------------------------------------------------------------
+  | DEBUG - REMOVE AFTER TESTING
+  |--------------------------------------------------------------------------
+  */
+ 
+  console.log('========== FORM DATA ==========');
+ 
+  formData.forEach((value: any, key: string) => {
+ 
+    if (value instanceof File) {
+ 
+      console.log(
+        key,
+        'FILE:',
+        value.name,
+        value.type,
+        value.size
+      );
+ 
+    } else {
+ 
+      console.log(key, value);
+ 
+    }
+ 
+  });
+ 
+
+
+    this.http.post(`${environment.apiUrl}addproperty`, formData).subscribe(
       (res: any) => {
         this.toastr.success('Your Property Post successfully.');
+        console.log('Property saved:', res);
         setTimeout(() => {
           window.location.reload();
         }, 1500);
@@ -1895,23 +1999,61 @@ export class PostPropertyFreeComponent {
   }
 
   // Image CRUD logic
+  // mainImagePreview holds base64 for display only; form stores filename only.
   mainImagePreview: string | null = null;
+  mainImageFile: File | null = null;
+  propertyImageFiles: File[] = [];
   galleryImagePreviews: { id: number; url: string; file: File; name: string }[] = [];
 
-  onMainImageChange(event: any): void {
-    const file = event.target.files && event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.mainImagePreview = e.target.result;
-        this.submitForm.patchValue({ property_main_img: this.mainImagePreview as any });
-      };
-      reader.readAsDataURL(file);
-    }
+   
+onMainImageChange(event: any): void {
+ 
+  const file = event.target.files && event.target.files[0];
+ 
+  if (!file) {
+
+    return;
+
   }
+ 
+  if (!file.type.startsWith('image/')) {
+
+    alert('Please select a valid image file.');
+
+    return;
+
+  }
+ 
+  // Store the ACTUAL file
+
+  this.mainImageFile = file;
+ 
+  // This is only for displaying filename/form value
+
+  this.submitForm.patchValue({
+
+    property_main_img: file.name
+
+  });
+ 
+  // Preview only
+
+  const reader = new FileReader();
+ 
+  reader.onload = (e: any) => {
+
+    this.mainImagePreview = e.target.result;
+
+  };
+ 
+  reader.readAsDataURL(file);
+
+}
+ 
 
   removeMainImage(): void {
     this.mainImagePreview = null;
+    this.mainImageFile = null;
     this.submitForm.patchValue({ property_main_img: null as any });
     const fileInput = document.getElementById('mainFileInput') as HTMLInputElement;
     if (fileInput) {
@@ -1923,16 +2065,18 @@ export class PostPropertyFreeComponent {
     const files: FileList = event.target.files;
     if (files && files.length > 0) {
       Array.from(files).forEach((file: File) => {
+        // Read DataURL for preview display only
         const reader = new FileReader();
         reader.onload = (e: any) => {
           this.galleryImagePreviews.push({
             id: Date.now() + Math.random(),
-            url: e.target.result,
+            url: e.target.result,  // base64 used only for <img> preview
             file: file,
             name: file.name
           });
-          const urls = this.galleryImagePreviews.map(img => img.url);
-          this.submitForm.patchValue({ property_img: urls as any });
+          // Store only filenames in the form (not base64)
+          const filenames = this.galleryImagePreviews.map(img => img.name);
+          this.submitForm.patchValue({ property_img: filenames as any });
         };
         reader.readAsDataURL(file);
       });
@@ -1942,8 +2086,8 @@ export class PostPropertyFreeComponent {
   removeGalleryImage(index: number): void {
     if (index >= 0 && index < this.galleryImagePreviews.length) {
       this.galleryImagePreviews.splice(index, 1);
-      const urls = this.galleryImagePreviews.map(img => img.url);
-      this.submitForm.patchValue({ property_img: urls.length > 0 ? (urls as any) : null });
+      const filenames = this.galleryImagePreviews.map(img => img.name);
+      this.submitForm.patchValue({ property_img: filenames.length > 0 ? (filenames as any) : null });
     }
   }
 
@@ -1963,24 +2107,103 @@ export class PostPropertyFreeComponent {
     this.isMainDragOver = false;
   }
 
-  onMainImageDrop(event: DragEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-    this.isMainDragOver = false;
+ 
+onMainImageDrop(event: DragEvent): void {
+ 
+  event.preventDefault();
 
-    if (event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files.length > 0) {
-      const file = event.dataTransfer.files[0];
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = (e: any) => {
-          this.mainImagePreview = e.target.result;
-          this.submitForm.patchValue({ property_main_img: this.mainImagePreview as any });
-        };
-        reader.readAsDataURL(file);
-      }
+  event.stopPropagation();
+ 
+  this.isMainDragOver = false;
+ 
+  if (
+
+    event.dataTransfer &&
+
+    event.dataTransfer.files &&
+
+    event.dataTransfer.files.length > 0
+
+  ) {
+ 
+    const file = event.dataTransfer.files[0];
+ 
+    if (!file.type.startsWith('image/')) {
+
+      alert('Please drop a valid image file.');
+
+      return;
+
     }
+ 
+    // Store actual File
+
+    this.mainImageFile = file;
+ 
+    // Filename only for form/display
+
+    this.submitForm.patchValue({
+
+      property_main_img: file.name
+
+    });
+ 
+    // Preview
+
+    const reader = new FileReader();
+ 
+    reader.onload = (e: any) => {
+
+      this.mainImagePreview = e.target.result;
+
+    };
+ 
+    reader.readAsDataURL(file);
+
   }
 
+}
+
+onPropertyImagesChange(event: any): void {
+
+  const files = event.target.files;
+
+  if (!files || files.length === 0) {
+    return;
+  }
+
+  for (let i = 0; i < files.length; i++) {
+
+    const file = files[i];
+
+    if (!file.type.startsWith('image/')) {
+      continue;
+    }
+
+    // Store actual File for FormData upload
+    this.propertyImageFiles.push(file);
+
+    // Generate base64 preview for the UI thumbnail grid
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      // Push into galleryImagePreviews — this is what the HTML template uses
+      this.galleryImagePreviews.push({
+        id: Date.now() + Math.random(),
+        url: e.target.result,   // base64 for <img src> preview only
+        file: file,
+        name: file.name
+      });
+      // Update form value with filenames (not base64)
+      const filenames = this.galleryImagePreviews.map(img => img.name);
+      this.submitForm.patchValue({ property_img: filenames as any });
+    };
+    reader.readAsDataURL(file);
+
+  }
+
+}
+ 
+ 
   onGalleryDragOver(event: DragEvent): void {
     event.preventDefault();
     event.stopPropagation();
@@ -2002,16 +2225,18 @@ export class PostPropertyFreeComponent {
       const files: FileList = event.dataTransfer.files;
       Array.from(files).forEach((file: File) => {
         if (file.type.startsWith('image/')) {
+          // Read DataURL for preview display only
           const reader = new FileReader();
           reader.onload = (e: any) => {
             this.galleryImagePreviews.push({
               id: Date.now() + Math.random(),
-              url: e.target.result,
+              url: e.target.result,  // base64 used only for <img> preview
               file: file,
               name: file.name
             });
-            const urls = this.galleryImagePreviews.map(img => img.url);
-            this.submitForm.patchValue({ property_img: urls as any });
+            // Store only filenames in the form (not base64)
+            const filenames = this.galleryImagePreviews.map(img => img.name);
+            this.submitForm.patchValue({ property_img: filenames as any });
           };
           reader.readAsDataURL(file);
         }

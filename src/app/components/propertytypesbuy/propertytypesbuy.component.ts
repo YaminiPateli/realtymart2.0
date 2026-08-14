@@ -141,96 +141,68 @@ export class PropertytypesbuyComponent implements OnInit{
   }
 
    applyFiltersAndSorting(): void {
-    let data = [...this.original];
+    let data = [...(this.original && this.original.length > 0 ? this.original : (this.propertytype || []))];
 
-      if (this.activeFilters['New Property']) {
-    data = data.filter(
-      (item: any) =>
-        item.transaction_type &&
-        item.transaction_type.toLowerCase() === 'new property'
-    );
-  }
+    if (this.activeFilters['New Property']) {
+      data = data.filter(
+        (item: any) =>
+          item.transaction_type &&
+          item.transaction_type.toLowerCase() === 'new property'
+      );
+    }
 
-  if (this.activeFilters['Ready to Move']) {
-    data = data.filter(
-      (item: any) =>
-        item.possession_status &&
-        item.possession_status.toLowerCase() === 'ready to move'
-    );
-  }
+    if (this.activeFilters['Ready to Move']) {
+      data = data.filter(
+        (item: any) =>
+          item.possession_status &&
+          item.possession_status.toLowerCase() === 'ready to move'
+      );
+    }
 
-  if (this.activeFilters['Featured']) {
-    data = data.filter(
-      (item: any) =>
-        (item.property_status &&
-          item.property_status.toLowerCase() === 'featured') ||
-        item.is_featured == 1
-    );
-  }
+    if (this.activeFilters['Featured']) {
+      data = data.filter(
+        (item: any) =>
+          (item.property_status &&
+            item.property_status.toLowerCase() === 'featured') ||
+          item.is_featured == 1
+      );
+    }
 
-  if (this.activeFilters['Farm House']) {
-    data = data.filter(
-      (item: any) =>
-        item.property_type &&
-        item.property_type.toLowerCase() === 'farm house'
-    );
-  }
+    if (this.activeFilters['Farm House']) {
+      data = data.filter(
+        (item: any) =>
+          item.property_type &&
+          item.property_type.toLowerCase() === 'farm house'
+      );
+    }
 
-  if (this.activeFilters['New Construction']) {
-    data = data.filter(
-      (item: any) =>
-        item.age_of_construction &&
-        item.age_of_construction.toLowerCase() === 'new construction'
-    );
-  }
+    if (this.activeFilters['New Construction']) {
+      data = data.filter(
+        (item: any) =>
+          item.age_of_construction &&
+          item.age_of_construction.toLowerCase() === 'new construction'
+      );
+    }
 
-  if (this.activeFilters['Furnished']) {
-    data = data.filter(
-      (item: any) =>
-        item.furnishing_status &&
-        item.furnishing_status.toLowerCase() === 'furnished'
-    );
-  }
+    if (this.activeFilters['Furnished']) {
+      data = data.filter(
+        (item: any) =>
+          item.furnishing_status &&
+          item.furnishing_status.toLowerCase() === 'furnished'
+      );
+    }
 
     switch (this.selectedSortOption) {
       case 'Price - Low to High':
-        data = data
-          .filter((item: any) => {
-            const priceA =
-              item.total_price !== null && item.total_price !== undefined
-                ? item.total_price
-                : item.rent_amount;
-            return priceA !== null && priceA !== undefined;
-          })
-          .sort((a: any, b: any) => {
-            const priceA =
-              a.total_price !== null ? a.total_price : a.rent_amount;
-            const priceB =
-              b.total_price !== null ? b.total_price : b.rent_amount;
-            return this.convertToLac(priceA) - this.convertToLac(priceB);
-          });
+        data.sort((a: any, b: any) => this.getItemPrice(a) - this.getItemPrice(b));
         break;
 
       case 'Price - High to Low':
-        data = data
-          .filter((item: any) => {
-            const priceA =
-              item.total_price !== null && item.total_price !== undefined
-                ? item.total_price
-                : item.rent_amount;
-            return priceA !== null && priceA !== undefined;
-          })
-          .sort((a: any, b: any) => {
-            const priceA =
-              a.total_price !== null ? a.total_price : a.rent_amount;
-            const priceB =
-              b.total_price !== null ? b.total_price : b.rent_amount;
-            return this.convertToLac(priceB) - this.convertToLac(priceA);
-          });
+        data.sort((a: any, b: any) => this.getItemPrice(b) - this.getItemPrice(a));
         break;
 
       case 'Most Recent':
-        data = data.sort((a: any, b: any) => this.sortByRecent(a, b));
+        data.sort((a: any, b: any) => this.sortByRecent(a, b));
         break;
 
       case 'Relevance':
@@ -239,7 +211,6 @@ export class PropertytypesbuyComponent implements OnInit{
     }
 
     this.propertytype = data;
-    this.initialListCount = Math.max(5, Math.min(this.initialListCount, this.propertytype.length || 5));
   }
 
 
@@ -330,22 +301,22 @@ export class PropertytypesbuyComponent implements OnInit{
     const city = this.route.snapshot.paramMap.get('city');
 
     if (type && city) {
-      this.http.get<any>(`${environment.apiUrl}propertytypesbuyin/${type}/${city}?page=${this.currentPage}`).subscribe(
+      this.http.get<any>(`${environment.apiUrl}projecttypesbuyin/${type}/${city}?page=${this.currentPage}`).subscribe(
         (response) => {
 
           this.propertytype =
-          response.responseData?.propertytypesbuyin?.data  || [];
-          this.original = [...this.propertytype, ...(response.responseData?.propertytypesbuyin?.data || []),];
+          response.responseData?.projecttypesbuyin?.data  || [];
+          this.original = [...(this.propertytype || [])];
           
           console.log(this.propertytype, "proprty type")
           this.propertytypecount =
-            response.responseData?.propertytypesbuyin?.total || 0;
+            response.responseData?.projecttypesbuyin?.total || 0;
 
-            this.itemsPerPage = response.responseData?.propertytypesbuyin.per_page;
+            this.itemsPerPage = response.responseData?.projecttypesbuyin.per_page;
 
           this.totalPages = Math.ceil(
-            this.propertytype /
-            this.itemsPerPage
+            (this.propertytypecount || 0) /
+            (this.itemsPerPage || 5)
           );
        
           this.setMetaTags(
@@ -353,7 +324,8 @@ export class PropertytypesbuyComponent implements OnInit{
           response.meta.description,
             );
 
-          this.lastPage = response.responseData?.propertytypesbuyin?.last_page;
+          this.lastPage = response.responseData?.projecttypesbuyin?.last_page;
+          this.applyFiltersAndSorting();
 
           
         },
@@ -385,8 +357,7 @@ export class PropertytypesbuyComponent implements OnInit{
 
   getUrl(urlPart1: any, urlPart2: any) {
     this.url = window.location.origin;
-    const staticpart = '/property-details/';
-    this.dynamicUrl = this.url + staticpart + urlPart1 + '/' + urlPart2;
+    this.dynamicUrl = this.url + '/' + urlPart1;
     // console.log(this.dynamicUrl);
   }
 
@@ -477,65 +448,52 @@ export class PropertytypesbuyComponent implements OnInit{
     this.applyFiltersAndSorting();
   }
 
-   private convertToLac(priceString: string): number {
-    if (!priceString) return 0;
+  getItemPrice(item: any): number {
+    if (!item) return 0;
+    const priceVal =
+      item.project_minimum_price ||
+      item.minprice ||
+      item.total_price ||
+      item.rent_amount ||
+      item.project_maximum_price ||
+      item.maxprice ||
+      '0';
+    return this.convertToLac(priceVal);
+  }
 
-    // Remove non-numeric characters except dot and trim spaces
-    let numericValue = parseFloat(priceString.replace(/[^0-9.]/g, '').trim());
+  private convertToLac(priceString: any): number {
+    if (priceString === null || priceString === undefined || priceString === '') return 0;
 
-    if (priceString.toLowerCase().includes('cr')) {
-      numericValue *= 100; // Convert Cr to LAC
-    } else if (priceString.toLowerCase().includes('lac')) {
-      // Already in LAC, no conversion needed
-    } else {
-      // Assume numeric values are direct and in the base unit (e.g., thousands)
-      numericValue = numericValue / 100000; // Convert to LAC
+    const str = String(priceString).toLowerCase().trim();
+    let numericValue = parseFloat(str.replace(/[^0-9.]/g, ''));
+    if (isNaN(numericValue) || numericValue <= 0) return 0;
+
+    if (str.includes('cr') || str.includes('crore')) {
+      numericValue *= 100;
+    } else if (str.includes('lac') || str.includes('lakh') || str.includes('l')) {
+      // Already in Lac
+    } else if (numericValue >= 100000) {
+      numericValue = numericValue / 100000;
     }
 
     return numericValue;
   }
 
-  private sortByPrice(a: any, b: any): number {
-    const priceA = this.convertToLac(a.rent_amount);
-    const priceB = this.convertToLac(b.rent_amount);
-
-    return priceA - priceB;
-  }
-
-  private sortByRecent(a: any, b: any): number {
-    const dateA = a?.created_at ? new Date(a.created_at).getTime() : 0;
-    const dateB = b?.created_at ? new Date(b.created_at).getTime() : 0;
-
+  sortByRecent(a: any, b: any): number {
+    const dateA = a?.created_at ? new Date(a.created_at).getTime() : (a?.id || 0);
+    const dateB = b?.created_at ? new Date(b.created_at).getTime() : (b?.id || 0);
     return dateB - dateA;
   }
 
-  filterByPrice(minPrice: number, maxPrice: number): void {
-    this.filteredData = this.propertytype.filter(
-      (property: { minprice: string; maxprice: string }) => {
-        const propertyMinPrice = this.convertToLac(property.minprice);
-        const propertyMaxPrice = this.convertToLac(property.maxprice);
-
-        return (
-          (minPrice === null || propertyMinPrice >= minPrice) &&
-          (maxPrice === null || propertyMaxPrice <= maxPrice)
-        );
-      }
-    );
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    this.isDropdownOpen = false;
   }
 
-  private parsePrice(priceString: string): number {
-    if (!priceString) return 0;
-
-    let numericValue = parseFloat(priceString.replace(/[^0-9.]/g, '').trim());
-
-    if (priceString.includes('cr')) {
-      numericValue *= 100; // Convert crore to lac
+  toggleDropdown(event?: Event): void {
+    if (event) {
+      event.stopPropagation();
     }
-
-    return numericValue;
-  }
-
-  toggleDropdown(): void {
     this.isDropdownOpen = !this.isDropdownOpen;
   }
   contactowner(propertyid: any) {

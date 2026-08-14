@@ -227,7 +227,7 @@ export class HomeComponent implements AfterViewInit, OnInit {
   }
 
   loadHomeBanner(): void {
-    this.bannerservice.homepagebannerget()?.subscribe((bannerData: any) => {
+    this.bannerservice.homepagebannerget(this.city || '')?.subscribe((bannerData: any) => {
       this.bannerData = bannerData;
       this.bannerbuilder = this.bannerData?.data;
     });

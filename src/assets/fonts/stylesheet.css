@@ -1,3 +1,6 @@
+/* Sora Font - Google Fonts (Regular 400 & SemiBold 600) */
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600&display=swap');
+
 @font-face {
     font-family: 'Myriad Pro';
     src: url('MyriadPro-BoldIt.eot');
@@ -211,3 +214,5 @@
     font-style: normal;
 
 }
+
+/* Sora font loaded via Google Fonts */

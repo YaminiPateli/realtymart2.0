@@ -1,14 +1,14 @@
 .project-banner {
   position: relative;
+  width: 100%;
   overflow: hidden;
-  border-radius: 0;
-  height: 78vh;
 }
 
 .banner-image {
-  width: 100%;
-  height: 73vh;
   display: block;
+  width: 100%;
+  height: 333px;
+  max-width: 100%;
 }
 
 /* Logo Card */
@@ -71,6 +71,7 @@
 
 /* Tablet */
 @media (max-width: 991px) {
+
 
   .logo-card {
     left: 15px;
@@ -152,6 +153,7 @@
 
 .location {
   font-size: 14px;
+  padding: 3px;
   border-bottom: none !important;
 }
 
@@ -159,6 +161,7 @@
   font-size: 24px;
   font-weight: 700;
   color: #333;
+  padding: 7px 0px;
   line-height: 100%;
 }
 
@@ -293,6 +296,11 @@
 .address-title {
   padding: 10px;
   background-color: rgb(255 255 255);
+  display: flex;
+  gap: 13px;
+  border: 1px solid lightgray;
+  background-color: ghostwhite;
+  border-radius: 12px;
 }
 
 
@@ -3589,29 +3597,15 @@ google-map {
   object-fit: contain;
 }
 
-@media (max-width:425px) {
-  .project-banner {
-    height: 27vh;
-  }
-}
 
-@media (max-width:2560px) {
-  .project-banner {
-    height: 70vh;
-  }
-}
 
-@media (max-width:1024px) {
-  .project-banner {
-    height: 58vh;
-  }
-}
+
+
+
 
 
 @media (max-width:768px) {
-  .project-banner {
-    height: 56vh;
-  }
+
 
   .floor-image {
     height: 250px;
@@ -3623,9 +3617,7 @@ google-map {
 }
 
 @media (max-width:320px) {
-  .project-banner {
-    height: 56vh;
-  }
+
 
   .modal-content {
     width: 98% !important;
@@ -3633,9 +3625,7 @@ google-map {
 }
 
 @media (max-width:1440px) {
-  .project-banner {
-    height: 57vh;
-  }
+
 
   .label,
   .value,
@@ -4627,6 +4617,10 @@ google-map {
   .reels-card-bottom-details {
     bottom: 0;
   }
+
+  .banner-image{
+    height: 49vh;
+  }
 }
 
 @media(max-width:921px) {
@@ -4716,4 +4710,14 @@ google-map {
 /* Ensure the flatpickr calendar dropdown renders above the Bootstrap modal */
 .flatpickr-calendar {
   z-index: 100010 !important;
+}
+
+@media (max-width:575px) {
+ .banner-image{
+  height: 457px !important;
+ }
+}
+
+.download-icon-img{
+  height: 20px;
 }

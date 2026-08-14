@@ -15,7 +15,7 @@
     </div>
     <div class="col-lg-3 col-md-3 col-sm-12">
       <div class="tabs_sortby pt-4">
-        <div class="tabs_sortby--title" (click)="toggleDropdown()">
+        <div class="tabs_sortby--title" (click)="toggleDropdown($event)">
           Sort by: <span>{{ selectedSortOption }}</span>
         </div>
         <div
@@ -74,46 +74,25 @@
         <div class="row">
           <div class="col-lg-3 col-md-5 col-sm-12">
             <div class="request-images">
-              <ngx-slick-carousel
-                class="carousel"
-                #slickModal="slick-carousel"
-                [config]="slideConfig1"
-              >
-                <div
-                  ngxSlickItem
-                  class="slide"
-                  *ngFor="let item1 of item.property_img"
-                >
                   <a
-                    routerLink="{{ item1 }}"
-                    data-fancybox="gallery"
-                    (click)="openGallery(item.property_img, $event)"
+                    routerLink="/{{ item.firstUrlPart }}"
                   >
-                    <img src="{{ item1 }}" alt="Gallery" class="img-fluid" />
+                    <img src="{{ item.project_banner_image }}" alt="Gallery" class="img-fluid" />
                   </a>
-                </div>
-               
-              </ngx-slick-carousel>
-
-              <span class="txt" *ngIf="item.property_img.length - 1 > 0"
-                >{{ item.property_img.length - 1 }}+ Photos</span
-              >
             </div>
-            <div class="property-verified" *ngIf="item.is_verified === '1'">
+            <!-- <div class="property-verified" *ngIf="item.is_verified === '1'">
               <img src="../../../assets/images/verified-property.png" alt="verified-property" />
-            </div>
+            </div> -->
           </div>
 
           <div class="col-lg-9 col-md-12 col-sm-12">
             <div class="wich-location">
               <a
-                routerLink="/property-details/{{ item.propertyfirstUrlPart }}/{{
-                  item.propertysecondUrlPart
-                }}"
+                [routerLink]="['/', item.firstUrlPart]"
                 class="tap-location"
               >
                 <h1 class="groups-companies-names">
-                  {{ item.property_locality }}
+                  {{ item.project_name }} <span class="builder">by {{item.builder_name}}</span>
                 </h1>
               </a>
             
@@ -123,7 +102,7 @@
                 data-bs-target="#shareModal"
                 title="Share"
                 (click)="
-                  getUrl(item.propertyfirstUrlPart, item.propertysecondUrlPart)
+                  getUrl(item.firstUrlPart, item.secondUrlPart)
                 "
               >
                 <svg
@@ -152,32 +131,55 @@
               </a>
             </div>
 
-            <p class="proparty_for" *ngIf="item.property_for !== null">
-              for {{ item.property_for }}
-              <span *ngIf="item.bedroom !== null"
+            <p class="proparty_for" *ngIf="item.project_localities !== null">
+              {{ item.project_localities }}
+              <!-- <span *ngIf="item.bedroom !== null"
                 >{{ item.bedroom }} BHK {{ item.property_typeName }}</span
               >
-              in {{ item.project.project_name }}
+              in {{ item?.project?.project_name }} -->
             </p>
             <div class="facility_wrapper">
-              <div *ngIf="item.property_price_show == 0">
+              <div *ngIf="item.project_minimum_price !== null && item.project_maximum_price !== null">
                 <h6 class="facility_title">Price</h6>
                 <p class="project-text">
                   ₹
                   {{
-                    item.total_price !== null
-                      ? item.total_price
-                      : item.rent_amount.toLocaleString()
-                  }}
+                    item.project_minimum_price
+                  }}-{{item.project_maximum_price}}
                 </p>
               </div>
-              <div *ngIf="item.floor_no !== null && item.total_floor !== null">
-                <h6 class="facility_title">Floor</h6>
+              <div>
+                <h6 class="facility_title">Project Status</h6>
                 <p class="project-text">
-                  {{ item.floor_no }} out of {{ item.total_floor }} Floor
+                  {{ item.project_status }}
                 </p>
               </div>
-              <div *ngIf="item.furnishing_status !== null">
+              <div>
+                <h6 class="facility_title">Project Type</h6>
+                <p class="project-text">
+                  {{ item.projectType }}
+                </p>
+              </div>
+              <div *ngIf="item.project_total_tower !== null">
+                <h6 class="facility_title">Total Towers</h6>
+                <p class="project-text">
+                  {{ item.project_total_tower }}
+                </p>
+              </div>
+               <div *ngIf="item.project_total_floor !== null">
+                <h6 class="facility_title">Total Floor</h6>
+                <p class="project-text">
+                  {{ item.project_total_floor }}
+                </p>
+              </div>
+              <div *ngIf="item.project_size_in_sqft !== null">
+                <h6 class="facility_title">Project Size</h6>
+                <p class="project-text">
+                  {{ item.project_size_in_sqft }} Sqft
+                </p>
+              </div>
+              
+              <!-- <div *ngIf="item.furnishing_status !== null">
                 <h6 class="facility_title">furnishing</h6>
                 <p class="project-text">{{ item.furnishing_status }}</p>
               </div>
@@ -201,16 +203,16 @@
               <div *ngIf="item.car_parking !== null">
                 <h6 class="facility_title">Car Parking</h6>
                 <p class="project-text">{{ item.car_parking }}</p>
-              </div>
+              </div> -->
             </div>
 
-            <div class="row" *ngIf="item.ploat_area !== null">
+            <!-- <div class="row" *ngIf="item.ploat_area !== null">
               <div>
                 <h6 class="facility_title">Plot Area</h6>
                 <p class="project-text">{{ item.ploat_area }}</p>
               </div>
               
-            </div>
+            </div> -->
          
             <div class="save-get-no">
          
@@ -229,7 +231,7 @@
                   class="contact-buy-btn"
                   data-bs-toggle="modal"
                   data-bs-target="#contact-owner"
-                  (click)="contactowner(item.propertysecondUrlPart)"
+                  (click)="contactowner(item.secondUrlPart)"
                 >
                   CONTACT OWNER
                 </button>
@@ -240,7 +242,7 @@
          
         </div>
       </div>
-      <div class="fw-bold text-center" *ngIf="propertytype.length === 0">No Data Found!</div>
+      <div class="fw-bold text-center" *ngIf="propertytype?.length === 0">No Data Found!</div>
       <app-pagination
   [currentPage]="currentPage"
   [totalPages]="totalPages"
@@ -278,35 +280,35 @@
         <div class="contact-form__prjInfo prj-top-info">
           <div class="contact-form__prjInfo__fig">
             <img alt="property_main_img"
-              src="{{ contact?.property?.property_main_img }}"
+              src="{{ contact?.project?.project_banner_image }}"
               class="contact-form__prjInfo__fig--graphic"
             />
           </div>
           <div class="contact-form__prjInfo__name">
-            {{ contact?.property?.project_name }}
+            {{ contact?.project?.project_name }}
           </div>
           <div class="contact-form__prjInfo__loc">
-            {{ contact?.property?.property_locality }}
+            {{ contact?.project?.property_locality }}
           </div>
           <div class="contact-form__prjInfo__content">
+            <!-- <div
+              class="contact-form__prjInfo__bhk"
+              *ngIf="contact?.project?.project_type !== null"
+            >
+              {{ contact?.project?.project_type }} BHK
+            </div> -->
             <div
               class="contact-form__prjInfo__bhk"
-              *ngIf="contact?.property?.bedroom !== null"
+              *ngIf="contact?.project?.project_type !== null"
             >
-              {{ contact?.property?.bedroom }} BHK
-            </div>
-            <div
-              class="contact-form__prjInfo__bhk"
-              *ngIf="contact?.property?.property_typeName !== null"
-            >
-              {{ contact?.property?.property_type }}
+              {{ contact?.project?.project_type }}
             </div>
             <!-- <div class="contact-form__prjInfo__bhk">2 BHK Flats</div> -->
             <div
               class="contact-form__prjInfo__price"
-              *ngIf="contact?.property?.property_price_show == '0'"
+              *ngIf="contact?.project?.property_price_show == '0'"
             >
-              <span> ₹ {{ contact?.property?.total_price }}</span>
+              <span> ₹ {{ contact?.project?.total_price }}</span>
             </div>
           </div>
         </div>

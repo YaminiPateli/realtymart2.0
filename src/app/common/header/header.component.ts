@@ -100,42 +100,22 @@ export class HeaderComponent implements AfterViewInit {
 
   getLocation() {
     const locationCookie = localStorage.getItem('location');
-    this.city = locationCookie || 'Ahmedabad';
-    if (!locationCookie) {
-      localStorage.setItem('location', 'Ahmedabad');
-    }
-
-    if (!locationCookie) {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const { latitude, longitude } = position.coords;
-            this.geolocationService.getCity(latitude, longitude).then((city: string) => {
-              this.locationFooter = latitude + ', ' + longitude;
-              if (this.isValidCity(city)) {
-                this.updateCity(city);
-              } else {
-                this.updateCity('Ahmedabad');
-              }
-            }).catch((error: any) => {
-              console.error('Error getting city from coordinates:', error);
-              this.updateCity('Ahmedabad');
-            });
-          },
-          (error) => {
-            console.error('Error getting location', error);
+    if (locationCookie && this.isValidCity(locationCookie)) {
+      this.city = locationCookie;
+      this.locationCookie = locationCookie;
+    } else {
+      this.geolocationService
+        .getCityByIp()
+        .then((ipCity: string) => {
+          if (this.isValidCity(ipCity)) {
+            this.updateCity(ipCity);
+          } else {
             this.updateCity('Ahmedabad');
           }
-        );
-      } else {
-        console.error('Geolocation not supported by this browser.');
-        this.updateCity('Ahmedabad');
-      }
-    } else {
-      // If 'location' cookie already exists, delete and set again with current city
-      localStorage.removeItem('location');
-      localStorage.setItem('location', this.city);
-      this.locationCookie = this.city;
+        })
+        .catch(() => {
+          this.updateCity('Ahmedabad');
+        });
     }
   }
 

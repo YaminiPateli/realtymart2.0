@@ -226,10 +226,11 @@
     flex-wrap: nowrap !important;
     align-items: center !important;
     justify-content: space-between !important;
+    gap: 12px !important;
     width: 95% !important;
     max-width: 1200px !important;
     height: 64px !important;
-    padding: 0 10px 0 18px !important;
+    padding: 0 10px 0 14px !important;
     border-radius: 12px !important;
     background: #ffffff !important;
     border: 1px solid #d1d5db !important;
@@ -242,7 +243,7 @@
   .location_chip_container {
     flex: 1 1 auto !important;
     width: auto !important;
-    min-width: 0 !important;
+    min-width: 220px !important;
     padding: 0 !important;
     border: none !important;
     margin: 0 !important;
@@ -251,8 +252,8 @@
   .property_drop {
     flex: 0 0 auto !important;
     width: auto !important;
-    min-width: 160px !important;
-    padding: 0 16px !important;
+    min-width: 130px !important;
+    padding: 0 12px !important;
     border-left: 1px solid #e5e7eb !important;
     border-right: 1px solid #e5e7eb !important;
     border-top: none !important;
@@ -265,8 +266,8 @@
   .budget_dorp {
     flex: 0 0 auto !important;
     width: auto !important;
-    min-width: 160px !important;
-    padding: 0 16px !important;
+    min-width: 130px !important;
+    padding: 0 12px !important;
     border: none !important;
     margin: 0 !important;
     height: 40px !important;
@@ -534,7 +535,7 @@
 
   .banner_bg {
     height: auto !important;
-    height: 494px !important;
+    height: 336px !important;
     padding-bottom: 40px !important;
   }
 
@@ -556,7 +557,6 @@
 }
 
 @media only screen and (max-width: 991px) {
-
   /* Home Page Responsive Start  */
   .feature-img img {
     max-width: 340px;
@@ -612,12 +612,6 @@
     line-height: 0;
   }
 
-  .search_wrapper {
-    width: 100%;
-    height: auto;
-    border-radius: 0px;
-  }
-
   .free-post {
     margin-bottom: 40px;
   }
@@ -655,11 +649,6 @@
   .property_drop {
     min-width: 267px;
   }
-
-  .search_wrapper {
-    width: 85%;
-  }
-
   .company_overview {
     padding: 40px 0 0;
   }
@@ -1917,6 +1906,10 @@
 
 @media only screen and (max-width: 480px) {
 
+  .search_wrapper{
+    width: 100% !important;
+  }
+
   /* Home Page Responsive Start  */
   .banner_title {
     font-size: 26px;
@@ -2228,3 +2221,188 @@
 }
 
 @media only screen and (max-width: 320px) {}
+
+@media (max-width: 1200px) {
+
+  .search_wrapper {
+    display: grid !important;
+    height: auto !important;
+    grid-template-columns: 1fr !important;
+    width: 57% !important;
+    border-radius: 0 0 15px 15px !important;
+    overflow: hidden;
+    padding: 0 15px 12px !important;
+    box-sizing: border-box;
+  }
+
+  .banner_bg {
+    height: 535px !important;
+  }
+
+  /* Location */
+  .location_chip_container {
+    width: 100% !important;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    padding: 12px !important;
+    border: 1px solid grey !important;
+    margin-top: 10px !important;
+    border-radius: 10px !important;
+  }
+
+  /* Property */
+  .property_drop {
+    width: 100% !important;
+    box-sizing: border-box;
+    padding: 25px 15px !important;
+    border: 1px solid gray !important;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Budget */
+  .budget_dorp {
+    width: 100% !important;
+    box-sizing: border-box;
+    padding: 25px 15px !important;
+    border: 1px solid gray !important;
+    border-radius: 7px;
+  }
+
+  .nav {
+    max-width: 532px !important;
+  }
+
+  /* Search button */
+  .search_btn {
+    width: 100% !important;
+    height: 52px;
+    margin-top: 12px;
+
+    border: none;
+    border-radius: 8px;
+    background: #ef3025;
+    color: #fff;
+
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    box-sizing: border-box;
+  }
+}
+
+
+@media (max-width:991px) {
+  .search_wrapper{
+    width: 77% !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .search_wrapper {
+    width: 100% !important;
+    padding: 10px !important;
+  }
+
+  .nav {
+    max-width: 969px !important;
+  }
+
+  .location_chip_container {
+    border: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin-top: 10px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+
+  .city_selector_wrapper {
+    width: 100% !important;
+  }
+
+  .city_selector_trigger {
+    width: 100% !important;
+    justify-content: space-between !important;
+    border: 1px solid gray !important;
+    background-color: #ffffff !important;
+    padding: 12px 15px !important;
+    box-sizing: border-box !important;
+    border-radius: 8px !important;
+    height: 48px !important;
+  }
+
+  .city_selector_dropdown {
+    width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .location_divider {
+    display: none !important;
+  }
+
+  .chips_box {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    border: 1px solid gray !important;
+    border-radius: 8px !important;
+    padding: 6px 12px !important;
+    background-color: #ffffff !important;
+    box-sizing: border-box !important;
+    min-height: 48px !important;
+  }
+
+  .chip_inline_input {
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 6px 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    background-color: transparent !important;
+  }
+
+  .search_suggestions_dropdown {
+    min-width: 100% !important;
+    max-height: 250px !important;
+    width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    box-sizing: border-box !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .nav {
+    width: 353px !important;
+  }
+
+  .search_wrapper {
+    width: 88% !important;
+  }
+}
+
+@media (max-width:375px){
+  .search_wrapper{
+    width: 98% !important;
+  }
+
+  .nav{
+    width: 342px !important;
+  }
+}

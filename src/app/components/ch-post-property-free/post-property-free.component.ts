@@ -37,7 +37,7 @@ export class PostPropertyFreeComponent {
   }
 
   getlocalityservices(): void {
-    this.localityservice.getlocality()?.subscribe((localityData: any) => {
+    this.localityservice.getlocality('')?.subscribe((localityData: any) => {
       this.localityData = localityData;
       this.locality = this.localityData?.responseData?.data;
     });

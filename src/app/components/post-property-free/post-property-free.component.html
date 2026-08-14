@@ -105,7 +105,7 @@
                     <input class="pp-form__elem-radio__input" formControlName="property_for" type="radio" id="PGHostel"
                       autocomplete="off" [value]="'PG/Hostel'" (change)="onPropertyFor($event)" />
                     <label class="pp-form__elem-radio__label" for="PGHostel">PG</label> -->
-                    <!-- <label class="pp-form__elem-radio__label" for="PGHostel">PG/Hostel</label> -->
+                  <!-- <label class="pp-form__elem-radio__label" for="PGHostel">PG/Hostel</label> -->
                   <!-- </div> -->
                 </div>
 
@@ -232,32 +232,27 @@
                   </div>
                 </div>
                 <div class="formCom">
-                    <select formControlName="property_locality" id="locality" class="gold-form-input post_fm"
-                  (change)="onLocalityChange($event)">
-                  <option value disabled selected>Select Locality</option>
-                  <option *ngFor="let data of this.localities" [value]="data.id">
-                    {{ data.localities }}
-                  </option>
-                </select>
-                <div
-                  *ngIf="submitForm.get('property_locality')?.invalid && (submitForm.get('property_locality')?.dirty || submitForm.get('property_locality')?.touched)"
-                  class="mgs_error">
-                  Please select locality.
-                </div>
+                  <select formControlName="property_locality" id="locality" class="gold-form-input post_fm"
+                    (change)="onLocalityChange($event)">
+                    <option value disabled selected>Select Locality</option>
+                    <option *ngFor="let data of this.localities" [value]="data.id">
+                      {{ data.localities }}
+                    </option>
+                  </select>
+                  <div
+                    *ngIf="submitForm.get('property_locality')?.invalid && (submitForm.get('property_locality')?.dirty || submitForm.get('property_locality')?.touched)"
+                    class="mgs_error">
+                    Please select locality.
+                  </div>
                 </div>
 
                 <div class="formCom">
                   <select formControlName="project_id" id="locality" class="gold-form-input post_fm">
-                  <option value disabled selected>Select Project</option>
-                  <option *ngFor="let data of this.projectList" [value]="data.id">
-                    {{ data.project_name }}
-                  </option>
-                </select>
-                <div
-                  *ngIf="submitForm.get('project_id')?.invalid && (submitForm.get('project_id')?.dirty || submitForm.get('project_id')?.touched)"
-                  class="mgs_error">
-                  Please enter project or society.
-                </div>
+                    <option value disabled selected>Select Project</option>
+                    <option *ngFor="let data of this.projectList" [value]="data.id">
+                      {{ data.project_name }}
+                    </option>
+                  </select>
                 </div>
 
                 <!-- <div>
@@ -278,13 +273,13 @@
                   <label for="Address">Address</label>
                   <input type="text" formControlName="property_address" id="Address" placeholder="Enter Address"
                     class="gold-form-input" />
-                    <div
-                  *ngIf="submitForm.get('property_address')?.invalid && (submitForm.get('property_address')?.dirty || submitForm.get('property_address')?.touched)"
-                  class="mgs_error">
-                  Please enter address.
+                  <div
+                    *ngIf="submitForm.get('property_address')?.invalid && (submitForm.get('property_address')?.dirty || submitForm.get('property_address')?.touched)"
+                    class="mgs_error">
+                    Please enter address.
+                  </div>
                 </div>
-                </div>
-                
+
                 <!-- <div id="city">
                   <label for="City">City</label>
                   <input
@@ -603,8 +598,7 @@
                   </div>
                 </div>
 
-                <div id="forcommercialandresidentialplot"
-                  *ngIf="['5', '9', '17', '21'].includes(selectedPropertyType)">
+                <div id="forcommercialandresidentialplot" *ngIf="['5', '9', '17', '21'].includes(selectedPropertyType)">
                   <div class="col-md-4">
                     <label _ngcontent-ng-c2223104581="" for="floors_allowed_for_construction">Floors Allowed for
                       construction</label>
@@ -1420,8 +1414,8 @@
 
                   <div id="rentavlbldate2" *ngIf="selectedAvailabaleDate === 'SelectDate'">
                     <div class="col-md-6">
-                      <input type="date" id="date"
-                        formControlName="available_from" class="gold-form-input post_fm mt-2" />
+                      <input type="date" id="date" formControlName="available_from"
+                        class="gold-form-input post_fm mt-2" />
                       <div
                         *ngIf="submitForm.get('available_from')?.invalid && (submitForm.get('available_from')?.dirty || submitForm.get('available_from')?.touched)"
                         class="mgs_error">
@@ -1934,16 +1928,16 @@
                     </div>
 
                     <!-- Drop Box when no image -->
-                    <div *ngIf="!mainImagePreview" class="dropbox-container"
-                         [ngClass]="{'drag-over': isMainDragOver}"
-                         (dragover)="onMainDragOver($event)"
-                         (dragleave)="onMainDragLeave($event)"
-                         (drop)="onMainImageDrop($event)">
-                      <label for="mainFileInput" class="dropbox-label cursor-pointer w-100 h-100 m-0 d-flex align-items-center justify-content-center">
+                    <div *ngIf="!mainImagePreview" class="dropbox-container" [ngClass]="{'drag-over': isMainDragOver}"
+                      (dragover)="onMainDragOver($event)" (dragleave)="onMainDragLeave($event)"
+                      (drop)="onMainImageDrop($event)">
+                      <label for="mainFileInput"
+                        class="dropbox-label cursor-pointer w-100 h-100 m-0 d-flex align-items-center justify-content-center">
                         <div class="dropbox-content text-center py-3 px-2">
                           <i class="fa-solid fa-cloud-arrow-up dropbox-icon text-danger fs-2 mb-2"></i>
                           <div class="fw-bold text-dark mb-1">Drag & Drop Main Cover Image</div>
-                          <div class="small text-muted mb-2">or <span class="text-danger text-decoration-underline">Browse File</span></div>
+                          <div class="small text-muted mb-2">or <span
+                              class="text-danger text-decoration-underline">Browse File</span></div>
                           <span class="badge bg-light text-secondary border">JPG, PNG, WEBP</span>
                         </div>
                       </label>
@@ -1952,9 +1946,11 @@
 
                     <!-- Main Image Preview & Controls (CRUD) -->
                     <div *ngIf="mainImagePreview" class="image-crud-card main-img-card position-relative mt-2">
-                      <img [src]="mainImagePreview" alt="Main Property Image" class="img-fluid rounded border shadow-sm main-preview-img" />
-                      <button type="button" class="btn btn-danger btn-sm main-delete-btn position-absolute top-0 end-0 m-1 rounded-circle p-0"
-                              (click)="removeMainImage()" title="Remove Main Image">
+                      <img [src]="mainImagePreview" alt="Main Property Image"
+                        class="img-fluid rounded border shadow-sm main-preview-img" />
+                      <button type="button"
+                        class="btn btn-danger btn-sm main-delete-btn position-absolute top-0 end-0 m-1 rounded-circle p-0"
+                        (click)="removeMainImage()" title="Remove Main Image">
                         <i class="fa-solid fa-xmark"></i>
                       </button>
                       <div class="image-actions-bar d-flex gap-2 mt-2">
@@ -1981,33 +1977,38 @@
                     </div>
 
                     <!-- Drop Box for Gallery Images -->
-                    <div class="dropbox-container"
-                         [ngClass]="{'drag-over': isGalleryDragOver}"
-                         (dragover)="onGalleryDragOver($event)"
-                         (dragleave)="onGalleryDragLeave($event)"
-                         (drop)="onGalleryImagesDrop($event)">
-                      <label for="galleryFileInput" class="dropbox-label cursor-pointer w-100 h-100 m-0 d-flex align-items-center justify-content-center">
+                    <div class="dropbox-container" [ngClass]="{'drag-over': isGalleryDragOver}"
+                      (dragover)="onGalleryDragOver($event)" (dragleave)="onGalleryDragLeave($event)"
+                      (drop)="onGalleryImagesDrop($event)">
+                      <label for="galleryFileInput"
+                        class="dropbox-label cursor-pointer w-100 h-100 m-0 d-flex align-items-center justify-content-center">
                         <div class="dropbox-content text-center py-3 px-2">
                           <i class="fa-solid fa-images dropbox-icon text-danger fs-2 mb-2"></i>
                           <div class="fw-bold text-dark mb-1">
-                            {{ galleryImagePreviews.length > 0 ? 'Drag & Drop + Add More Images' : 'Drag & Drop Gallery Images' }}
+                            {{ galleryImagePreviews.length > 0 ? 'Drag & Drop + Add More Images' : 'Drag & Drop Gallery
+                            Images' }}
                           </div>
-                          <div class="small text-muted mb-2">or <span class="text-danger text-decoration-underline">Browse Files</span></div>
+                          <div class="small text-muted mb-2">or <span
+                              class="text-danger text-decoration-underline">Browse Files</span></div>
                           <span class="badge bg-light text-secondary border">Multiple Images Allowed</span>
                         </div>
                       </label>
-                      <input type="file" id="galleryFileInput" (change)="onGalleryImagesChange($event)" accept="image/*" multiple />
+                      <input type="file" id="galleryFileInput" (change)="onPropertyImagesChange($event)"
+                        accept="image/*" multiple />
                     </div>
 
                     <!-- Gallery Image Previews Grid (CRUD) -->
                     <div *ngIf="galleryImagePreviews.length > 0" class="gallery-crud-grid d-flex flex-wrap gap-2 mt-2">
-                      <div *ngFor="let item of galleryImagePreviews; let i = index" class="gallery-preview-item position-relative border rounded p-1 bg-light">
+                      <div *ngFor="let item of galleryImagePreviews; let i = index"
+                        class="gallery-preview-item position-relative border rounded p-1 bg-light">
                         <img [src]="item.url" [alt]="item.name" class="img-thumbnail rounded gallery-thumb-img" />
-                        <button type="button" class="btn btn-danger btn-sm gallery-delete-btn position-absolute top-0 end-0 m-1 rounded-circle p-0"
-                                (click)="removeGalleryImage(i)" title="Remove Image">
+                        <button type="button"
+                          class="btn btn-danger btn-sm gallery-delete-btn position-absolute top-0 end-0 m-1 rounded-circle p-0"
+                          (click)="removeGalleryImage(i)" title="Remove Image">
                           <i class="fa-solid fa-xmark"></i>
                         </button>
-                        <div class="small text-truncate mt-1 px-1 text-muted" style="max-width: 90px;" [title]="item.name">
+                        <div class="small text-truncate mt-1 px-1 text-muted" style="max-width: 90px;"
+                          [title]="item.name">
                           {{ item.name }}
                         </div>
                       </div>
@@ -2037,7 +2038,8 @@
               </p>
               <div class="check-compare mb-3 mt-1">
                 <input type="checkbox" id="agree" formControlName="terms_conditions" value="agree" class="mycheck" />
-                <label for="agree" class="compares">I Agree to RealtyMart <a routerLink="../../terms-conditions" target="_blank">Terms of Use</a>
+                <label for="agree" class="compares">I Agree to RealtyMart <a routerLink="../../terms-conditions"
+                    target="_blank">Terms of Use</a>
                   <span class="policy_links"><a routerLink="../terms-conditions" target="_blank">T&C &</a>
                     <a routerLink="../privacy-policy" target="_blank">Privacy Policy</a></span></label><br />
               </div>
@@ -2056,7 +2058,115 @@
             </form>
           </div>
         </div>
-        <div class="col-lg-4"></div>
+        <div class="col-lg-4">
+            <div class="posting-card mt-4 mt-md-0">
+              <h5 class="posting-title">
+                You are posting this property for
+              </h5>
+
+              <div class="price">
+                ₹5000 <span>Free</span>
+              </div>
+
+              <div class="benefits">
+
+                <div class="benefit-item">
+                  <span class="check-icon">✓</span>
+                  <span>Free Professional Photoshoot</span>
+                </div>
+
+                <div class="benefit-item">
+                  <span class="check-icon">✓</span>
+                  <span>Get Contact Details of upto 5 Responses</span>
+                </div>
+
+                <div class="benefit-item">
+                  <span class="check-icon">✓</span>
+                  <span>Access to 15 Lac Buyers & Tenants</span>
+                </div>
+
+              </div>
+            </div>
+            <div class="buyer-card mt-4">
+
+              <h5 class="buyer-title">
+                How can you identify the<br>
+                appropriate buyer?
+              </h5>
+
+              <!-- Item 1 -->
+              <div class="buyer-item">
+
+                <div class="buyer-icon">
+                  📞
+                </div>
+
+                <div class="buyer-content">
+                  <div class="buyer-heading">
+                    Reply to inquiries from potential<br>
+                    buyers.
+                  </div>
+
+                  <p>
+                    Engage with buyers when they reach out
+                    about your property.
+                  </p>
+
+                  <a href="javascript:void(0)" class="contact-link">
+                    View upto 5 contact details for FREE!
+                  </a>
+                </div>
+
+              </div>
+
+              <hr>
+
+              <!-- Item 2 -->
+              <div class="buyer-item">
+
+                <div class="buyer-icon">
+                  👤
+                </div>
+
+                <div class="buyer-content">
+                  <div class="buyer-heading">
+                    Engage with buyers that match your<br>
+                    criteria.
+                  </div>
+
+                  <p>
+                    Proactively search for compatible
+                    buyers and establish connections.
+                  </p>
+                </div>
+
+              </div>
+
+              <hr>
+
+              <!-- Item 3 -->
+              <div class="buyer-item">
+
+                <div class="buyer-icon">
+                  📱
+                </div>
+
+                <div class="buyer-content">
+                  <div class="buyer-heading">
+                    Download the App
+                  </div>
+
+                  <p>
+                    Receive instant notifications for every
+                    new buyer inquiry and establish
+                    immediate connections.
+                  </p>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
       </div>
     </div>
   </section>

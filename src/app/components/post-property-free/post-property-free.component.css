@@ -44,7 +44,7 @@
   display: none;
 }
 
-.pp-form__elem-radio__input:checked ~ .pp-form__elem-radio__label {
+.pp-form__elem-radio__input:checked~.pp-form__elem-radio__label {
   background-color: #fbe9e9;
   color: #303030;
 }
@@ -108,6 +108,7 @@
   line-height: 32px;
   display: inline-block;
 }
+
 .custom-select span::after {
   position: absolute;
   content: "";
@@ -201,6 +202,7 @@ span.policy_links a {
   font-size: 18px;
   color: #606060;
 }
+
 .modify_oop {
   display: flex;
   gap: 30px;
@@ -211,10 +213,12 @@ span.policy_links a {
   border: 1px solid #bbb;
   padding: 0;
 }
+
 .bedroom_specification input {
   height: 30px;
   width: 80px;
 }
+
 .bedroom_specification input:focus {
   box-shadow: none;
   outline: none;
@@ -224,6 +228,7 @@ span.policy_links a {
   margin: 0;
   font-size: 14px;
 }
+
 .bedroom_specification h6 {
   background-color: #bbb;
   margin: 0;
@@ -253,19 +258,24 @@ span.policy_links a {
   text-align: center;
   line-height: 32px;
 }
+
 .flat_list_count ul li:nth-child(2) {
   width: 90px;
 }
+
 .bed-list {
   height: 150px;
   overflow-y: auto;
 }
+
 .bed-list::-webkit-scrollbar {
   width: 3px;
 }
+
 .bed-list::-webkit-scrollbar-thumb {
   background-color: #817f7f;
 }
+
 .bedroom-fields {
   display: flex;
   gap: 40px;
@@ -291,18 +301,20 @@ input[type="file"] {
   display: none;
 }
 
-textarea{
+textarea {
   /* resize: none; */
 }
 
 .mgs_error {
   color: red;
 }
+
 .form-check-input[type=radio] {
   border-width: 3px;
   accent-color: #e53726;
 }
-.formCom{
+
+.formCom {
   margin-bottom: 30px;
 }
 
@@ -326,7 +338,7 @@ textarea{
 
 .gallery-preview-item {
   width: 95px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
   transition: transform 0.2s ease;
 }
 
@@ -348,7 +360,7 @@ textarea{
   line-height: 18px;
   font-size: 10px;
   text-align: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .main-delete-btn {
@@ -357,7 +369,7 @@ textarea{
   line-height: 22px;
   font-size: 12px;
   text-align: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
   z-index: 5;
 }
 
@@ -398,4 +410,143 @@ textarea{
 
 .dropbox-container:hover .dropbox-icon {
   transform: translateY(-3px);
+}
+
+.posting-card {
+  width: 100%;
+  max-width: 323px;
+  padding: 26px 22px;
+  border: 1px solid #ddd;
+  border-radius: 14px;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.posting-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #222;
+}
+
+.price {
+  margin-top: 3px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #222;
+}
+
+.price span {
+  margin-left: 4px;
+  color: #e25545;
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-weight: 700;
+}
+
+.benefits {
+  margin-top: 22px;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 13px;
+  color: #777;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.benefit-item:last-child {
+  margin-bottom: 0;
+}
+
+.check-icon {
+  width: 17px;
+  height: 17px;
+  min-width: 17px;
+  border: 2px solid #65b84a;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #65b84a;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.buyer-card {
+  width: 100%;
+  max-width: 323px;
+  padding: 30px 22px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 14px;
+  box-sizing: border-box;
+}
+
+.buyer-title {
+  margin: 0 0 25px;
+  color: #222;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.buyer-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.buyer-icon {
+  width: 29px;
+  min-width: 29px;
+  font-size: 27px;
+  line-height: 1;
+  text-align: center;
+  margin-top: 2px;
+}
+
+.buyer-content {
+  flex: 1;
+}
+
+.buyer-heading {
+  color: #333;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.buyer-content p {
+  margin: 5px 0 6px;
+  color: #777;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.contact-link {
+  color: #d45a4d;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.contact-link:hover {
+  text-decoration: underline;
+}
+
+.buyer-card hr {
+  margin: 25px 0;
+  border: 0;
+  border-top: 1px dashed #999;
+  opacity: 0.8;
+}
+
+@media (max-width: 991.98px) {
+  .posting-card {
+    margin-top: 1.5rem !important;
+  }
 }

@@ -106,7 +106,6 @@ export class HomeComponent implements AfterViewInit, OnInit {
   propertyother: any;
   propertyplotData: any;
   propertyplot: any[] = [
-    { id: 1, name: 'Agriculture Land' },
     { id: 2, name: 'Residential Land & Plot' },
     { id: 3, name: 'Commercial Land' },
     { id: 4, name: 'Industrial Land' }
@@ -185,6 +184,7 @@ export class HomeComponent implements AfterViewInit, OnInit {
   showLocationDropdown: boolean = false;
   showExtraChipsPopover: boolean = false;
   locationSuggestions: Array<{ name: string; category: string; subtext?: string; slug?: string; rawData?: any }> = [];
+  selectedSuggestionIndex: number = -1;
   cityLocalities: any[] = [];
   minBudget: string = '';
   maxBudget: string = '';
@@ -197,20 +197,12 @@ export class HomeComponent implements AfterViewInit, OnInit {
   }
 
   selectCityFromSelector(cityName: string) {
+    localStorage.setItem('userSelectedCity', cityName);
     this.selectedCityChip = cityName;
     this.selectedExtraChips = [];
     this.saveChipsToLocalStorage();
     this.loadCityLocalities(cityName);
     this.updateCity(cityName);
-    this.loadHotDeals();
-    this.loadFeaturedResidentalProjects();
-    this.loadFeaturedCommercialProjects();
-    this.loadFeaturedBunglowsProjects();
-    this.loadFarmHouseProjects();
-    this.loadFeaturedPlotsProjects();
-    this.loadTopBuilders();
-    this.loadHomeBanner();
-    this.loadAhmedabadProjects();
     this.showCitySelectorDropdown = false;
   }
 
@@ -261,29 +253,8 @@ export class HomeComponent implements AfterViewInit, OnInit {
     private headerService: HeaderService,
     private seoService: SeoService
   ) {
-    this.getLocation();
-    this.loadHotDeals();
-    this.loadFeaturedResidentalProjects();
-    this.loadFeaturedCommercialProjects();
-    this.loadFeaturedBunglowsProjects();
-    this.loadFarmHouseProjects();
-    this.loadFeaturedPlotsProjects();
-    this.loadTopBuilders();
-    this.loadHomeBanner();
-    this.loadpropertyresidential();
-    this.loadpropertycommercial();
-    this.loadPropertyOther();
-    this.loadPropertyPlot();
-    this.loadPropertyPg();
-    this.loadPropertyHostel();
-    this.myForm = new FormGroup({
-      selectcitysearch: new FormControl(null),
-      propertytype: new FormControl(''),
-      searchtype: new FormControl(''),
-    });
     this.myForm = this.fb.group({
       selectcitysearch: [null, Validators.required],
-      // searchtype: [''],
     });
 
     // Initialize error messages
@@ -294,20 +265,9 @@ export class HomeComponent implements AfterViewInit, OnInit {
     this.myForm.get('selectcitysearch')?.valueChanges.subscribe((selectedCityId) => {
       if (!selectedCityId) return;
       const matchedCity = this.citySearch?.find((city: any) => city.id == selectedCityId);
-      if (matchedCity) {
-        const cityName = matchedCity.name;
-        this.updateCity(cityName);
+      if (matchedCity && matchedCity.name !== this.city) {
+        this.updateCity(matchedCity.name);
         this.headerService.triggerRefresh();
-        // reload home page data
-        this.loadHotDeals();
-        this.loadFeaturedResidentalProjects();
-        this.loadFeaturedCommercialProjects();
-        this.loadFeaturedBunglowsProjects();
-        this.loadFarmHouseProjects();
-        this.loadFeaturedPlotsProjects();
-        this.loadTopBuilders();
-        this.loadHomeBanner();
-        this.loadAhmedabadProjects();
         // Call search API
         this.onSubmit(false);
       }
@@ -318,23 +278,33 @@ export class HomeComponent implements AfterViewInit, OnInit {
     this.loadpropertyresidential();
   }
   ngOnInit() {
-    this.locationCookie = localStorage.getItem('location');
-    this.selectedCityChip = localStorage.getItem('selectedCityChip') || this.locationCookie || 'Ahmedabad';
-    try {
-      const savedExtra = localStorage.getItem('selectedExtraChips');
-      if (savedExtra) {
-        this.selectedExtraChips = JSON.parse(savedExtra);
-      }
-    } catch (e) { }
-    this.minBudget = localStorage.getItem('minBudget') || '';
-    this.maxBudget = localStorage.getItem('maxBudget') || '';
+    // Reset area and user city selection on screen refresh so IP city is selected on refresh
+    this.selectedExtraChips = [];
+    this.locationInputText = '';
+    this.showExtraChipsPopover = false;
+    localStorage.removeItem('userSelectedCity');
+    localStorage.removeItem('selectedExtraChips');
+    localStorage.removeItem('selectedArea');
+    localStorage.removeItem('locationInputText');
+
+    this.minBudget = '';
+    this.maxBudget = '';
+    localStorage.removeItem('minBudget');
+    localStorage.removeItem('maxBudget');
 
     this.seoService.setCanonicalURL(window.location.href);
     this.fetchCities();
     this.checkLoggedIn();
-    this.propertyServicesHomePage()
+    this.propertyServicesHomePage();
     this.loadpropertyresidential();
-    this.loadAhmedabadProjects();
+    this.loadpropertycommercial();
+    this.loadPropertyOther();
+    this.loadPropertyPlot();
+    this.loadPropertyPg();
+    this.loadPropertyHostel();
+
+    // Initialize location via IP on page refresh and load city-based sections
+    this.getLocation();
     this.loadCityLocalities(this.selectedCityChip);
     this.titleService.setTitle('Real Estate Property Portal | Real Estate Services | Buy, Sell, Rent Properties | realtymart.com');
     this.metaService.addTag({
@@ -394,78 +364,19 @@ export class HomeComponent implements AfterViewInit, OnInit {
   }
 
   getLocation() {
-    const locationCookie = localStorage.getItem('location');
-    this.city = locationCookie || 'Ahmedabad';
-    if (!locationCookie) {
-      localStorage.setItem('location', 'Ahmedabad');
-    }
-
-    if (!locationCookie) {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const { latitude, longitude } = position.coords;
-            this.geolocationService
-              .getCity(latitude, longitude)
-              .then((city: string) => {
-                if (this.isValidCity(city)) {
-                  this.updateCity(city);
-                  this.loadHotDeals();
-                  this.loadFeaturedResidentalProjects();
-                  this.loadFeaturedCommercialProjects();
-                  this.loadFeaturedBunglowsProjects();
-                  this.loadFarmHouseProjects();
-                  this.loadFeaturedPlotsProjects();
-                  this.loadTopBuilders();
-                  this.loadHomeBanner();
-                } else {
-                  this.updateCity('Ahmedabad');
-                  this.loadHotDeals();
-                  this.loadFeaturedResidentalProjects();
-                  this.loadFeaturedCommercialProjects();
-                  this.loadFeaturedBunglowsProjects();
-                  this.loadFarmHouseProjects();
-                  this.loadFeaturedPlotsProjects();
-                  this.loadTopBuilders();
-                  this.loadHomeBanner();
-                }
-              })
-              .catch((error: any) => {
-                this.updateCity('Ahmedabad');
-                this.loadHotDeals();
-                this.loadFeaturedResidentalProjects();
-                this.loadFeaturedCommercialProjects();
-                this.loadFeaturedBunglowsProjects();
-                this.loadFarmHouseProjects();
-                this.loadFeaturedPlotsProjects();
-                this.loadTopBuilders();
-                this.loadHomeBanner();
-              });
-          },
-          (error) => {
-            this.updateCity('Ahmedabad');
-            this.loadHotDeals();
-            this.loadFeaturedResidentalProjects();
-            this.loadFeaturedCommercialProjects();
-            this.loadFeaturedBunglowsProjects();
-            this.loadFarmHouseProjects();
-            this.loadFeaturedPlotsProjects();
-            this.loadTopBuilders();
-            this.loadHomeBanner();
-          }
-        );
-      } else {
+    this.geolocationService
+      .getCityByIp()
+      .then((ipCity: string) => {
+        if (this.isValidCity(ipCity)) {
+          this.updateCity(ipCity);
+        } else {
+          this.updateCity('Ahmedabad');
+        }
+      })
+      .catch((error: any) => {
+        console.error('Error fetching IP city:', error);
         this.updateCity('Ahmedabad');
-        this.loadHotDeals();
-        this.loadFeaturedResidentalProjects();
-        this.loadFeaturedCommercialProjects();
-        this.loadFeaturedBunglowsProjects();
-        this.loadFarmHouseProjects();
-        this.loadFeaturedPlotsProjects();
-        this.loadTopBuilders();
-        this.loadHomeBanner();
-      }
-    }
+      });
   }
 
   isValidCity(city: string): boolean {
@@ -600,7 +511,8 @@ export class HomeComponent implements AfterViewInit, OnInit {
   loadpropertyresidential(): void {
     this.propertyresidentialservice.getpropertytyperesidential()?.subscribe((propertyresidentialData: any) => {
       this.propertyresidentialData = propertyresidentialData;
-      this.propertyresidential = this.propertyresidentialData?.data;
+      const apiData = Array.isArray(this.propertyresidentialData?.data) ? this.propertyresidentialData.data : [];
+      this.propertyresidential = apiData.filter((item: any) => !item?.name || !/agri/i.test(item.name));
 
       this.selectedResidentialItems = [];
       this.selectedCommercialItems = [];
@@ -616,18 +528,19 @@ export class HomeComponent implements AfterViewInit, OnInit {
   loadpropertycommercial(): void {
     this.propertycommercialservice.getpropertytypecommercial()?.subscribe((propertycommercialData: any) => {
       this.propertycommercialData = propertycommercialData;
-      this.propertycommercial = this.propertycommercialData?.data;
+      const apiData = Array.isArray(this.propertycommercialData?.data) ? this.propertycommercialData.data : [];
+      this.propertycommercial = apiData.filter((item: any) => !item?.name || !/agri/i.test(item.name));
     });
   }
   loadPropertyOther(): void {
     this.propertyotherservice.getpropertytypeother()?.subscribe((propertyotherData: any) => {
       this.propertyotherData = propertyotherData;
-      this.propertyother = this.propertyotherData?.data;
+      const apiData = Array.isArray(this.propertyotherData?.data) ? this.propertyotherData.data : [];
+      this.propertyother = apiData.filter((item: any) => !item?.name || !/agri/i.test(item.name));
     });
   }
   loadPropertyPlot(): void {
     const defaultPlots = [
-      { id: 1, name: 'Agriculture Land' },
       { id: 2, name: 'Residential Land & Plot' },
       { id: 3, name: 'Commercial Land' },
       { id: 4, name: 'Industrial Land' }
@@ -636,7 +549,8 @@ export class HomeComponent implements AfterViewInit, OnInit {
       next: (propertyplotData: any) => {
         this.propertyplotData = propertyplotData;
         const apiData = Array.isArray(this.propertyplotData?.data) ? this.propertyplotData.data : [];
-        this.propertyplot = apiData.length > 0 ? apiData : defaultPlots;
+        const rawPlots = apiData.length > 0 ? apiData : defaultPlots;
+        this.propertyplot = rawPlots.filter((item: any) => !item?.name || !/agri/i.test(item.name));
       },
       error: () => {
         this.propertyplot = defaultPlots;
@@ -646,13 +560,15 @@ export class HomeComponent implements AfterViewInit, OnInit {
   loadPropertyPg(): void {
     this.propertypgservice.getpropertytypepg()?.subscribe((propertypgData: any) => {
       this.propertypgData = propertypgData;
-      this.propertypg = this.propertypgData?.data;
+      const apiData = Array.isArray(this.propertypgData?.data) ? this.propertypgData.data : [];
+      this.propertypg = apiData.filter((item: any) => !item?.name || !/agri/i.test(item.name));
     });
   }
   loadPropertyHostel(): void {
     this.propertyhostelservice.getpropertytypehostel()?.subscribe((propertyhostelData: any) => {
       this.propertyhostelData = propertyhostelData;
-      this.propertyhostel = this.propertyhostelData?.data;
+      const apiData = Array.isArray(this.propertyhostelData?.data) ? this.propertyhostelData.data : [];
+      this.propertyhostel = apiData.filter((item: any) => !item?.name || !/agri/i.test(item.name));
     });
   }
   visible: boolean = false;
@@ -810,8 +726,8 @@ export class HomeComponent implements AfterViewInit, OnInit {
   //Featured Projects Slider //
   //-------------------------------//
   slideConfig1 = {
-    slidesToShow: 3,
-    slidesToScroll: 3,
+    slidesToShow: 2,
+    slidesToScroll: 2,
     dots: true,
     arrows: false,
     infinite: true,
@@ -1064,6 +980,7 @@ export class HomeComponent implements AfterViewInit, OnInit {
     if (!query) {
       this.locationSuggestions = [];
       this.showLocationDropdown = false;
+      this.selectedSuggestionIndex = -1;
       return;
     }
 
@@ -1092,9 +1009,11 @@ export class HomeComponent implements AfterViewInit, OnInit {
 
           this.locationSuggestions = apiSuggestions;
           this.showLocationDropdown = this.locationSuggestions.length > 0;
+          this.selectedSuggestionIndex = -1;
         } else {
           this.locationSuggestions = [];
           this.showLocationDropdown = false;
+          this.selectedSuggestionIndex = -1;
         }
       },
       (error) => {
@@ -1150,7 +1069,59 @@ export class HomeComponent implements AfterViewInit, OnInit {
   onLocationBlur() {
     setTimeout(() => {
       this.showLocationDropdown = false;
+      this.selectedSuggestionIndex = -1;
     }, 250);
+  }
+
+  onLocationKeydown(event: KeyboardEvent) {
+    if (!this.showLocationDropdown || !this.locationSuggestions || this.locationSuggestions.length === 0) {
+      if (event.key === 'ArrowDown') {
+        this.onLocationInput();
+      }
+      return;
+    }
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      if (this.selectedSuggestionIndex < this.locationSuggestions.length - 1) {
+        this.selectedSuggestionIndex++;
+      } else {
+        this.selectedSuggestionIndex = 0;
+      }
+      this.scrollSelectedSuggestionIntoView();
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      if (this.selectedSuggestionIndex > 0) {
+        this.selectedSuggestionIndex--;
+      } else {
+        this.selectedSuggestionIndex = this.locationSuggestions.length - 1;
+      }
+      this.scrollSelectedSuggestionIntoView();
+    } else if (event.key === 'Enter') {
+      if (this.selectedSuggestionIndex >= 0 && this.selectedSuggestionIndex < this.locationSuggestions.length) {
+        event.preventDefault();
+        const selectedItem = this.locationSuggestions[this.selectedSuggestionIndex];
+        this.selectLocationSuggestion(selectedItem);
+        this.selectedSuggestionIndex = -1;
+      } else {
+        this.onLocationEnter(event);
+      }
+    } else if (event.key === 'Escape') {
+      this.showLocationDropdown = false;
+      this.selectedSuggestionIndex = -1;
+    }
+  }
+
+  scrollSelectedSuggestionIntoView() {
+    setTimeout(() => {
+      const dropdowns = document.querySelectorAll('.search_suggestions_dropdown');
+      dropdowns.forEach((dropdown) => {
+        const activeItem = dropdown.querySelector('.suggestion_item.active');
+        if (activeItem) {
+          activeItem.scrollIntoView({ block: 'nearest' });
+        }
+      });
+    }, 0);
   }
 
   selectLocationSuggestion(item: { name: string; category: string; slug?: string; rawData?: any }) {
@@ -1194,6 +1165,7 @@ export class HomeComponent implements AfterViewInit, OnInit {
 
     this.locationInputText = '';
     this.showLocationDropdown = false;
+    this.selectedSuggestionIndex = -1;
   }
 
   removeCityChip() {
@@ -1807,3 +1779,4 @@ export class HomeComponent implements AfterViewInit, OnInit {
     }
   }
 }
+

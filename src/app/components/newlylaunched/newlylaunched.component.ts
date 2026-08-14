@@ -163,6 +163,8 @@ export class NewlylaunchedComponent implements OnInit{
           const oldScrollY = window.scrollY;
             this.newlauchedproperty =
         response.data?.data || [];
+          this.original = [...this.newlauchedproperty];
+          this.applySort();
 
         this.setNewLaunchProjectSchema();
 
@@ -413,110 +415,114 @@ export class NewlylaunchedComponent implements OnInit{
   // showLastPage(): boolean {
   //   return this.currentPage < this.getTotalPages() - 2;
   // }
-  changeSortOption(option: string): void {
-  this.selectedSortOption = option;
-  this.isDropdownOpen = false;
-
-  // Always work on a copy to trigger Angular change detection properly
-  let sorted = [...this.newlauchedproperty];
-
-  switch (option) {
-    case 'Price - Low to High':
-      sorted.sort((a: any, b: any) => {
-        const priceA = this.parsePrice(a.project_minimum_price);
-        const priceB = this.parsePrice(b.project_minimum_price);
-        if (priceA === 0 && priceB !== 0) return 1; // no value last
-        if (priceB === 0 && priceA !== 0) return -1;
-        return priceA - priceB;
-      });
-      break;
-
-    case 'Price - High to Low':
-      sorted.sort((a: any, b: any) => {
-        const priceA = this.parsePrice(a.project_minimum_price);
-        const priceB = this.parsePrice(b.project_minimum_price);
-        if (priceA === 0 && priceB !== 0) return 1; // no value last
-        if (priceB === 0 && priceA !== 0) return -1;
-        return priceB - priceA;
-      });
-      break;
-
-    case 'Most Recent':
-      sorted.sort((a: any, b: any) => this.sortByPossession(a, b));
-      break;
-
-    case 'Relevance':
-    default:
-      sorted = [...this.newlauchedproperty]; // show all data
-      break;
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.tabs_sortby')) {
+      this.isDropdownOpen = false;
+    }
   }
 
-  this.newlauchedproperty = sorted; // assign new array reference
-}
+  toggleDropdown(event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isDropdownOpen = !this.isDropdownOpen;
+  }
 
-  private convertToLac(priceString: string): number {
-    if (!priceString) return 0;
-    let numericValue = parseFloat(priceString.replace(/[^0-9.]/g, '').trim());
+  changeSortOption(option: string): void {
+    this.selectedSortOption = option;
+    this.isDropdownOpen = false;
+    this.applySort();
+  }
 
-    if (priceString.toLowerCase().includes('cr')) {
-      numericValue *= 100;
-    } else if (priceString.toLowerCase().includes('lac')) {
-    } else {
-      numericValue = numericValue / 100000;
+  private applySort(): void {
+    if (!this.original || !this.original.length) {
+      this.original = [...(this.newlauchedproperty || [])];
     }
 
-    return numericValue;
+    let sorted = [...this.original];
+
+    switch (this.selectedSortOption) {
+      case 'Price - Low to High':
+        sorted.sort((a: any, b: any) => {
+          const minA = this.convertToLac(a.project_minimum_price);
+          const maxA = this.convertToLac(a.project_maximum_price);
+          const priceA = minA || maxA;
+
+          const minB = this.convertToLac(b.project_minimum_price);
+          const maxB = this.convertToLac(b.project_maximum_price);
+          const priceB = minB || maxB;
+
+          if (priceA === 0 && priceB !== 0) return 1;
+          if (priceB === 0 && priceA !== 0) return -1;
+
+          if (priceA !== priceB) {
+            return priceA - priceB;
+          }
+          return maxA - maxB;
+        });
+        break;
+
+      case 'Price - High to Low':
+        sorted.sort((a: any, b: any) => {
+          const minA = this.convertToLac(a.project_minimum_price);
+          const maxA = this.convertToLac(a.project_maximum_price);
+          const priceA = minA || maxA;
+
+          const minB = this.convertToLac(b.project_minimum_price);
+          const maxB = this.convertToLac(b.project_maximum_price);
+          const priceB = minB || maxB;
+
+          if (priceA === 0 && priceB !== 0) return 1;
+          if (priceB === 0 && priceA !== 0) return -1;
+
+          if (priceA !== priceB) {
+            return priceB - priceA;
+          }
+          return maxB - maxA;
+        });
+        break;
+
+      case 'Most Recent':
+        sorted.sort((a: any, b: any) => this.sortByRecent(a, b));
+        break;
+
+      case 'Relevance':
+      default:
+        sorted = [...this.original];
+        break;
+    }
+
+    this.newlauchedproperty = sorted;
   }
 
-  private sortByPrice(a: any, b: any): number {
-    const priceA = this.parsePrice(a.project.project_maximum_price);
-    const priceB = this.parsePrice(b.project.project_minimum_price);
+  private convertToLac(priceString: any): number {
+    if (!priceString) return 0;
+    const str = String(priceString).toLowerCase().trim();
+    let numericValue = parseFloat(str.replace(/[^0-9.]/g, ''));
+    if (isNaN(numericValue)) return 0;
 
-    return priceA - priceB;
+    if (str.includes('cr')) {
+      numericValue *= 100;
+    } else if (str.includes('lac') || str.includes('lakh') || str.includes('l')) {
+      // Already in Lacs
+    } else if (numericValue >= 1000) {
+      numericValue = numericValue / 100000;
+    }
+    return numericValue;
   }
 
   private sortByRecent(a: any, b: any): number {
-    const dateA = a?.created_at ? new Date(a.created_at).getTime() : 0;
-    const dateB = b?.created_at ? new Date(b.created_at).getTime() : 0;
-
-    return dateB - dateA;
-  }
-
-  private sortByPossession(a: any, b: any): number {
-    const dateA = a?.project_possession_date ? new Date(a.project_possession_date).getTime() : 0;
-    const dateB = b?.project_possession_date ? new Date(b.project_possession_date).getTime() : 0;
-
-    return dateB - dateA; // most recent first
-  }
-
-  filterByPrice(minPrice: number, maxPrice: number): void {
-    this.filteredData = this.newlauchedproperty.filter(
-      (property: { minprice: string; maxprice: string }) => {
-        const propertyMinPrice = this.parsePrice(property.minprice);
-        const propertyMaxPrice = this.parsePrice(property.maxprice);
-
-        return (
-          (minPrice === null || propertyMinPrice >= minPrice) &&
-          (maxPrice === null || propertyMaxPrice <= maxPrice)
-        );
+    const getTime = (item: any) => {
+      const dateStr = item?.created_at || item?.project_possession_date || item?.projectdetails?.created_at;
+      if (dateStr) {
+        const time = new Date(dateStr).getTime();
+        if (!isNaN(time) && time > 0) return time;
       }
-    );
-  }
-
-  private parsePrice(priceString: string): number {
-    if (!priceString) return 0;
-
-    let numericValue = parseFloat(priceString.replace(/[^0-9.]/g, '').trim());
-
-    if (priceString.includes('cr')) {
-      numericValue *= 100; // Convert crore to lac
-    }
-
-    return numericValue;
-  }
-
-  toggleDropdown(): void {
-    this.isDropdownOpen = !this.isDropdownOpen;
+      return item?.id || 0;
+    };
+    return getTime(b) - getTime(a);
   }
 
   contactowner(propertyid: any) {
