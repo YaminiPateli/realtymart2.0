@@ -9,8 +9,9 @@
 }
 
 .free_boxs h1 {
-  font-size: 39px;
+  font-size: 32px;
   font-weight: bold;
+  line-height: 42px;
   margin-bottom: 30px;
 }
 
@@ -191,7 +192,7 @@ span.policy_links a {
 }
 
 .looking_sell_rent {
-  font-size: 22px;
+  font-size: 17px;
   color: #303030;
   font-weight: 600;
   padding-bottom: 8px;
@@ -199,7 +200,7 @@ span.policy_links a {
 }
 
 .looking_info {
-  font-size: 18px;
+  font-size: 15px;
   color: #606060;
 }
 
@@ -245,7 +246,7 @@ span.policy_links a {
   margin: 0;
   padding: 0;
   top: 35px;
-  width: 100%;
+  width: 114%;
   background-color: #fff;
   display: flex;
 }

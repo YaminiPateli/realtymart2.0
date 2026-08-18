@@ -129,6 +129,7 @@ input.sub_phone {
   padding: 0;
   overflow-x: auto;
   flex-wrap: nowrap;
+  font-size: 15px;
   text-wrap: nowrap;
   gap: 24px;
   scrollbar-width: none;
@@ -256,7 +257,7 @@ input.sub_phone {
 }
 .wp_box {
   color: #e53726;
-  font-size: 18px;
+  font-size: 15px;
   font-style: normal;
   font-weight: 700;
   border-radius: 5px;
@@ -270,7 +271,7 @@ input.sub_phone {
   background: #1e82e6;
   color: #fff;
   padding: 10px 20px;
-  font-size: 18px;
+  font-size: 15px;
   font-style: normal;
   font-weight: 700;
   line-height: normal;

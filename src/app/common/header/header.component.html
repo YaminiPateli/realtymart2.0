@@ -12,18 +12,18 @@
         <!-- <a routerLink="/register" class="register ms-3"
           > SIGN UP</a
         > -->
-        <a target="_blank" routerLink="/selling-guide" class="post_btn">List Property</a>
+        <a target="_blank" routerLink="/selling-guide" class="post_btn">List Property Free</a>
       </div>
     </div>
   </div>
 
   <nav class="navbar navbar-expand-lg">
     <div class="container">
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <button class="navbar-toggler" type="button" (click)="toggleMenu()"
+        aria-controls="navbarSupportedContent" [attr.aria-expanded]="!isMenuCollapsed" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <div class="collapse navbar-collapse" [class.show]="!isMenuCollapsed" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" id="navbarDropdown" data-bs-toggle="dropdown"
@@ -181,7 +181,7 @@
                 <div class="">
                   <li class="dropdown-item menu_inner_title">Owner</li>
                   <li>
-                    <a target="_blank" class="dropdown-item" routerLink="/selling-guide">List Property <span
+                    <a target="_blank" class="dropdown-item" routerLink="/selling-guide">List Property Free<span
                         class="badge">NEW</span></a>
                   </li>
                   <li></li>

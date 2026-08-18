@@ -199,10 +199,10 @@
                     <div class="form_sticky">
                         <div class="fill_info">
                             <h4 *ngIf="singlecompany.company_address !== null" class="info-title mb-1">Address:</h4>
-                            <p *ngIf="singlecompany.company_address !== null">{{singlecompany.company_address}} </p>
+                            <p class="body-text" *ngIf="singlecompany.company_address !== null">{{singlecompany.company_address}} </p>
 
                             <div class="d-flex align-items-center flex-wrap our_time">
-                                <a *ngIf="singlecompany?.company_map != null" class="directions" target="_blank" [href]="googleMapUrl">Get Directions</a>
+                                <a *ngIf="singlecompany?.company_map != null" class="directions uppercase" target="_blank" [href]="googleMapUrl">Get Directions</a>
                                     <ul class="dropdown list-unstyled" *ngIf="singlecompany.bussiness_hours !== null">
                                         <p class="m-0"><b>Business Hours</b></p>
                                         <div *ngFor="let businessHour of reorderBusinessHours() || []">
@@ -223,11 +223,11 @@
                             <div class="some_info d-flex justify-content-between flex-wrap mt-3">
                                 <div *ngIf="singlecompany.company_contactno !== null">
                                     <p class="info-title m-0">Contact Us:</p>
-                                    <a href="tel:">{{singlecompany.company_contactno }}</a>
+                                    <a class="body-text" href="tel:">{{singlecompany.company_contactno }}</a>
                                 </div>
                                 <div *ngIf="singlecompany.company_email !== null">
                                     <p class="info-title m-0">Email Us:</p>
-                                    <a
+                                    <a class="body-text"
                                         href="mailto:">{{singlecompany.company_email}}</a>
                                 </div>
                             </div>
@@ -238,7 +238,7 @@
                                 <div>
                                     <p class="info-title m-0">Visit Our
                                         Website:</p>
-                                    <a target="_blank" href={{singlecompany.company_website}}>{{singlecompany.company_website}}</a>
+                                    <a class="body-text" target="_blank" href={{singlecompany.company_website}}>{{singlecompany.company_website}}</a>
                                 </div>
                             </div>
 
@@ -246,7 +246,7 @@
                                 <div>
                                     <p class="info-title mb-2">Share This:</p>
                                     <a href="javascript::void()"
-                                        class="directions d-flex align-items-center gap-2">Share
+                                        class="directions uppercase d-flex align-items-center gap-2">Share
                                         <svg xmlns="http://www.w3.org/2000/svg"
                                             width="24" height="24"
                                             viewBox="0 0 24 24" fill="none">
@@ -285,7 +285,7 @@
                     </div>
                     <div class="col-lg-7 d-flex align-items-center justify-content-between">
                         <a href="tel:7378373783"
-                            class="directions d-inline-flex gap-2 align-items-center"><svg
+                            class="directions uppercase d-inline-flex gap-2 align-items-center"><svg
                                 xmlns="http://www.w3.org/2000/svg" width="24"
                                 height="24" viewBox="0 0 24 24" fill="none">
                                 <g clip-path="url(#clip0_1748_273)">
@@ -355,9 +355,9 @@
                                             fill="white" />
                                     </clippath>
                                 </defs>
-                            </svg> Contact us</a>
+                            </svg> Contact US</a>
 
-                        <a href="javascript:void(0)" (click)="shareonWhatsapp()" class="wp_box d-inline-flex gap-2 align-items-center"><svg
+                        <a href="javascript:void(0)" (click)="shareonWhatsapp()" class="wp_box d-inline-flex uppercase body-text gap-2 align-items-center"><svg
                                 xmlns="http://www.w3.org/2000/svg" width="24"
                                 height="24" viewBox="0 0 24 24" fill="none">
                                 <g clip-path="url(#clip0_1748_296)">
@@ -374,9 +374,9 @@
                                             fill="white" />
                                     </clippath>
                                 </defs>
-                            </svg> WhatsApp us</a>
+                            </svg> WhatsApp US</a>
 
-                        <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#enquiryModal" class="send_enquiry d-inline-flex gap-2 align-items-center">
+                        <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#enquiryModal" class="send_enquiry d-inline-flex uppercase gap-2 align-items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                                 <g clip-path="url(#clip0_1748_301)">
                                   <mask id="mask0_1748_301" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="-1" y="-1" width="25" height="25">

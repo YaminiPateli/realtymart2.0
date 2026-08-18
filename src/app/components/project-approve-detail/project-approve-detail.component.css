@@ -131,8 +131,9 @@
 }
 
 .project-title {
-  font-size: 40px;
+  font-size: 32px;
   font-weight: 700;
+  line-height: 42px;
   color: #1d1d1d;
 }
 
@@ -142,8 +143,8 @@
 }
 
 .builder-name-by {
-  font-size: 18px;
-  line-height: 26px;
+  font-size: 15px;
+  line-height: 24px;
 }
 
 .location-developer {
@@ -152,8 +153,9 @@
 }
 
 .location {
-  font-size: 14px;
+  font-size: 15px;
   padding: 3px;
+  line-height: 24px;
   border-bottom: none !important;
 }
 
@@ -541,7 +543,7 @@ ul.flore_links li a {
 
 @media(max-width:1440px) {
   ul.flore_links li a {
-    font-size: 16px;
+    font-size: 15px;
   }
 }
 
@@ -670,7 +672,7 @@ ul.flore_links::-webkit-scrollbar-thumb {
 .whatsapp-btn,
 .visit-btn {
   height: 40px;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   border-radius: 3px;
 
@@ -684,6 +686,7 @@ ul.flore_links::-webkit-scrollbar-thumb {
   background: #e53726 !important;
   border: 1px solid #ef3f23;
   color: #fff;
+  text-transform: uppercase;
 }
 
 .contact-btn:hover {
@@ -694,12 +697,14 @@ ul.flore_links::-webkit-scrollbar-thumb {
   background: #dff3df;
   border: 1px solid #8bc98b;
   color: #45a049;
+  text-transform: uppercase;
 }
 
 .visit-btn {
   background: #000;
   border: 1px solid #000;
   color: #fff;
+  text-transform: uppercase;
 }
 
 /* Mobile */
@@ -909,14 +914,14 @@ ul.flore_links::-webkit-scrollbar-thumb {
 
   border-radius: 6px;
 
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 600;
 
   transition: all .3s ease;
 }
 
 .floor-tab.active {
-  background: #ef3f23;
+  background: #e53726;
   border-color: #ef3f23;
   color: #fff;
 }
@@ -1002,7 +1007,7 @@ ul.flore_links::-webkit-scrollbar-thumb {
 }
 
 .map-btn {
-  background: #f44324;
+  background: #e53726;
   color: #fff;
   text-decoration: none;
 
@@ -1135,12 +1140,13 @@ google-map {
 
   padding: 12px 28px;
 
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
 
   display: inline-flex;
   align-items: center;
   gap: 10px;
+  text-transform: uppercase;
 
   transition: all .3s ease;
 }
@@ -1407,7 +1413,7 @@ google-map {
   .whatsapp-btn,
   .visit-btn {
     height: 42px;
-    font-size: 14px;
+    font-size: 15px;
     border-radius: 6px;
     width: 100%;
   }
@@ -3631,7 +3637,7 @@ google-map {
   .value,
   .investing-desc,
   .developer-desc-container {
-    font-size: 16px;
+    font-size: 15px;
   }
 
   .display-none {

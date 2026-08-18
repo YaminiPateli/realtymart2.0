@@ -1,5 +1,6 @@
 .explore-link{
     padding: 11px 43px;
+    font-size: 15px;
 }
 
 .nav-pills .explore-link.active, .nav-pills .show>.explore-link{

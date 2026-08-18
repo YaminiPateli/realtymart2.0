@@ -25,7 +25,7 @@ interface City {
   templateUrl: './propertyincityrent.component.html',
   styleUrls: ['./propertyincityrent.component.css']
 })
-export class PropertyincityrentComponent implements OnInit{
+export class PropertyincityrentComponent implements OnInit {
   tooltipVisible = false;
   tooltipPosition = { top: '0px', left: '0px' };
   @ViewChild('otpModel') otpModel!: ElementRef;
@@ -103,9 +103,9 @@ export class PropertyincityrentComponent implements OnInit{
   is_token: boolean = false;
 
   city: string = '';
-  city1:City[]=[];
-  validcityforselected:any;
-  cityget:any;
+  city1: City[] = [];
+  validcityforselected: any;
+  cityget: any;
 
   constructor(
     private titleService: Title,
@@ -119,7 +119,7 @@ export class PropertyincityrentComponent implements OnInit{
     private router: Router,
     private route: ActivatedRoute,
     private geolocationService: GeolocationService,
-    private seoService:SeoService
+    private seoService: SeoService
   ) {
     this.cityss = localStorage.getItem('location');
 
@@ -149,42 +149,141 @@ export class PropertyincityrentComponent implements OnInit{
     this.router.navigate(['property-details/:name/:id']);
   }
 
-  loadProperties() {
-    this.cityget = this.route.snapshot.paramMap.get('city');
+  parsePriceValue(val: any): number {
+    if (val === null || val === undefined || val === '') return 0;
+    if (typeof val === 'number') return val;
+    const str = String(val).toLowerCase().replace(/,/g, '').trim();
+    if (str.includes('cr')) {
+      const num = parseFloat(str.replace(/[^0-9.]/g, ''));
+      return isNaN(num) ? 0 : num * 10000000;
+    }
+    if (str.includes('lac') || str.includes('lakh')) {
+      const num = parseFloat(str.replace(/[^0-9.]/g, ''));
+      return isNaN(num) ? 0 : num * 100000;
+    }
+    if (str.includes('k')) {
+      const num = parseFloat(str.replace(/[^0-9.]/g, ''));
+      return isNaN(num) ? 0 : num * 1000;
+    }
+    const num = parseFloat(str.replace(/[^0-9.]/g, ''));
+    return isNaN(num) ? 0 : num;
+  }
 
-   
+  filterByBudgetAndType(items: any[]): any[] {
+    const qp = this.route.snapshot.queryParams;
+    if (!qp) return items;
+
+    let result = items;
+    const minValStr = qp['minPrice'] || qp['min_price'];
+    const maxValStr = qp['maxPrice'] || qp['max_price'];
+    const minVal = minValStr ? this.parsePriceValue(minValStr) : 0;
+    const maxVal = maxValStr ? this.parsePriceValue(maxValStr) : 0;
+
+    if (minVal > 0 || maxVal > 0) {
+      result = result.filter(item => {
+        const price = this.parsePriceValue(item.rent_amount || item.total_price || item.price || item.minprice);
+        if (price <= 0) return true;
+        if (minVal > 0 && price < minVal) return false;
+        if (maxVal > 0 && price > maxVal) return false;
+        return true;
+      });
+    }
+
+    const locKeyword = (qp['locality'] || qp['search_keyword'] || '').toLowerCase().trim();
+    if (locKeyword) {
+      result = result.filter(item => {
+        const itemLocality = (
+          item.property_locality ||
+          item.project_locality_name ||
+          item.prjlocalities ||
+          item.project_localities ||
+          item.locality ||
+          item.location ||
+          item.area ||
+          item.address ||
+          item.project_location ||
+          ''
+        ).toLowerCase();
+        return itemLocality.includes(locKeyword) || locKeyword.includes(itemLocality);
+      });
+    }
+
+    return result;
+  }
+
+  loadProperties() {
+    this.cityget = this.route.snapshot.paramMap.get('city') || 'Ahmedabad';
+
+    const qp = this.route.snapshot.queryParams;
+    let url = `${environment.apiUrl}propertyrentincity/${this.cityget}?page=${this.currentPage}`;
+
+    if (qp) {
+      const params = new URLSearchParams();
+      if (qp['minPrice'] || qp['min_price']) {
+        const minP = qp['minPrice'] || qp['min_price'];
+        params.append('minPrice', minP);
+        params.append('min_price', minP);
+      }
+      if (qp['maxPrice'] || qp['max_price']) {
+        const maxP = qp['maxPrice'] || qp['max_price'];
+        params.append('maxPrice', maxP);
+        params.append('max_price', maxP);
+      }
+      if (qp['residentialItems']) {
+        params.append('residentialItems', qp['residentialItems']);
+      }
+      if (qp['otherItems']) {
+        params.append('otherItems', qp['otherItems']);
+      }
+      if (qp['commercialItems']) {
+        params.append('commercialItems', qp['commercialItems']);
+      }
+      if (qp['property_type'] || qp['propertyType']) {
+        const pt = qp['property_type'] || qp['propertyType'];
+        params.append('property_type', pt);
+        params.append('propertyType', pt);
+      }
+      if (qp['locality']) {
+        params.append('locality', qp['locality']);
+      }
+      if (qp['search_keyword']) {
+        params.append('search_keyword', qp['search_keyword']);
+      }
+
+      const paramString = params.toString();
+      if (paramString) {
+        url += `&${paramString}`;
+      }
+    }
+
     this.http
-      .get<any>(
-        `${environment.apiUrl}propertyrentincity/${this.cityget}?page=${this.currentPage}`
-      )
+      .get<any>(url)
       .subscribe(
         (response) => {
+          let rawData = response.data?.data || response.responseData?.data || response.data || [];
+          let list = Array.isArray(rawData) ? rawData : [];
+          this.ownerlauchedproperty = this.filterByBudgetAndType(list);
 
-          this.ownerlauchedproperty =
-            response.data?.data || [];
-
-            this.setPropertyRentSchema();
+          this.setPropertyRentSchema();
 
           this.ownerlauchedpropertycount =
-            response.data?.total;
+            response.data?.total || response.responseData?.total || this.ownerlauchedproperty.length;
 
-            this.itemsPerPage = response.data.per_page;
+          this.itemsPerPage = response.data?.per_page || response.responseData?.per_page || 10;
 
           this.totalPages = Math.ceil(
             this.ownerlauchedpropertycount /
-            this.itemsPerPage
+            (this.itemsPerPage || 10)
           );
 
+          if (response.meta) {
+            this.setMetaTags(
+              response.meta.title,
+              response.meta.description,
+            );
+          }
 
-        this.setMetaTags(
-          response.meta.title,
-          response.meta.description,
-        );
-
-          this.lastPage = response.data.data?.last_page;
-
-
-
+          this.lastPage = response.data?.last_page || response.responseData?.last_page || 1;
         },
         (error) => {
           console.error('Error fetching properties:', error);
@@ -196,111 +295,111 @@ export class PropertyincityrentComponent implements OnInit{
 
   setPropertyRentSchema() {
 
-  const properties = this.ownerlauchedproperty.map((item: any, index: number) => ({
+    const properties = this.ownerlauchedproperty.map((item: any, index: number) => ({
 
-    "@type": "ListItem",
+      "@type": "ListItem",
 
-    "position": index + 1,
+      "position": index + 1,
 
-    "item": {
+      "item": {
 
-      "@type": "Residence",
+        "@type": "Residence",
 
-      "name": item.project_name,
+        "name": item.project_name,
 
-      "url": `https://www.realtymart.com/property-details/${item.propertyfirstUrlPart}/${item.propertysecondUrlPart}`,
+        "url": `https://www.realtymart.com/property-details/${item.propertyfirstUrlPart}/${item.propertysecondUrlPart}`,
 
-      "image": item.property_main_img,
+        "image": item.property_main_img,
 
-      "description": `For Rent ${item.bedroom ? item.bedroom + ' BHK' : item.property_type} in ${item.project_name}`,
+        "description": `For Rent ${item.bedroom ? item.bedroom + ' BHK' : item.property_type} in ${item.project_name}`,
 
-      "address": {
-        "@type": "PostalAddress",
-        "addressLocality": item.property_locality,
-        "addressCountry": "IN"
-      },
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": item.property_locality,
+          "addressCountry": "IN"
+        },
 
-      "numberOfRooms": item.bedroom || undefined,
+        "numberOfRooms": item.bedroom || undefined,
 
-      "floorSize": item.super_area
-        ? {
+        "floorSize": item.super_area
+          ? {
             "@type": "QuantitativeValue",
             "value": item.super_area,
             "unitCode": "FTK"
           }
-        : undefined,
+          : undefined,
 
-      "offers": {
-        "@type": "Offer",
-        "price": item.rent_amount || item.total_price,
-        "priceCurrency": "INR",
-        "availability": "https://schema.org/InStock",
-        "url": `https://www.realtymart.com/property-details/${item.propertyfirstUrlPart}/${item.propertysecondUrlPart}`
-      }
-
-    }
-
-  }));
-
-
-  const schema = {
-
-    "@context": "https://schema.org",
-
-    "@graph": [
-
-      {
-
-        "@type": "CollectionPage",
-
-        "@id": window.location.href,
-
-        "url": window.location.href,
-
-        "name": `Property For Rent in ${this.cityget}`,
-
-        "description": `Browse rental properties in ${this.cityget}. Find apartments, flats, villas, offices, shops and commercial properties available for rent on RealtyMart.`,
-
-        "publisher": {
-          "@type": "Organization",
-          "name": "Intelliworkz Business Solutions Pvt. Ltd.",
-          "brand": {
-            "@type": "Brand",
-            "name": "RealtyMart"
-          }
-        },
-
-        "mainEntity": {
-
-          "@type": "ItemList",
-
-          "numberOfItems": this.ownerlauchedproperty.length,
-
-          "itemListElement": properties
-
+        "offers": {
+          "@type": "Offer",
+          "price": item.rent_amount || item.total_price,
+          "priceCurrency": "INR",
+          "availability": "https://schema.org/InStock",
+          "url": `https://www.realtymart.com/property-details/${item.propertyfirstUrlPart}/${item.propertysecondUrlPart}`
         }
 
       }
 
-    ]
+    }));
 
-  };
 
-  this.seoService.setSchema(schema);
+    const schema = {
 
-}
+      "@context": "https://schema.org",
 
-onPageChange(page: number) {
+      "@graph": [
 
-  this.currentPage = page;
+        {
 
-  this.loadProperties();
+          "@type": "CollectionPage",
 
-  window.scrollTo({
-    top: 0,
-    behavior: 'smooth'
-  });
-}
+          "@id": window.location.href,
+
+          "url": window.location.href,
+
+          "name": `Property For Rent in ${this.cityget}`,
+
+          "description": `Browse rental properties in ${this.cityget}. Find apartments, flats, villas, offices, shops and commercial properties available for rent on RealtyMart.`,
+
+          "publisher": {
+            "@type": "Organization",
+            "name": "Intelliworkz Business Solutions Pvt. Ltd.",
+            "brand": {
+              "@type": "Brand",
+              "name": "RealtyMart"
+            }
+          },
+
+          "mainEntity": {
+
+            "@type": "ItemList",
+
+            "numberOfItems": this.ownerlauchedproperty.length,
+
+            "itemListElement": properties
+
+          }
+
+        }
+
+      ]
+
+    };
+
+    this.seoService.setSchema(schema);
+
+  }
+
+  onPageChange(page: number) {
+
+    this.currentPage = page;
+
+    this.loadProperties();
+
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  }
 
   openGallery(images: string[], event: Event) {
     event.preventDefault(); // Prevents default anchor behavior
@@ -384,9 +483,13 @@ onPageChange(page: number) {
   // }
 
   ngOnInit() {
-     const city = this.route.snapshot.paramMap.get('city');
+    const city = this.route.snapshot.paramMap.get('city');
 
-  this.seoService.setCanonicalURL(window.location.href);
+    this.route.queryParams.subscribe(() => {
+      this.loadProperties();
+    });
+
+    this.seoService.setCanonicalURL(window.location.href);
     const token = localStorage.getItem('myrealtylogintoken');
     if (token) {
       this.is_token = true;
@@ -400,12 +503,6 @@ onPageChange(page: number) {
         localStorage.getItem('contact_no') || '';
       this.formDataphone.termsContactAccepted = true;
     }
-    // const modalElement = document.getElementById('get-owner');
-    // if (modalElement) {
-    //   modalElement.addEventListener('hide.bs.modal', () => {
-    //     this.resetContactForm();
-    //   });
-    // }
   }
   scrollToElement(element: Element) {
     const elementRect = element.getBoundingClientRect(); // Element's position relative to the viewport
@@ -438,7 +535,7 @@ onPageChange(page: number) {
         this.contactData = contactData;
         this.contact = this.contactData?.data;
       },
-      (error: any) => {}
+      (error: any) => { }
     );
   }
   submitForm() {
@@ -478,7 +575,7 @@ onPageChange(page: number) {
       receiver_user_id: this.contact?.property?.user_id,
       leads_type: 'contact-owner',
       leads_for: 'Property',
-      location:this.city,
+      location: this.city,
       // project_Id:this.singleproject.id,
       // leads_for:this.singleproject.property_for,
       // receiver_user_id:this.singleproject.user_id,
@@ -495,7 +592,7 @@ onPageChange(page: number) {
       .subscribe(
         (response: any) => {
           if (response.status === true) {
-            this.activityTrackerService.logActivity('Inquiry stored for property','');
+            this.activityTrackerService.logActivity('Inquiry stored for property', '');
             this.tost.success('We have received your inquiry. Our team will get back to you within 24 working hours.');
             // const elementToClick = this.elementRef.nativeElement.querySelector('#contactownerbuttonclose');
             const modalElement = document.getElementById('contect-owner');
@@ -512,7 +609,7 @@ onPageChange(page: number) {
       );
   }
 
-   validateCharInput(event: KeyboardEvent) {
+  validateCharInput(event: KeyboardEvent) {
     const charCode = event.which ? event.which : event.keyCode;
     const inputElement = event.target as HTMLInputElement;
 
@@ -579,7 +676,7 @@ onPageChange(page: number) {
   }
 
   verifyOTP() {
-    console.log(this.formData.contact_no,'this.formData.contact_no')
+    console.log(this.formData.contact_no, 'this.formData.contact_no')
     if (this.formData.otp == '') {
       this.tost.error('Please Enter OTP');
       return;
@@ -778,7 +875,7 @@ onPageChange(page: number) {
       agent_id: this.singleProp.agent_id,
       leads_type: 'call for price',
       leads_for: 'Property',
-      location:this.city
+      location: this.city
     };
     const token = localStorage.getItem('myrealtylogintoken');
 
@@ -790,7 +887,7 @@ onPageChange(page: number) {
       .subscribe(
         (response: any) => {
           if (response.status === true) {
-            this.activityTrackerService.logActivity('Inquiry stored for property','');
+            this.activityTrackerService.logActivity('Inquiry stored for property', '');
             this.tost.success('We have received your inquiry. Our team will get back to you within 24 working hours.');
             const modalElement = document.getElementById('get-owner');
             if (modalElement) {
@@ -1018,21 +1115,21 @@ onPageChange(page: number) {
     // console.log(this.dynamicUrl);
   }
 
-    fetchCities() {
-      this.http.get<{ data: { id: number; name: string }[] }>(`${environment.apiUrl}cities`).subscribe(
-        (response: any) => {
-          this.city1 = response.responseData.map((city: any) => ({
-            cid: city.id,
-            cname: city.name
-          }));
-          this.validcityforselected = response.validCities;
-          const defaultCity = this.city1.find(city => city.cname === this.city);
-        },
-        (error: any) => {
-          console.error('API Error:', error);
-        }
-      );
-    }
+  fetchCities() {
+    this.http.get<{ data: { id: number; name: string }[] }>(`${environment.apiUrl}cities`).subscribe(
+      (response: any) => {
+        this.city1 = response.responseData.map((city: any) => ({
+          cid: city.id,
+          cname: city.name
+        }));
+        this.validcityforselected = response.validCities;
+        const defaultCity = this.city1.find(city => city.cname === this.city);
+      },
+      (error: any) => {
+        console.error('API Error:', error);
+      }
+    );
+  }
 
   isValidCity(city: string): boolean {
     return this.validcityforselected.includes(city);
@@ -1060,13 +1157,12 @@ onPageChange(page: number) {
 
   @Input() propertyLink: string = '';
   copyLink(event: MouseEvent) {
-    navigator.clipboard.writeText(this.dynamicUrl).then(() =>
-      {
+    navigator.clipboard.writeText(this.dynamicUrl).then(() => {
       this.showTooltip(event);
     }, (err) => {
       console.log('failed copy')
     });
-}
+  }
 
   twitterShare() {
     const text = encodeURIComponent('Check this out!');
@@ -1088,21 +1184,21 @@ onPageChange(page: number) {
     window.open(gmailUrl, '_blank');
   }
 
-showTooltip(event: MouseEvent): void {
-  const button = event.target as HTMLElement;
-  const buttonRect = button.getBoundingClientRect();
-  this.tooltipPosition = {
-    top: `${buttonRect.top - 50}px`,
-    left: `${buttonRect.left + 60}px`,
+  showTooltip(event: MouseEvent): void {
+    const button = event.target as HTMLElement;
+    const buttonRect = button.getBoundingClientRect();
+    this.tooltipPosition = {
+      top: `${buttonRect.top - 50}px`,
+      left: `${buttonRect.left + 60}px`,
 
-  };
+    };
 
-  this.tooltipVisible = true;
+    this.tooltipVisible = true;
 
-  setTimeout(() => {
-    this.tooltipVisible = false;
-  }, 1500);
-}
+    setTimeout(() => {
+      this.tooltipVisible = false;
+    }, 1500);
+  }
 
   // Image slider
 

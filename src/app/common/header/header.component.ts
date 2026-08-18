@@ -43,6 +43,15 @@ export class HeaderComponent implements AfterViewInit {
   city: any;
   locationFooter: any;
   validCities: string[] = ['Ahmedabad', 'Rajkot', 'Surat', 'Vadodara', 'Mumbai', 'Navi Mumbai', 'Pune', 'Bangalore', 'NCR', 'Delhi', 'Gurgaon', 'Hyderabad'];
+  isMenuCollapsed: boolean = true;
+
+  toggleMenu() {
+    this.isMenuCollapsed = !this.isMenuCollapsed;
+  }
+
+  closeMenu() {
+    this.isMenuCollapsed = true;
+  }
 
   @HostListener('window:scroll', [])
   onWindowScroll() {

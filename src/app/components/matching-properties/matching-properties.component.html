@@ -63,7 +63,7 @@
                     <div class="col-lg-2 col-md-6 col-sm-12">
                       <div class="city-images">
                         <img
-                          src="{{ projectincity.project_banner_image?.[0] || projectincity.project_banner_image || projectincity.project_images }}"
+                          src="{{ projectincity.project_banner_image || projectincity.project_banner_image || projectincity.project_images }}"
                           alt="project-img" class="img-fluid" />
                       </div>
                       <!-- <div class="check-compare">
@@ -75,7 +75,7 @@
                       <div class="row">
                         <div class="col-lg-6 col-md-6 col-sm-12">
                           <h1>
-                            <a [routerLink]="['/' + projectincity.projectfirstUrlPart]"
+                            <a [routerLink]="['/' + projectincity.firstUrlPart]"
                               class="groups-companies-names">{{ projectincity.project_name }}</a>
                           </h1>
                           <p class="opnesince">
@@ -88,7 +88,7 @@
                             <div class="col-md-6">
                               <p class="interior-location">
                                 <span class="me-3"><i class="fa fa-sharp fa-light fa-location-dot"
-                                    style="color: #bbbbbb"></i></span>in {{ projectincity.project_locality_name }}
+                                    style="color: #bbbbbb"></i></span>in {{ projectincity.prjlocalities }}
                               </p>
                             </div>
                             <div class="col-md-6">

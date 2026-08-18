@@ -34,7 +34,7 @@
             <li class="nav-item" role="presentation">
               <button class="nav-link" id="pills-Residential-tab" data-bs-toggle="pill"
                 data-bs-target="#pills-Residential" type="button" role="tab" aria-controls="pills-Residential"
-                (click)="handleTabClick('residential')" aria-selected="false">
+                (click)="handleTabClick('farmhouse')" aria-selected="false">
                 Farm House
               </button>
             </li>
@@ -114,7 +114,7 @@
                       </div>
 
                       <!-- Inline Search Input -->
-                      <input type="text" class="chip_inline_input" placeholder="What are you looking for?"
+                      <input type="text" class="chip_inline_input" placeholder="Search Area"
                         [(ngModel)]="locationInputText" [ngModelOptions]="{standalone: true}"
                         (input)="onLocationInput($event)" (focus)="onLocationFocus()" (blur)="onLocationBlur()"
                         (keydown)="onLocationKeydown($event)" />
@@ -150,8 +150,6 @@
                         </div>
                         <div class="suggestion_content">
                           <span class="suggestion_title">{{ item.name }}</span>
-                          <span class="suggestion_type_badge {{ item.category.toLowerCase() }}">{{ item.category
-                            }}</span>
                         </div>
                       </div>
                     </div>
@@ -236,7 +234,7 @@
                             <div class="wrap-budget">
                               <ul class="budget-mm nav-pills" id="pills-tab" role="tablist">
                                 <li class="nav-item" role="presentation">
-                                  <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill"
+                                  <button class="nav-link" [class.active]="activeBudgetTab === 'min'" (click)="activeBudgetTab = 'min'; $event.stopPropagation()" id="pills-home-tab" data-bs-toggle="pill"
                                     data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home"
                                     aria-selected="true">
                                     <input type="text" class="mb-search__budget__fld-min-max" id="budgetMin"
@@ -245,7 +243,7 @@
                                   </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                  <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill"
+                                  <button class="nav-link" [class.active]="activeBudgetTab === 'max'" (click)="activeBudgetTab = 'max'; $event.stopPropagation()" id="pills-profile-tab" data-bs-toggle="pill"
                                     data-bs-target="#pills-profile" type="button" role="tab"
                                     aria-controls="pills-profile" aria-selected="false">
                                     <input type="text" class="mb-search__budget__fld-min-max" id="budgetMax"
@@ -256,7 +254,7 @@
                               </ul>
                             </div>
                             <div class="tab-content profile-content" id="pills-tabContent">
-                              <div class="tab-pane fade show active" id="pills-home" role="tabpanel"
+                              <div class="tab-pane fade" [class.show]="activeBudgetTab === 'min'" [class.active]="activeBudgetTab === 'min'" id="pills-home" role="tabpanel"
                                 aria-labelledby="pills-home-tab">
                                 <div class="mb-search__min-max webkit__scroll-search left-budget" id="minBudjetbuy">
                                   <div class="mb-search__min-max__item" (click)="getvaluemin('Min', 'buy')">Min</div>
@@ -362,7 +360,7 @@
                                   </div>
                                 </div>
                               </div>
-                              <div class="tab-pane fade" id="pills-profile" role="tabpanel"
+                              <div class="tab-pane fade" [class.show]="activeBudgetTab === 'max'" [class.active]="activeBudgetTab === 'max'" id="pills-profile" role="tabpanel"
                                 aria-labelledby="pills-profile-tab">
                                 <div class="mb-search__min-max webkit__scroll-search right-budget" id="maxBudjetbuy">
                                   <div class="mb-search__min-max__item" (click)="getvaluemax('Max', 'buy')">
@@ -552,7 +550,7 @@
                       </div>
 
                       <!-- Inline Search Input -->
-                      <input type="text" class="chip_inline_input" placeholder="What are you looking for?"
+                      <input type="text" class="chip_inline_input" placeholder="Search Area"
                         [(ngModel)]="locationInputText" [ngModelOptions]="{standalone: true}"
                         (input)="onLocationInput($event)" (focus)="onLocationFocus()" (blur)="onLocationBlur()"
                         (keydown)="onLocationKeydown($event)" />
@@ -588,15 +586,13 @@
                         </div>
                         <div class="suggestion_content">
                           <span class="suggestion_title">{{ item.name }}</span>
-                          <span class="suggestion_type_badge {{ item.category.toLowerCase() }}">{{ item.category
-                            }}</span>
                         </div>
                       </div>
                     </div>
                   </div>
                   <!-- <div class="location_search">
                   <div class="input-group">
-                    <input type="text" class="form-control" placeholder="What are you looking for?"
+                    <input type="text" class="form-control" placeholder="Search Area"
                       aria-label="location" aria-describedby="basic-addon1" />
                   </div>
                 </div> -->
@@ -682,7 +678,7 @@
                             <div class="wrap-budget">
                               <ul class="budget-mm nav-pills" id="pills-tab" role="tablist">
                                 <li class="nav-item" role="presentation">
-                                  <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill"
+                                  <button class="nav-link" [class.active]="activeBudgetTab === 'min'" (click)="activeBudgetTab = 'min'; $event.stopPropagation()" id="pills-home-tab" data-bs-toggle="pill"
                                     data-bs-target="#pills-homerent" type="button" role="tab" aria-controls="pills-home"
                                     aria-selected="true">
                                     <input type="text" class="mb-search__budget__fld-min-max" id="minBudjetrent"
@@ -691,7 +687,7 @@
                                   </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                  <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill"
+                                  <button class="nav-link" [class.active]="activeBudgetTab === 'max'" (click)="activeBudgetTab = 'max'; $event.stopPropagation()" id="pills-profile-tab" data-bs-toggle="pill"
                                     data-bs-target="#pills-profilerent" type="button" role="tab"
                                     aria-controls="pills-profile" aria-selected="false">
                                     <input type="text" class="mb-search__budget__fld-min-max" id="maxBudjetrent"
@@ -702,7 +698,7 @@
                               </ul>
                             </div>
                             <div class="tab-content profile-content" id="pills-tabContent">
-                              <div class="tab-pane fade show active" id="pills-homerent" role="tabpanel"
+                              <div class="tab-pane fade" [class.show]="activeBudgetTab === 'min'" [class.active]="activeBudgetTab === 'min'" id="pills-homerent" role="tabpanel"
                                 aria-labelledby="pills-home-tab">
                                 <div class="mb-search__min-max webkit__scroll-search left-budget" id="minBudjetrent">
                                   <div class="mb-search__min-max__item">
@@ -778,7 +774,7 @@
                                   </div>
                                 </div>
                               </div>
-                              <div class="tab-pane fade" id="pills-profilerent" role="tabpanel"
+                              <div class="tab-pane fade" [class.show]="activeBudgetTab === 'max'" [class.active]="activeBudgetTab === 'max'" id="pills-profilerent" role="tabpanel"
                                 aria-labelledby="pills-profile-tab">
                                 <div class="mb-search__min-max webkit__scroll-search right-budget" id="maxBudjetrent">
                                   <div class="mb-search__min-max__item">
@@ -943,7 +939,7 @@
                       </div>
 
                       <!-- Inline Search Input -->
-                      <input type="text" class="chip_inline_input" placeholder="What are you looking for?"
+                      <input type="text" class="chip_inline_input" placeholder="Search Area"
                         [(ngModel)]="locationInputText" [ngModelOptions]="{standalone: true}"
                         (input)="onLocationInput($event)" (focus)="onLocationFocus()" (blur)="onLocationBlur()"
                         (keydown)="onLocationKeydown($event)" />
@@ -979,15 +975,13 @@
                         </div>
                         <div class="suggestion_content">
                           <span class="suggestion_title">{{ item.name }}</span>
-                          <span class="suggestion_type_badge {{ item.category.toLowerCase() }}">{{ item.category
-                            }}</span>
                         </div>
                       </div>
                     </div>
                   </div>
                   <!-- <div class="location_search">
                   <div class="input-group">
-                    <input type="text" class="form-control" placeholder="What are you looking for?"
+                    <input type="text" class="form-control" placeholder="Search Area"
                       aria-label="location" aria-describedby="basic-addon1" />
                   </div>
                 </div> -->
@@ -1074,7 +1068,7 @@
                             <div class="wrap-budget">
                               <ul class="budget-mm nav-pills" id="pills-tab" role="tablist">
                                 <li class="nav-item" role="presentation">
-                                  <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill"
+                                  <button class="nav-link" [class.active]="activeBudgetTab === 'min'" (click)="activeBudgetTab = 'min'; $event.stopPropagation()" id="pills-home-tab" data-bs-toggle="pill"
                                     data-bs-target="#pills-homefarm" type="button" role="tab" aria-controls="pills-home"
                                     aria-selected="true">
                                     <input type="text" class="mb-search__budget__fld-min-max" id="minBudjetfarm"
@@ -1083,7 +1077,7 @@
                                   </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                  <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill"
+                                  <button class="nav-link" [class.active]="activeBudgetTab === 'max'" (click)="activeBudgetTab = 'max'; $event.stopPropagation()" id="pills-profile-tab" data-bs-toggle="pill"
                                     data-bs-target="#pills-profilefarm" type="button" role="tab"
                                     aria-controls="pills-profile" aria-selected="false">
                                     <input type="text" class="mb-search__budget__fld-min-max" id="maxBudjetfarm"
@@ -1094,7 +1088,7 @@
                               </ul>
                             </div>
                             <div class="tab-content profile-content" id="pills-tabContent">
-                              <div class="tab-pane fade show active" id="pills-homefarm" role="tabpanel"
+                              <div class="tab-pane fade" [class.show]="activeBudgetTab === 'min'" [class.active]="activeBudgetTab === 'min'" id="pills-homefarm" role="tabpanel"
                                 aria-labelledby="pills-home-tab">
                                 <div class="mb-search__min-max webkit__scroll-search left-budget" id="minBudjetfarm">
                                   <div class="mb-search__min-max__item" (click)="getvaluemin('Min', 'farm')">
@@ -1202,7 +1196,7 @@
                                   </div>
                                 </div>
                               </div>
-                              <div class="tab-pane fade" id="pills-profilefarm" role="tabpanel"
+                              <div class="tab-pane fade" [class.show]="activeBudgetTab === 'max'" [class.active]="activeBudgetTab === 'max'" id="pills-profilefarm" role="tabpanel"
                                 aria-labelledby="pills-profile-tab">
                                 <div class="mb-search__min-max webkit__scroll-search right-budget" id="maxBudjetfarm">
                                   <div class="mb-search__min-max__item" (click)="getvaluemax('Max', 'farm')">
@@ -1391,7 +1385,7 @@
                       </div>
 
                       <!-- Inline Search Input -->
-                      <input type="text" class="chip_inline_input" placeholder="What are you looking for?"
+                      <input type="text" class="chip_inline_input" placeholder="Search Area"
                         [(ngModel)]="locationInputText" [ngModelOptions]="{standalone: true}"
                         (input)="onLocationInput($event)" (focus)="onLocationFocus()" (blur)="onLocationBlur()"
                         (keydown)="onLocationKeydown($event)" />
@@ -1427,15 +1421,13 @@
                         </div>
                         <div class="suggestion_content">
                           <span class="suggestion_title">{{ item.name }}</span>
-                          <span class="suggestion_type_badge {{ item.category.toLowerCase() }}">{{ item.category
-                            }}</span>
                         </div>
                       </div>
                     </div>
                   </div>
                   <!-- <div class="location_search">
                   <div class="input-group">
-                    <input type="text" class="form-control" placeholder="What are you looking for?"
+                    <input type="text" class="form-control" placeholder="Search Area"
                       aria-label="location" aria-describedby="basic-addon1" />
                   </div>
                 </div> -->
@@ -1492,7 +1484,7 @@
                             <div class="wrap-budget">
                               <ul class="budget-mm nav-pills" id="pills-tab" role="tablist">
                                 <li class="nav-item" role="presentation">
-                                  <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill"
+                                  <button class="nav-link" [class.active]="activeBudgetTab === 'min'" (click)="activeBudgetTab = 'min'; $event.stopPropagation()" id="pills-home-tab" data-bs-toggle="pill"
                                     data-bs-target="#pills-homeplot" type="button" role="tab" aria-controls="pills-home"
                                     aria-selected="true">
                                     <input type="text" class="mb-search__budget__fld-min-max" id="minBudjetplot"
@@ -1501,7 +1493,7 @@
                                   </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                  <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill"
+                                  <button class="nav-link" [class.active]="activeBudgetTab === 'max'" (click)="activeBudgetTab = 'max'; $event.stopPropagation()" id="pills-profile-tab" data-bs-toggle="pill"
                                     data-bs-target="#pills-profileplot" type="button" role="tab"
                                     aria-controls="pills-profile" aria-selected="false">
                                     <input type="text" class="mb-search__budget__fld-min-max" id="maxBudjetplot"
@@ -1512,7 +1504,7 @@
                               </ul>
                             </div>
                             <div class="tab-content profile-content" id="pills-tabContent">
-                              <div class="tab-pane fade show active" id="pills-homeplot" role="tabpanel"
+                              <div class="tab-pane fade" [class.show]="activeBudgetTab === 'min'" [class.active]="activeBudgetTab === 'min'" id="pills-homeplot" role="tabpanel"
                                 aria-labelledby="pills-home-tab">
                                 <div class="mb-search__min-max webkit__scroll-search left-budget" id="minBudjetplot">
                                   <div class="mb-search__min-max__item" (click)="getvaluemin('Min', 'plot')">
@@ -1620,7 +1612,7 @@
                                   </div>
                                 </div>
                               </div>
-                              <div class="tab-pane fade" id="pills-profileplot" role="tabpanel"
+                              <div class="tab-pane fade" [class.show]="activeBudgetTab === 'max'" [class.active]="activeBudgetTab === 'max'" id="pills-profileplot" role="tabpanel"
                                 aria-labelledby="pills-profile-tab">
                                 <div class="mb-search__min-max webkit__scroll-search right-budget" id="maxBudjetplot">
                                   <div class="mb-search__min-max__item" (click)="getvaluemax('Max', 'plot')">
@@ -1848,7 +1840,7 @@
                             <div class="wrap-budget">
                               <ul class="budget-mm nav-pills" id="pills-tab" role="tablist">
                                 <li class="nav-item" role="presentation">
-                                  <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill"
+                                  <button class="nav-link" [class.active]="activeBudgetTab === 'min'" (click)="activeBudgetTab = 'min'; $event.stopPropagation()" id="pills-home-tab" data-bs-toggle="pill"
                                     data-bs-target="#pills-homepg" type="button" role="tab" aria-controls="pills-home"
                                     aria-selected="true">
                                     <input type="text" class="mb-search__budget__fld-min-max" id="minBudjetpg"
@@ -1856,7 +1848,7 @@
                                   </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                  <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill"
+                                  <button class="nav-link" [class.active]="activeBudgetTab === 'max'" (click)="activeBudgetTab = 'max'; $event.stopPropagation()" id="pills-profile-tab" data-bs-toggle="pill"
                                     data-bs-target="#pills-profilepg" type="button" role="tab"
                                     aria-controls="pills-profile" aria-selected="false">
                                     <input type="text" class="mb-search__budget__fld-min-max" id="maxBudjetpg"
@@ -1866,7 +1858,7 @@
                               </ul>
                             </div>
                             <div class="tab-content profile-content" id="pills-tabContent">
-                              <div class="tab-pane fade show active" id="pills-homepg" role="tabpanel"
+                              <div class="tab-pane fade" [class.show]="activeBudgetTab === 'min'" [class.active]="activeBudgetTab === 'min'" id="pills-homepg" role="tabpanel"
                                 aria-labelledby="pills-home-tab">
                                 <div class="mb-search__min-max webkit__scroll-search left-budget" id="minBudjetpg">
                                   <div class="mb-search__min-max__item">
@@ -1902,7 +1894,7 @@
                                   </div>
                                 </div>
                               </div>
-                              <div class="tab-pane fade" id="pills-profilepg" role="tabpanel"
+                              <div class="tab-pane fade" [class.show]="activeBudgetTab === 'max'" [class.active]="activeBudgetTab === 'max'" id="pills-profilepg" role="tabpanel"
                                 aria-labelledby="pills-profile-tab">
                                 <div class="mb-search__min-max webkit__scroll-search right-budget" id="maxBudjetpg">
                                   <div class="mb-search__min-max__item">
@@ -2017,7 +2009,7 @@
                           </div>
                         </div>
                       </div>
-                      <input type="text" class="chip_inline_input" placeholder="What are you looking for?"
+                      <input type="text" class="chip_inline_input" placeholder="Search Area"
                         [(ngModel)]="locationInputText" [ngModelOptions]="{standalone: true}"
                         (input)="onLocationInput($event)" (focus)="onLocationFocus()" (blur)="onLocationBlur()"
                         (keydown)="onLocationKeydown($event)" />
@@ -2053,8 +2045,6 @@
                         </div>
                         <div class="suggestion_content">
                           <span class="suggestion_title">{{ item.name }}</span>
-                          <span class="suggestion_type_badge {{ item.category.toLowerCase() }}">{{ item.category
-                            }}</span>
                         </div>
                       </div>
                     </div>
@@ -2114,7 +2104,7 @@
                             <div class="wrap-budget">
                               <ul class="budget-mm nav-pills" id="pills-tab" role="tablist">
                                 <li class="nav-item" role="presentation">
-                                  <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill"
+                                  <button class="nav-link" [class.active]="activeBudgetTab === 'min'" (click)="activeBudgetTab = 'min'; $event.stopPropagation()" id="pills-home-tab" data-bs-toggle="pill"
                                     data-bs-target="#pills-homehostel" type="button" role="tab"
                                     aria-controls="pills-home" aria-selected="true">
                                     <input type="text" class="mb-search__budget__fld-min-max" id="minBudjetpg"
@@ -2123,7 +2113,7 @@
                                   </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                  <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill"
+                                  <button class="nav-link" [class.active]="activeBudgetTab === 'max'" (click)="activeBudgetTab = 'max'; $event.stopPropagation()" id="pills-profile-tab" data-bs-toggle="pill"
                                     data-bs-target="#pills-profilehostel" type="button" role="tab"
                                     aria-controls="pills-profile" aria-selected="false">
                                     <input type="text" class="mb-search__budget__fld-min-max" id="maxBudjethostel"
@@ -2134,7 +2124,7 @@
                               </ul>
                             </div>
                             <div class="tab-content profile-content" id="pills-tabContent">
-                              <div class="tab-pane fade show active" id="pills-homehostel" role="tabpanel"
+                              <div class="tab-pane fade" [class.show]="activeBudgetTab === 'min'" [class.active]="activeBudgetTab === 'min'" id="pills-homehostel" role="tabpanel"
                                 aria-labelledby="pills-home-tab">
                                 <div class="mb-search__min-max webkit__scroll-search left-budget" id="minBudjethostel">
                                   <div class="mb-search__min-max__item" (click)="getvaluemin('Min', 'hostel')">
@@ -2170,7 +2160,7 @@
                                   </div>
                                 </div>
                               </div>
-                              <div class="tab-pane fade" id="pills-profilehostel" role="tabpanel"
+                              <div class="tab-pane fade" [class.show]="activeBudgetTab === 'max'" [class.active]="activeBudgetTab === 'max'" id="pills-profilehostel" role="tabpanel"
                                 aria-labelledby="pills-profile-tab">
                                 <div class="mb-search__min-max webkit__scroll-search right-budget" id="maxBudjethostel">
                                   <div class="mb-search__min-max__item" (click)="getvaluemax('Max', 'hostel')">
@@ -2441,13 +2431,13 @@
     </div>
   </section>
 
-  <section class="highlight-group" *ngIf="bannerbuilder">
+  <section class="highlight-group" *ngIf="bannerbuilder.length > 0">
     <div class="container">
       <div class="row">
 
         <div class="col-lg-12 col-md-12 col-sm-12 ps-0 ps-lg-0 ps-md-3">
           <a target="_blank" *ngIf="bannerbuilder[0]"
-            routerLink="/{{ bannerbuilder[0].projectfirstUrlPart }}-{{ bannerbuilder[0].projectsecondUrlPart }}">
+            routerLink="/{{ bannerbuilder[0].projectfirstUrlPart }}">
             <img src="{{ bannerbuilder[0].project_banner_img }}" alt="project_banner_img"
               class="img-fluid group-main-img" />
           </a>
@@ -2504,7 +2494,7 @@
     </div>
   </section>
 
-  <section class="highlight-group" *ngIf="bannerbuilder">
+  <section class="highlight-group" *ngIf="bannerbuilder.length > 0">
     <div class="container">
       <div class="row">
         <!-- <div class="col-lg-3 col-md-12 col-sm-12 pe-0 pe-lg-0 pe-md-3">
@@ -2526,7 +2516,7 @@
         </div> -->
         <div class="col-lg-12 col-md-12 col-sm-12 ps-0 ps-lg-0 ps-md-3">
           <a target="_blank" *ngIf="bannerbuilder[1]"
-            routerLink="project-details/{{ bannerbuilder[1].projectfirstUrlPart }}/{{ bannerbuilder[1].projectsecondUrlPart }}">
+            routerLink="/{{ bannerbuilder[1].projectfirstUrlPart }}">
             <img src="{{ bannerbuilder[1].project_banner_img }}" alt="project_banner_img"
               class="img-fluid group-main-img" />
           </a>
@@ -2588,33 +2578,46 @@
     </div>
   </section>
 
-  <section class="service-provider container">
-    <div class="related-property">
-      <h4 class="titles-heading text-center">
-        Property Related Services
-      </h4>
-      <div class="propertyes mt-5">
-        <ngx-slick-carousel class="carousel" #slickModal="slick-carousel" [config]="slideConfig4">
-          <div ngxSlickItem class="slide" *ngFor="let property of propertyServices">
-            <div class="allpropertyes">
-              <a target="_blank" routerLink="property-services/{{ property.prpsrcurl }}"><img src={{property.image}}
-                  alt={{property.name}} class="img_slider_serviceprovider" />
-                <p class="title-img-property">{{property.name}}</p>
+  <!-- builder -->
+    <section class="builders">
+    <div class="container">
+      <h2 class="titles-heading-pg">Top Builders</h2>
+      <div class="builders-swiper">
+        <ngx-slick-carousel class="carousel" #slickModal="slick-carousel" [config]="slideConfig5">
+          <div ngxSlickItem class="slide" *ngFor="let topbuilders of topbuilders">
+            <!-- <img src="{{ slide.img }}" alt="" width="100%" /> -->
+            <div class="builder-main-slid">
+              <a target="_blank" routerLink="builder-detail/{{ topbuilders.builderUrl }}" class="builder-front">
+                <div class="builder-logos">
+                  <img src="{{ topbuilders.builder_logo }}" alt="builder_logo" class="img-fluid" />
+                </div>
+                <div class="builder-details">
+                  <h4 class="builder-head">{{ topbuilders.name }}</h4>
+                  <p class="build-sells">
+                    Ongoing
+                    <span class="items-building">{{
+                      topbuilders.total_projects -
+                      topbuilders.completed_projects
+                      }}</span>
+                  </p>
+                  <p class="build-sells">
+                    Past
+                    <span class="items-building">{{
+                      topbuilders.completed_projects
+                      }}</span>
+                  </p>
+                </div>
               </a>
             </div>
           </div>
-
         </ngx-slick-carousel>
-      </div>
-      <div class="property-services mt-5 mt-md-2">
-        <a target="_blank" routerLink="/property-services">All Property Services</a>
       </div>
     </div>
   </section>
 
   <section class="builders">
     <div class="container">
-      <h2 class="titles-heading">Featured Farm Houses Projects</h2>
+      <h2 class="titles-heading farm-house-heading">Featured Farm Houses Projects</h2>
       <div class="feature-main-slide-item">
         <ngx-slick-carousel class="carousel" #slickModal="slick-carousel" [config]="slideConfig3">
           <div ngxSlickItem class="slide" *ngFor="let featurefarmhouse of featurefarmhouse">
@@ -2661,7 +2664,7 @@
     </div>
   </section>
 
-  <section class="highlight-group" *ngIf="bannerbuilder">
+  <section class="highlight-group" *ngIf="bannerbuilder.length > 0">
     <div class="container">
       <div class="row">
         <!-- <div class="col-lg-3 col-md-12 col-sm-12 pe-0 pe-lg-0 pe-md-3">
@@ -2683,7 +2686,7 @@
         </div> -->
         <div class="col-lg-12 col-md-12 col-sm-12 ps-0 ps-lg-0 ps-md-3">
           <a target="_blank" *ngIf="bannerbuilder[2]"
-            routerLink="project-details/{{ bannerbuilder[2].projectfirstUrlPart }}/{{ bannerbuilder[2].projectsecondUrlPart }}">
+            routerLink="/{{ bannerbuilder[2].projectfirstUrlPart }}">
             <img src="{{ bannerbuilder[2].project_banner_img }}" alt="project_banner_img"
               class="img-fluid group-main-img" />
           </a>
@@ -2813,38 +2816,27 @@
     </div>
   </section> -->
 
-  <section class="builders">
-    <div class="container">
-      <h2 class="titles-heading-pg">Top Builders</h2>
-      <div class="builders-swiper">
-        <ngx-slick-carousel class="carousel" #slickModal="slick-carousel" [config]="slideConfig5">
-          <div ngxSlickItem class="slide" *ngFor="let topbuilders of topbuilders">
-            <!-- <img src="{{ slide.img }}" alt="" width="100%" /> -->
-            <div class="builder-main-slid">
-              <a target="_blank" routerLink="builder-detail/{{ topbuilders.builderUrl }}" class="builder-front">
-                <div class="builder-logos">
-                  <img src="{{ topbuilders.builder_logo }}" alt="builder_logo" class="img-fluid" />
-                </div>
-                <div class="builder-details">
-                  <h4 class="builder-head">{{ topbuilders.name }}</h4>
-                  <p class="build-sells">
-                    Ongoing
-                    <span class="items-building">{{
-                      topbuilders.total_projects -
-                      topbuilders.completed_projects
-                      }}</span>
-                  </p>
-                  <p class="build-sells">
-                    Past
-                    <span class="items-building">{{
-                      topbuilders.completed_projects
-                      }}</span>
-                  </p>
-                </div>
+
+  <section class="service-provider container">
+    <div class="related-property">
+      <h4 class="titles-heading text-center">
+        Property Related Services
+      </h4>
+      <div class="propertyes mt-5">
+        <ngx-slick-carousel class="carousel" #slickModal="slick-carousel" [config]="slideConfig4">
+          <div ngxSlickItem class="slide" *ngFor="let property of propertyServices">
+            <div class="allpropertyes">
+              <a target="_blank" routerLink="property-services/{{ property.prpsrcurl }}"><img src={{property.image}}
+                  alt={{property.name}} class="img_slider_serviceprovider" />
+                <p class="title-img-property">{{property.name}}</p>
               </a>
             </div>
           </div>
+
         </ngx-slick-carousel>
+      </div>
+      <div class="property-services mt-5 mt-md-2">
+        <a target="_blank" routerLink="/property-services">All Property Services</a>
       </div>
     </div>
   </section>

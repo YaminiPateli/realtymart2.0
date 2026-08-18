@@ -216,7 +216,8 @@
   }
 
   .loan-title {
-    margin: 20px 0 20px;
+    margin: 20px auto 20px;
+    text-align: center;
   }
 
   /* Search wrapper stays horizontal at ALL widths including 1400px */
@@ -423,12 +424,12 @@
   }
 
   .explore-front {
-    grid-template-columns: repeat(1, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 0;
   }
 
   .explore-inner {
-    top: 93%;
+    top: 83%;
   }
 
   /* Explore Builders page responsive End  */
@@ -579,7 +580,29 @@
   }
 
   .header_wrapper .navbar {
-    overflow: scroll;
+    height: auto !important;
+    min-height: 40px;
+    overflow: visible !important;
+  }
+
+  .header_wrapper .navbar-collapse {
+    background-color: var(--red-E63525, #e63525);
+    padding: 12px 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1050;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+
+  .header_wrapper .navbar-collapse.show {
+    display: block !important;
+  }
+
+  .header_wrapper .navbar-nav .nav-link {
+    color: #ffffff !important;
+    padding: 8px 12px !important;
+    font-size: 16px;
   }
 
   /* .free-post {margin-bottom: 350px;} */
@@ -656,9 +679,6 @@
   /* header menu and searchbar  */
 
   /* Property Related Services page Responsive Start  */
-  .property-service {
-    margin-top: 125px;
-  }
 
   .service-box {
     grid-template-columns: repeat(2, 1fr);
@@ -2224,15 +2244,21 @@
 
 @media (max-width: 1200px) {
 
+  .owner-cc a{
+    font-size: 12px;
+  }
+
   .search_wrapper {
     display: grid !important;
     height: auto !important;
     grid-template-columns: 1fr !important;
     width: 57% !important;
     border-radius: 0 0 15px 15px !important;
-    overflow: hidden;
+    overflow: visible !important;
     padding: 0 15px 12px !important;
     box-sizing: border-box;
+    position: relative !important;
+    z-index: 50 !important;
   }
 
   .banner_bg {
@@ -2261,6 +2287,8 @@
     border-radius: 8px;
     display: flex;
     align-items: center;
+    position: relative !important;
+    z-index: 101 !important;
   }
 
   /* Budget */
@@ -2270,6 +2298,38 @@
     padding: 25px 15px !important;
     border: 1px solid gray !important;
     border-radius: 7px;
+    position: relative !important;
+    z-index: 100 !important;
+  }
+
+  .property_inner {
+    margin-top: 0 !important;
+    top: calc(100% + 4px) !important;
+    left: 0 !important;
+    z-index: 999999 !important;
+    overflow: visible !important;
+  }
+
+  .budget_dorp .property_inner {
+    left: auto !important;
+    right: 0 !important;
+  }
+
+  .serch-propert-price {
+    position: absolute !important;
+    top: 0 !important;
+    width: 320px !important;
+    max-width: calc(100vw - 40px) !important;
+    z-index: 999999 !important;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.25) !important;
+    border-radius: 12px !important;
+    border: 1px solid #d1d5db !important;
+    background: #ffffff !important;
+  }
+
+  .budget_dorp .serch-propert-price {
+    left: auto !important;
+    right: 0 !important;
   }
 
   .nav {

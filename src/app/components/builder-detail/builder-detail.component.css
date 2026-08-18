@@ -1,6 +1,6 @@
 .all_view a {
   color: #e53726;
-  font-size: 20px;
+  font-size: 15px;
   font-style: normal;
   font-weight: 700;
   line-height: normal;
@@ -9,6 +9,7 @@
   padding: 10px 20px;
   display: flex;
   align-items: center;
+  text-transform: uppercase;
   gap: 12px;
 }
 
@@ -226,4 +227,8 @@
   .top_flore {
     top: 106px;
   }
+}
+
+.office_address{
+  font-size: 15px;
 }

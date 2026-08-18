@@ -181,7 +181,12 @@ originalPropertytype: any[] = [];
     }
     this.type = this.route.snapshot.paramMap.get('type');
     this.city = this.route.snapshot.paramMap.get('city');
-    this.fetchPropertyTypeBuysIn();
+
+    this.route.queryParams.subscribe(() => {
+      this.currentPage = 1;
+      this.propertytype = [];
+      this.fetchPropertyTypeBuysIn();
+    });
   }
 
   checkLoggedIn() {
@@ -232,10 +237,72 @@ originalPropertytype: any[] = [];
     const link = `https://wa.me/?text=${encodeURIComponent(this.dynamicUrl)}`;
     window.open(link, '_blank');
   }
+  parsePriceValue(val: any): number {
+    if (val === null || val === undefined || val === '') return 0;
+    if (typeof val === 'number') return val;
+    const str = String(val).toLowerCase().replace(/,/g, '').trim();
+    if (str.includes('cr')) {
+      const num = parseFloat(str.replace(/[^0-9.]/g, ''));
+      return isNaN(num) ? 0 : num * 10000000;
+    }
+    if (str.includes('lac') || str.includes('lakh')) {
+      const num = parseFloat(str.replace(/[^0-9.]/g, ''));
+      return isNaN(num) ? 0 : num * 100000;
+    }
+    if (str.includes('k')) {
+      const num = parseFloat(str.replace(/[^0-9.]/g, ''));
+      return isNaN(num) ? 0 : num * 1000;
+    }
+    const num = parseFloat(str.replace(/[^0-9.]/g, ''));
+    return isNaN(num) ? 0 : num;
+  }
+
+  filterByBudgetAndType(items: any[]): any[] {
+    const qp = this.route.snapshot.queryParams;
+    if (!qp) return items;
+
+    let result = items;
+    const minValStr = qp['minPrice'] || qp['min_price'];
+    const maxValStr = qp['maxPrice'] || qp['max_price'];
+    const minVal = minValStr ? this.parsePriceValue(minValStr) : 0;
+    const maxVal = maxValStr ? this.parsePriceValue(maxValStr) : 0;
+
+    if (minVal > 0 || maxVal > 0) {
+      result = result.filter(item => {
+        const price = this.parsePriceValue(item.rent_amount || item.total_price || item.price || item.minprice);
+        if (price <= 0) return true;
+        if (minVal > 0 && price < minVal) return false;
+        if (maxVal > 0 && price > maxVal) return false;
+        return true;
+      });
+    }
+
+    const locKeyword = (qp['locality'] || qp['search_keyword'] || '').toLowerCase().trim();
+    if (locKeyword) {
+      result = result.filter(item => {
+        const itemLocality = (
+          item.property_locality ||
+          item.project_locality_name ||
+          item.prjlocalities ||
+          item.project_localities ||
+          item.locality ||
+          item.location ||
+          item.area ||
+          item.address ||
+          item.project_location ||
+          ''
+        ).toLowerCase();
+        return itemLocality.includes(locKeyword) || locKeyword.includes(itemLocality);
+      });
+    }
+
+    return result;
+  }
+
   fetchPropertyTypeBuysIn() {
     const type = this.route.snapshot.paramMap.get('type');
     const city = this.route.snapshot.paramMap.get('city');
-    if (this.isLoading || this.currentPage > this.lastPage) return;
+    if (this.isLoading || (this.lastPage && this.currentPage > this.lastPage)) return;
 
     this.isLoading = true;
     this.loading = true;
@@ -245,30 +312,50 @@ originalPropertytype: any[] = [];
     const lastItemOffset = lastItem ? lastItem.getBoundingClientRect().top : 0;
 
     if (type && city) {
+      const qp = this.route.snapshot.queryParams;
+      let url = `${environment.apiUrl}propertytypesrentin/${type}/${city}?page=${this.currentPage}`;
+      if (qp) {
+        const params = new URLSearchParams();
+        if (qp['minPrice'] || qp['min_price']) {
+          const minP = qp['minPrice'] || qp['min_price'];
+          params.append('minPrice', minP);
+          params.append('min_price', minP);
+        }
+        if (qp['maxPrice'] || qp['max_price']) {
+          const maxP = qp['maxPrice'] || qp['max_price'];
+          params.append('maxPrice', maxP);
+          params.append('max_price', maxP);
+        }
+        const pstr = params.toString();
+        if (pstr) url += `&${pstr}`;
+      }
+
       this.http
-        .get<any>(
-          `${environment.apiUrl}propertytypesrentin/${type}/${city}?page=${this.currentPage}`
-        )
+        .get<any>(url)
         .subscribe(
           (response) => {
             const oldScrollY = window.scrollY;
 
+            const newData = response.responseData?.propertytypesrentin?.data || response.data?.data || [];
+            const filteredNewData = this.filterByBudgetAndType(newData);
+
             this.propertytype = this.propertytype || [];
             this.propertytype = [
               ...this.propertytype,
-              ...(response.responseData?.propertytypesrentin?.data || []),
+              ...filteredNewData,
             ];
             this.originalPropertytype = [
               ...this.propertytype,
-              ...(response.responseData?.propertytypesrentin?.data || []),
             ];
 
-            this.setMetaTags(response.meta.title, response.meta.description);
+            if (response.meta) {
+              this.setMetaTags(response.meta.title, response.meta.description);
+            }
 
             this.lastPage =
-              response.responseData?.propertytypesrentin?.last_page;
+              response.responseData?.propertytypesrentin?.last_page || response.data?.last_page || 1;
             this.propertytypecount =
-              response.responseData?.propertytypesrentin?.total;
+              response.responseData?.propertytypesrentin?.total || response.data?.total || this.propertytype.length;
 
             this.currentPage++;
             this.isLoading = false;

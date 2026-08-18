@@ -188,6 +188,7 @@ export class HomeComponent implements AfterViewInit, OnInit {
   cityLocalities: any[] = [];
   minBudget: string = '';
   maxBudget: string = '';
+  activeBudgetTab: string = 'min';
 
   showCitySelectorDropdown: boolean = false;
 
@@ -605,6 +606,18 @@ export class HomeComponent implements AfterViewInit, OnInit {
     this.visible = !this.visible;
   }
 
+  @HostListener('window:scroll', ['$event'])
+  onWindowScroll(event: Event): void {
+    const target = event?.target as HTMLElement;
+    if (target && target.closest && (target.closest('.property_inner') || target.closest('.mb-search__dropdown') || target.closest('.serch-propert'))) {
+      return;
+    }
+    this.visible = false;
+    this.togglebudget = false;
+    this.showLocationDropdown = false;
+    this.showCitySelectorDropdown = false;
+  }
+
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     const clickedElement = event.target as HTMLElement;
@@ -645,6 +658,13 @@ export class HomeComponent implements AfterViewInit, OnInit {
   }
   toggleBudget() {
     this.togglebudget = !this.togglebudget;
+    if (this.togglebudget) {
+      if (this.minBudget && String(this.minBudget).trim() !== '' && String(this.minBudget).trim() !== 'Min') {
+        this.activeBudgetTab = 'max';
+      } else {
+        this.activeBudgetTab = 'min';
+      }
+    }
   }
   Gender() {
     this.gender = !this.gender;
@@ -992,19 +1012,15 @@ export class HomeComponent implements AfterViewInit, OnInit {
           const apiSuggestions: Array<{ name: string; category: string; slug?: string; rawData?: any }> = [];
 
           res.responseData.forEach((item: any) => {
-            let category = 'Area';
             const itemType = (item.type || '').toLowerCase();
-            if (itemType === 'builder') category = 'Builder';
-            else if (itemType === 'project') category = 'Project';
-            else if (itemType === 'area') category = 'Area';
-            else if (itemType === 'city') category = 'CITY';
-
-            apiSuggestions.push({
-              name: item.name,
-              category: category,
-              slug: item.slug || '',
-              rawData: item
-            });
+            if (itemType === 'area' || itemType === 'locality' || (!itemType && itemType !== 'builder' && itemType !== 'project' && itemType !== 'city')) {
+              apiSuggestions.push({
+                name: item.name,
+                category: 'Area',
+                slug: item.slug || '',
+                rawData: item
+              });
+            }
           });
 
           this.locationSuggestions = apiSuggestions;
@@ -1186,6 +1202,52 @@ export class HomeComponent implements AfterViewInit, OnInit {
     this.saveChipsToLocalStorage();
   }
 
+  parsePriceValue(val: any): number {
+    if (val === null || val === undefined || val === '') return 0;
+    if (typeof val === 'number') return val;
+    const str = String(val).toLowerCase().replace(/,/g, '').trim();
+    if (!str) return 0;
+    if (str.includes('cr')) {
+      const num = parseFloat(str.replace(/[^0-9.]/g, ''));
+      return isNaN(num) ? 0 : num * 10000000;
+    }
+    if (str.includes('lac') || str.includes('lakh')) {
+      const num = parseFloat(str.replace(/[^0-9.]/g, ''));
+      return isNaN(num) ? 0 : num * 100000;
+    }
+    if (str.includes('k')) {
+      const num = parseFloat(str.replace(/[^0-9.]/g, ''));
+      return isNaN(num) ? 0 : num * 1000;
+    }
+    const num = parseFloat(str.replace(/[^0-9.]/g, ''));
+    return isNaN(num) ? 0 : num;
+  }
+
+  isPriceInBudget(item: any, minVal: number, maxVal: number): boolean {
+    if (!item) return true;
+    const itemMin = this.parsePriceValue(item.project_minimum_price || item.minprice || item.rent_amount || item.total_price || item.price);
+    const itemMax = this.parsePriceValue(item.project_maximum_price || item.maxprice || item.total_price || item.rent_amount || item.price);
+
+    let flatPrices: number[] = [];
+    if (Array.isArray(item.properties)) {
+      flatPrices = item.properties.map((p: any) => this.parsePriceValue(p.price || p.total_price || p.rent_amount)).filter((p: number) => p > 0);
+    }
+
+    if (itemMin <= 0 && itemMax <= 0 && flatPrices.length === 0) return true;
+
+    const priceMin = itemMin > 0 ? itemMin : (flatPrices.length > 0 ? Math.min(...flatPrices) : itemMax);
+    const priceMax = itemMax > 0 ? itemMax : (flatPrices.length > 0 ? Math.max(...flatPrices) : itemMin);
+
+    if (minVal > 0 && maxVal > 0) {
+      return priceMin >= minVal && priceMax <= maxVal;
+    } else if (minVal > 0) {
+      return priceMin >= minVal;
+    } else if (maxVal > 0) {
+      return priceMax <= maxVal && priceMin <= maxVal;
+    }
+    return true;
+  }
+
   onSubmit(redirect: boolean = true) {
     if (!this.selectedCityChip && !this.myForm.get('selectcitysearch')?.value) {
       this.searchError = true;
@@ -1232,12 +1294,41 @@ export class HomeComponent implements AfterViewInit, OnInit {
     const extraKeywords = extraChips.join(' ');
     this.saveChipsToLocalStorage();
 
+    if (this.activeTab === 'rent' && redirect) {
+      const queryParams: any = {};
+      if (this.minBudget) queryParams.minPrice = this.minBudget;
+      if (this.maxBudget) queryParams.maxPrice = this.maxBudget;
+      if (ResidentialItems && ResidentialItems.length > 0) {
+        queryParams.residentialItems = ResidentialItems.join(',');
+      }
+      if (OtherItems && OtherItems.length > 0) {
+        queryParams.otherItems = OtherItems.join(',');
+      }
+      if (CommercialItems && CommercialItems.length > 0) {
+        queryParams.commercialItems = CommercialItems.join(',');
+      }
+      if (apiLocality) queryParams.locality = apiLocality;
+      if (extraKeywords) queryParams.search_keyword = extraKeywords;
+
+      const targetCity = location || 'Ahmedabad';
+      let routePath = 'property-for-rent-in-' + targetCity;
+      if (this.selectedItemsOrder && this.selectedItemsOrder.length === 1 && this.selectedItemsOrder[0].name) {
+        const slug = this.selectedItemsOrder[0].name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        if (slug) {
+          routePath = slug + '-for-rent-in-' + targetCity;
+        }
+      }
+
+      this.router.navigate([routePath], { queryParams });
+      return;
+    }
+
     let searchData: any = {
       location: location,
       city: location,
-      locality: apiLocality,
-      area: apiLocality,
-      search_keyword: extraKeywords,
+      locality: '',
+      area: '',
+      search_keyword: '',
       minPrice: this.minBudget,
       maxPrice: this.maxBudget,
       propertyfor: this.activeTab,
@@ -1264,10 +1355,48 @@ export class HomeComponent implements AfterViewInit, OnInit {
         (response: any) => {
           console.log('API Response:', response);
           if (redirect) {
+            let rawData = response?.responseData || response?.data || response || [];
+            if (extraChips && extraChips.length > 0 && Array.isArray(rawData)) {
+              const lowerKeywords = extraChips.map((k: string) => k.toLowerCase().trim()).filter((k: string) => k.length > 0);
+              if (lowerKeywords.length > 0) {
+                rawData = rawData.filter((item: any) => {
+                  const locName = (
+                    item.project_locality_name ||
+                    item.prjlocalities ||
+                    item.project_localities ||
+                    item.locality ||
+                    item.location ||
+                    item.area ||
+                    item.project_location ||
+                    item.project_address ||
+                    item.address ||
+                    item.name ||
+                    item.title ||
+                    ''
+                  ).toLowerCase();
+                  return lowerKeywords.some((kw: string) => locName.includes(kw) || kw.includes(locName));
+                });
+              }
+            }
+
+            const minVal = this.parsePriceValue(this.minBudget || localStorage.getItem('minBudget'));
+            const maxVal = this.parsePriceValue(this.maxBudget || localStorage.getItem('maxBudget'));
+            if ((minVal > 0 || maxVal > 0) && Array.isArray(rawData)) {
+              rawData = rawData.filter((item: any) => this.isPriceInBudget(item, minVal, maxVal));
+            }
+
+            if (response.responseData) {
+              response.responseData = rawData;
+            } else if (response.data) {
+              response.data = rawData;
+            }
+
             const extraState = {
               ...(response || {}),
               searchKeywords: extraChips,
-              searchedLocality: extraKeywords
+              searchedLocality: extraKeywords,
+              minPrice: this.minBudget,
+              maxPrice: this.maxBudget
             };
             this.router.navigate(['search-property'], { state: extraState });
           }
@@ -1486,6 +1615,11 @@ export class HomeComponent implements AfterViewInit, OnInit {
     const val = String(minval || '').trim();
     this.minBudget = (val === 'Min' || !val) ? '' : val;
     this.saveChipsToLocalStorage();
+    if (this.minBudget) {
+      this.activeBudgetTab = 'max';
+    } else {
+      this.activeBudgetTab = 'min';
+    }
   }
 
   getvaluemax(maxval: any, type?: any) {

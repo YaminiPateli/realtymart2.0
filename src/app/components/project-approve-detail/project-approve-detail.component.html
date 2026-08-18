@@ -95,7 +95,7 @@
             </div>
           </div>
 
-          <button [attr.data-bs-toggle]="is_token ? null : 'modal'"
+          <button *ngIf="singleproject?.project_contact_no" [attr.data-bs-toggle]="is_token ? null : 'modal'"
             [attr.data-bs-target]="is_token ? null : '#get-builder'"
             (click)="is_token ? redirectToWhatsApp() : openOtpModal('whatsapp')"
             class="btn btn-success d-flex align-items-center gap-2 action-btn whatsapp-btn">
@@ -186,7 +186,7 @@
             </div>
           </div>
 
-          <button [attr.data-bs-toggle]="is_token ? null : 'modal'"
+          <button *ngIf="singleproject?.project_contact_no" [attr.data-bs-toggle]="is_token ? null : 'modal'"
             [attr.data-bs-target]="is_token ? null : '#get-builder'"
             (click)="is_token ? redirectToWhatsApp() : openOtpModal('whatsapp')"
             class="btn btn-success d-flex align-items-center gap-2 action-btn whatsapp-btn">
@@ -200,7 +200,7 @@
             *ngIf="isPdf(singleproject?.project_brochure)"
             class="btn btn-dark d-flex align-items-center gap-2 action-btn download-btn">
             <span><img class="download-icon-img" src="../../../assets/images/download.svg" alt="download" srcset=""></span>
-            Download Brochure
+            Brochure
           </button>
         </div>
       </div>
@@ -545,7 +545,7 @@
               [attr.data-bs-target]="is_token ? null : '#get-builder'"
               (click)="is_token ? downloadBrochureDirectly() : openOtpModal('brochure')">
               <img class="download-icon-img" src="../../../assets/images/download.svg" alt="download" srcset="">
-              Download Brochure
+              Brochure
             </button>
 
           </div>
@@ -750,7 +750,7 @@
           }}</a>
       </div>
     </div>
-    <button [attr.data-bs-toggle]="is_token ? null : 'modal'" [attr.data-bs-target]="is_token ? null : '#get-builder'"
+    <button  *ngIf="singleproject?.project_contact_no" [attr.data-bs-toggle]="is_token ? null : 'modal'" [attr.data-bs-target]="is_token ? null : '#get-builder'"
       (click)="is_token ? redirectToWhatsApp() : openOtpModal('whatsapp')"
       class="btn whatsapp-btn flex-grow-1 d-flex align-items-center justify-content-center gap-2">
       <span><img src="../../../assets/images/whatsapp.svg" alt="whatsapp" srcset=""></span>

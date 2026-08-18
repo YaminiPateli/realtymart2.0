@@ -145,7 +145,7 @@ select[id="ownerISD"] {
 }
 
 .userWhatsapp--info {
-  font-size: 21px;
+  font-size: 15px;
   color: #333333;
 }
 
@@ -155,7 +155,7 @@ select[id="ownerISD"] {
   -webkit-appearance: none;
   appearance: none;
   border: 0;
-  background-color: #d8232a;
+  background-color: #e53726;
   border-radius: 10px;
   color: #fff;
   font-weight: 500;
@@ -165,7 +165,6 @@ select[id="ownerISD"] {
   padding: 16px;
   margin-top: 28px;
   text-transform: uppercase;
-  font-size: 22px;
 }
 .fill_pop {
   text-align: center;
@@ -250,8 +249,8 @@ select[id="ownerISD"] {
 
 @media only screen and (max-width: 1440px) {
     .free_advertisement {
-        font-size: 38px;
-        line-height: 40px;
+        font-size: 32px;
+        line-height: 42px;
       }
 
       .free_advertisement span {

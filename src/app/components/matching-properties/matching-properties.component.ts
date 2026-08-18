@@ -112,6 +112,52 @@ export class MatchingPropertiesComponent implements OnInit {
   validcityforselected: any;
   totalPages = 0;
 
+  parsePriceValue(val: any): number {
+    if (val === null || val === undefined || val === '') return 0;
+    if (typeof val === 'number') return val;
+    const str = String(val).toLowerCase().replace(/,/g, '').trim();
+    if (!str) return 0;
+    if (str.includes('cr')) {
+      const num = parseFloat(str.replace(/[^0-9.]/g, ''));
+      return isNaN(num) ? 0 : num * 10000000;
+    }
+    if (str.includes('lac') || str.includes('lakh')) {
+      const num = parseFloat(str.replace(/[^0-9.]/g, ''));
+      return isNaN(num) ? 0 : num * 100000;
+    }
+    if (str.includes('k')) {
+      const num = parseFloat(str.replace(/[^0-9.]/g, ''));
+      return isNaN(num) ? 0 : num * 1000;
+    }
+    const num = parseFloat(str.replace(/[^0-9.]/g, ''));
+    return isNaN(num) ? 0 : num;
+  }
+
+  isPriceInBudget(item: any, minVal: number, maxVal: number): boolean {
+    if (!item) return true;
+    const itemMin = this.parsePriceValue(item.project_minimum_price || item.minprice || item.rent_amount || item.total_price || item.price);
+    const itemMax = this.parsePriceValue(item.project_maximum_price || item.maxprice || item.total_price || item.rent_amount || item.price);
+
+    let flatPrices: number[] = [];
+    if (Array.isArray(item.properties)) {
+      flatPrices = item.properties.map((p: any) => this.parsePriceValue(p.price || p.total_price || p.rent_amount)).filter((p: number) => p > 0);
+    }
+
+    if (itemMin <= 0 && itemMax <= 0 && flatPrices.length === 0) return true;
+
+    const priceMin = itemMin > 0 ? itemMin : (flatPrices.length > 0 ? Math.min(...flatPrices) : itemMax);
+    const priceMax = itemMax > 0 ? itemMax : (flatPrices.length > 0 ? Math.max(...flatPrices) : itemMin);
+
+    if (minVal > 0 && maxVal > 0) {
+      return priceMin >= minVal && priceMax <= maxVal;
+    } else if (minVal > 0) {
+      return priceMin >= minVal;
+    } else if (maxVal > 0) {
+      return priceMax <= maxVal && priceMin <= maxVal;
+    }
+    return true;
+  }
+
   constructor(
     private router: Router,
     private tost: ToastrService,
@@ -147,6 +193,7 @@ export class MatchingPropertiesComponent implements OnInit {
           rawData = rawData.filter((item: any) => {
             const locName = (
               item.project_locality_name ||
+              item.prjlocalities ||
               item.project_localities ||
               item.locality ||
               item.location ||
@@ -161,6 +208,15 @@ export class MatchingPropertiesComponent implements OnInit {
             return lowerKeywords.some(kw => locName.includes(kw) || kw.includes(locName));
           });
         }
+      }
+
+      let minPriceStr = data.minPrice || localStorage.getItem('minBudget') || '';
+      let maxPriceStr = data.maxPrice || localStorage.getItem('maxBudget') || '';
+      const minVal = this.parsePriceValue(minPriceStr);
+      const maxVal = this.parsePriceValue(maxPriceStr);
+
+      if ((minVal > 0 || maxVal > 0) && Array.isArray(rawData)) {
+        rawData = rawData.filter((item: any) => this.isPriceInBudget(item, minVal, maxVal));
       }
 
       this.searchdata = rawData;

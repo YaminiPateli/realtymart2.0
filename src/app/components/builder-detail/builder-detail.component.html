@@ -309,9 +309,9 @@
           <h4 class="info-title mb-1" *ngIf="builderDetail?.office_address !== null">
             Corporate Office Address:
           </h4>
-          <p>{{ builderDetail?.office_address }}</p>
+          <p class="office_address">{{ builderDetail?.office_address }}</p>
 
-          <div class="d-flex align-items-center flex-wrap">
+          <div class="d-flex uppercase align-items-center flex-wrap">
             <a *ngIf="builderDetail?.map_link != null" class="directions" target="_blank"
               [href]="googleMapUrl">Get
               Directions</a>
@@ -322,13 +322,13 @@
               <p class="info-title m-0" *ngIf="builderDetail?.builder_number !== null">
                 Contact Us:
               </p>
-              <a>{{ builderDetail?.builder_number }}</a>
+              <a class="body-text">{{ builderDetail?.builder_number }}</a>
             </div>
             <div>
               <p class="info-title m-0" *ngIf="builderDetail?.builder_email !== null">
                 Email Us:
               </p>
-              <a>{{ builderDetail?.builder_email }}</a>
+              <a class="body-text">{{ builderDetail?.builder_email }}</a>
             </div>
           </div>
 
@@ -336,7 +336,7 @@
             class="some_info d-flex justify-content-between flex-wrap">
             <div>
               <p class="info-title m-0">Visit Our Website:</p>
-              <a target="_blank" href="{{ builderDetail?.builder_website }}">{{ builderDetail?.builder_website }}</a>
+              <a class="body-text" target="_blank" href="{{ builderDetail?.builder_website }}">{{ builderDetail?.builder_website }}</a>
             </div>
           </div>
 
@@ -345,7 +345,7 @@
               <h4 class="info-title m-0">
                 {{ builderDetail?.total_projects }}
               </h4>
-              <p class="m-0">Total Projects</p>
+              <p class="m-0 body-text-title">Total Projects</p>
             </div>
             <div class="all_view">
               <a routerLink="">View All
@@ -360,7 +360,7 @@
               <h4 class="info-title m-0">
                 {{ builderDetail?.completed_projects }}
               </h4>
-              <p class="m-0">Ready to Move Projects</p>
+              <p class="m-0 body-text-title">Ready to Move Projects</p>
             </div>
             <div class="all_view">
               <a routerLink="">View All
@@ -375,7 +375,7 @@
               <h4 class="info-title m-0" *ngIf="builderDetail?.running_projects">
                 {{ builderDetail?.running_projects }}
               </h4>
-              <p class="m-0">Under Construction</p>
+              <p class="m-0 body-text-title">Under Construction</p>
             </div>
             <div class="all_view">
               <a routerLink="">View All
@@ -389,7 +389,7 @@
             <div>
               <p class="info-title mb-2">Share This:</p>
 
-              <a href="javascript:void(0)" class="directions d-flex align-items-center gap-2" data-bs-toggle="modal"
+              <a href="javascript:void(0)" class="directions d-flex align-items-center uppercase  gap-2" data-bs-toggle="modal"
                 data-bs-target="#shareModal" (click)="setShareUrl()">Share
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                   <g clip-path="url(#clip0_1748_130)">
